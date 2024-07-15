@@ -1,0 +1,439 @@
+{% extends 'wrapper.html' %}
+
+{% block content %}
+
+<div id="main">
+    <header class="mb-3">
+        <a href="#" class="burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </a>
+    </header>
+
+<div class="page-heading">
+    <section class="section">
+        <div class="card">
+            <div class="card-header d-flex ">
+                <h3 class="text m-1" id="container_name">Konteyner raqami: {{ container.name }}</h3> 
+                <i class="bi bi-pencil-square text-warning fs-4 mr-4" role="button" data-bs-toggle="modal"
+                data-bs-target="#border-less"></i>
+            </div>
+            <div class="card-body row">
+
+            <div class="col-md-6">
+
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1 ">Kirgan sanasi: </h6> <h6 class="text m-1 " id="container_come_date"> {{ container.come_date|date:"d/m/Y" }}</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Kirdi: </h6> <h6 class="text m-1">25 metr kub </h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Sotildi: </h6> <h6 class="text m-1"> 8 metr kub</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Qoldi: </h6> <h6 class="text m-1">17 metr kub</h6>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Kirgan sunma: </h6> <h6 class="text m-1">1500 USD</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Sotilgan summa: </h6> <h6 class="text m-1"> 600 USD</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Harajat summa: </h6> <h6 class="text m-1">50 USD</h6>
+                </div>
+            </div>
+
+
+               
+            </div>
+         </div>  
+
+    </section>
+
+
+    <div class="card-content">
+        <div class="card-body">
+            
+          
+            <div class="list-group list-group-horizontal-sm mb-1 text-center" >
+
+
+                {% if request.path|slice:":24" == "/container-products-detail/" %}
+                <a class="list-group-item list-group-item-action active" href="{% url 'main:container-products-detail' container.id %}" role="tab">Mahsulotlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-trade-detail' container.id %}" role="tab">Sotuv</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-expence-detail' %}" role="tab">Chiqimlar</a>
+
+
+                {% elif  request.path|slice:":24" == '/container-trade-detail/' %}
+
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-products-detail' container.id %}" role="tab">Mahsulotlar</a>
+                <a class="list-group-item list-group-item-action active" href="{% url 'main:container-trade-detail'  container.id %}" role="tab">Sotuv</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-expence-detail' container.id %}" role="tab">Chiqimlar</a>
+               
+                {% elif request.path == '/container-expence-detail/container.id'  %}
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-products-detail' container.id %}" role="tab">Mahsulotlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-trade-detail' container.id %}" role="tab">Sotuv</a>
+                <a class="list-group-item list-group-item-action active" href="{% url 'main:container-expence-detail' container.id %}" role="tab">Chiqimlar</a>
+                {% else %}
+                {% endif %}
+
+
+
+            </div>
+
+
+        
+                   <!-- start 1 section -->
+                    <section class="section mt-3">
+                        <div class="card">
+                         
+                
+                            <div class="row" id="table-inverse">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                       
+                                        
+                                        <div class="card-content m-3">
+                                        
+                                            <div class="table-responsive">
+                                      
+                                                <table class="table table-bordered  mb-0 mt-2 text-center" style="max-height: 40vh;">
+                
+                
+                                                    <thead >
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Nomi</th>
+                                                            <th>Qoldiq ( dona ) </th>
+                                                            <th>Qoldiq ( kub )</th>
+                                                            <th>Narx</th>
+                                                            <th>Sotish (dona) </th>
+                                                            <th>Jami narxi</th>
+                                                        
+                                                        </tr>
+                                                        
+                                                    </thead>
+                                                    <tbody class="products_tbody">
+                
+                                                        <tr>
+                                                            <td class="text-bold-500">#</td>
+                                                            <td>Sasna 2x6x4</td>
+                                                            <td class="text-bold-500 total_qty_product">10</td>
+                                                            <td class="text-bold-500">105</td>
+                                                            <td><input type="number" min="0" class="w-100  product-cost" id="product_cost_id-1" style="font-size: 14px; border:none; "></td>
+                                                            <td><input type="number" min="0" max="15"  class=" w-100 product-qty"  id="product_qty_id-1"  style="font-size: 14px; border:none;"></td>
+                                                            <td id="product_total_sum-1" class="total-sum">0</td>
+                                                            
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-bold-500">#</td>
+                                                            <td>Sasna 2x6x4</td>
+                                                            <td class="text-bold-500">10</td>
+                                                            <td class="text-bold-500">105</td>
+                                                            <td><input type="number" min="0"  class=" w-100 product-cost" id="product_cost_id-1" style="font-size: 14px; border:none;"></td>
+                                                            <td><input type="number" min="0"  class=" w-100 product-qty"  id="product_qty_id-1"  style="font-size: 14px; border:none;"></td>
+
+                                                            <td id="product_total_sum-2" class="total-sum">0</td>
+                                                            
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-bold-500">#</td>
+                                                            <td>Sasna 2x6x4</td>
+                                                            <td class="text-bold-500">10</td>
+                                                            <td class="text-bold-500">105</td>
+                                                            <td><input type="number" class=" w-50 product-cost" id="product_cost_id-1" style="font-size: 14px; border:none;"></td>
+                                                            <td><input type="number"    class=" w-50 product-qty"  id="product_qty_id-1"  style="font-size: 14px; border:none;"></td>
+
+                                                            <td id="product_total_sum-2" class="total-sum">0</td>
+                                                            
+                                                        </tr>
+                                                      
+                                                        
+                                                       
+                                                        
+                                                        
+                                                    </tbody>
+                                                </table>
+                                                <div class=""style="text-align:right;" >
+                                                    <a href="#" id="show-modal" class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#xlarge">Sotish</a>
+                                                 
+                                                </div>
+                                            </div>
+                                            
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                
+                
+                
+                        </div>
+                    </section> 
+                    <!-- end 1 section -->
+
+             
+            </div>
+        </div>
+    </div>
+
+
+
+ 
+</div> 
+
+</div>
+
+<!-- modal 1 -->
+<div class="modal fade text-left modal-borderless" id="border-less" tabindex="-1"
+role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Border-Less</h5>
+            <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
+                aria-label="Close">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form action="" id="editContainerName" method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="basicInput">Name</label>
+                    <input type="text" class="form-control" id="basicInput" name="name" value="{{ container.name }}" required>
+                    <label for="basicInputDate1">Date</label>
+                    
+                    <input type="date" class="form-control" id="basicInputDate1"  name="date" value="{{ container.come_date|date:'Y-m-d' }}" required>
+                    <input type="text" value="{{ container.id }}" name="container_id" style="display: none;">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light-primary" data-bs-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Yopish</span>
+                    </button>
+                    <button type="button" id="editContainerBtn" class="btn btn-primary ms-1" data-bs-toggle="modal" data-bs-target="#border-less">
+                        <i class="bx bx-check d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">O'zgartirish</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+</div>
+</div>
+<!-- endmodal 1 -->
+
+<!-- modal 2  -->
+<div class="modal fade text-left w-100" id="xlarge" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel16" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"
+    role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel16">Sotilayotgan mahsulotlar ro'yxati</h4>
+            <button type="button" class="close" data-bs-dismiss="modal"
+                aria-label="Close">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="table-responsive">
+                        <table class="table mb-0 table-lg" >
+                            <thead>
+                                <tr>
+                                    <th>Nomi</th>
+                                    <th>Soni</th>
+                                    <th>Narx</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-products-tbody">
+                                <tr>
+                                    <td class="text-bold-500">Sasna 2x5x6</td>
+                                    <td>10</td>
+                                    <td class="text-bold-500">150000</td>
+
+                                </tr>
+                             
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                    <br> 
+                    <div class="info-text " style="text-align: left;">
+                        <h6 >Jami: <span class="all_total_summa">0</span> so'm</h6>
+                    </div>
+
+                    
+                    
+                </div>
+                <div class="col-md-4">
+
+                    <form action="#">
+
+                    <div class="form-check form-switch m-2">
+                        <input class="form-check-input" type="checkbox" id="switchDebt" >
+                        <label class="form-check-label" for="flexSwitchCheckChecked">Nasiyaga savdo</label>
+                    </div>
+                    <div class="form-group m-2">
+                        <select id="second_select_expense" class="searchable">
+                            <option value="0">Mijoz</option>
+                            <option value="2">Abdullo</option>
+                            <option value="3">Oyatillo</option>
+                            <option value="4">Abdulhamid</option>
+                            
+                        </select>
+                    </div>
+                    
+                   
+
+                </form>
+                <button type="button" class="btn btn-light-secondary mt-5 " data-bs-dismiss="modal">
+                    <i class="bx bx-x d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Orqaga</span>
+                </button>
+
+                <button type="submit" class="btn btn-success ms-1 mt-5"
+                    data-bs-dismiss="modal">
+                    <i class="bx bx-check d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Tasdiqlash</span>
+                </button>
+                
+                
+                </div>
+                
+                
+
+            </div>
+        </div>
+      
+    </div>
+</div>
+</div>
+<!-- endmodal 2  -->
+
+
+<script>
+    let $select_ = $('select.searchable').selectize({normalize:true})
+    let selectize1 = $select_[0].selectize
+
+
+    $(document).ready(function() {
+        $('#switchDebt').on('change', function() {
+            if(this.checked){
+                $('.searchable').prop('required', true)
+                
+            }else{
+                $('.searchable').prop('required', false)
+
+            }
+            console.log('working')
+        });
+    });
+
+    
+    
+
+    $(document).ready(function() {
+    function updateTotalSum() {
+        $('.products_tbody tr').each(function() {
+            let $row = $(this);
+
+           // let total_qty_product = Number($row.find('.total_qty_product').text())
+
+            let cost = Math.abs(parseFloat($row.find('.product-cost').val()) || 0)
+            let quantity = Math.abs(parseFloat($row.find('.product-qty').val()) || 0)
+
+            
+
+
+            let totalSum = cost * quantity;
+            $row.find('.total-sum').text(totalSum.toFixed(2));
+        });
+    }
+
+    $('.product-cost, .product-qty').on('input', updateTotalSum);
+
+    $('#show-modal').on('click', function() {
+        let modalTableBody = $('#modal-products-tbody');
+        modalTableBody.empty(); // Clear previous content
+        
+        let all_total_sum = $('.all_total_summa')
+
+        let numberTotalSum = 0
+
+        $('.products_tbody tr').each(function(index) {
+            let $row = $(this);
+            let nomi = $row.find('td:nth-child(2)').text();
+            let cost = $row.find('.product-cost').val();
+            let quantity = $row.find('.product-qty').val();
+            let totalSum = $row.find('.total-sum').text();
+            
+            numberTotalSum += Number(totalSum)
+
+            if( cost === '' || cost.empty){
+                console.log(typeof cost)
+                modalTableBody.append('');
+            }else{
+
+                let modalRow = '<tr>' +
+                    '<td>' + nomi + '</td>' +
+                    '<td>' + quantity + '</td>' +
+                    '<td>' + totalSum + '</td>' +
+                    '</tr>';
+                modalTableBody.append(modalRow);
+            }
+
+        });
+
+        all_total_sum.text(numberTotalSum)
+
+        $('#xlarge').modal('show');
+    });
+
+
+    // Initial calculation
+    updateTotalSum();
+});
+
+
+$(document).ready(function() {
+    // Handle form submission with AJAX
+    $('#editContainerBtn').click(function(event) {
+        event.preventDefault();
+
+
+        let editContainerForm = $(`#editContainerName`).serialize()
+
+        $.ajax({
+            url: '{% url "main:update-container-info" %}',  
+            type: 'POST',
+            data: editContainerForm,
+            success: function(response) {
+
+                $('#container_name').text(`Konteyner raqami: ${response.data.container_name}`)
+                $('#container_come_date').text(response.data.container_come_date)
+
+            },
+            error: function(xhr, status, error) {
+                console.log('Error updating data: ' + error);
+            }
+        });
+
+
+    })
+})
+
+</script>
+
+
+
+{% endblock content %}

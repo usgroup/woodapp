@@ -1,0 +1,203 @@
+{% extends 'wrapper.html' %}
+
+{% block content %}
+
+<div id="main">
+    <header class="mb-3">
+        <a href="#" class="burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </a>
+    </header>
+    
+<div class="page-heading">
+    <section class="section">
+        <div class="card">
+            <div class="card-header d-flex ">
+                <h3 class="text m-1">Container 010-012</h3> 
+               
+            </div>
+            <div class="card-body row">
+
+            <div class="col-md-6">
+
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1 ">Kirgan sanasi: </h6> <h6 class="text m-1 "> 11-11-2024</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Kirdi: </h6> <h6 class="text m-1">25 metr kub </h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Sotildi: </h6> <h6 class="text m-1"> 8 metr kub</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Qoldi: </h6> <h6 class="text m-1">17 metr kub</h6>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Kirgan sunma: </h6> <h6 class="text m-1">1500 USD</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Sotilgan summa: </h6> <h6 class="text m-1"> 600 USD</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Harajat summa: </h6> <h6 class="text m-1">50 USD</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Tugatilgan sana: </h6> <h6 class="text m-1">12-12-2024</h6>
+                </div>
+            </div>
+
+
+               
+            </div>
+         </div>  
+
+    </section>
+
+
+    <div class="card-content">
+        <div class="card-body">
+            
+            
+
+        
+                   <!-- start 1 section -->
+                    <section class="section mt-3">
+                        <div class="card">
+                         
+                
+                            <div class="row" id="table-inverse">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                       
+                                        
+                                        <div class="card-content m-3">
+                                        
+                                            <div class="table-responsive">
+                                                
+                                              
+                                                <table class="table table-bordered mb-0 " style="max-height: 40vh;">
+                
+                
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Nomi</th>
+                                                            <th>Qoldiq (dona) </th>
+                                                            <th>Qoldiq (kub) </th>
+                                                            <th>Narxi</th>
+                                                 
+                                                        </tr>
+                                                  
+                                                    </thead>
+                                                    <tbody>
+                
+                                                        <tr>
+                                                            <td class="text-bold-500">#</td>
+                                                            <td>Sasna 2x6x4</td>
+                                                            <td class="text-bold-500">10</td>
+                                                            <td class="text-bold-500">50 kub</td>
+                                                            <td class="text-bold-500">50 $</td>
+                                                          
+                                                  
+                                                        </tr>
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                     
+                          
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                
+                
+                        </div>
+                    </section> 
+                    <!-- end 1 section -->
+
+               
+            </div>
+        </div>
+    </div>
+
+
+
+</div> 
+
+</div>
+
+<!-- modals 1 -->
+
+<div class="modal fade text-left modal-borderless" id="border-less" tabindex="-1"
+role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Border-Less</h5>
+            <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
+                aria-label="Close">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="basicInput">Name</label>
+                <input type="text" class="form-control" id="basicInput" placeholder="01101">
+                <label for="basicInputDate1">Date</label>
+                <input type="date" class="form-control" id="basicInputDate1" >
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-light-primary" data-bs-dismiss="modal">
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Yopish</span>
+            </button>
+            <button type="button" class="btn btn-primary ms-1" data-bs-dismiss="modal">
+                <i class="bx bx-check d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">O'zgartirish</span>
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+<!-- end modals 1 -->
+
+<!-- modals 2 -->
+<div class="modal fade text-left" id="default" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel1">Mahsulotni tahrirlash</h5>
+            <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
+                aria-label="Close">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            kub bilan donani ozgartirishni iloji boladimi yo'qmi
+            agar bo'lsa ikkalasini ortasida tafovut bolmaydimi ?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn" data-bs-dismiss="modal">
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Orqaga</span>
+            </button>
+            <button type="button" class="btn btn-primary ms-1" data-bs-dismiss="modal">
+                <i class="bx bx-check d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Saqlash</span>
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- endmodals 2 -->
+
+
+
+{% endblock content %}

@@ -1,0 +1,137 @@
+{% extends 'wrapper.html' %}
+
+{% block content %}
+
+    <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            
+            <div class="page-content mt-3"> 
+                <section class="row">
+                    <div class="card">
+                        <div class="card-content">
+
+                    <div class="row d-flex justify-content-between">
+                        <div class="col-md-3">
+                            <input type="date" class="form-control m-3" id="start_date" >
+                        </div>
+                      
+                        <div class="col-md-3">
+                            <input type="date" class="form-control  m-3" id="end_date" >
+
+                        </div>
+                        <div class="col-md-4">
+
+                            <div class="add-container-btn d-flex justify-content-end m-3" >
+                                <a href="#" class="btn btn-primary"  data-bs-toggle="modal" data-bs-target="#border-less">Mahsulot qo'shish +</a>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                
+
+                    <div class="table-responsive m-3">
+                        <table class="table table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Nomi</th>
+                                    <th>RATE</th>
+                                    <th>SKILL</th>
+                                    <th>TYPE</th>
+                                    <th>LOCATION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-bold-500">Michael Right</td>
+                                    <td>$15/hr</td>
+                                    <td class="text-bold-500">UI/UX</td>
+                                    <td>Remote</td>
+                                    <td>Austin,Taxes</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-bold-500">Michael Right</td>
+                                    <td>$15/hr</td>
+                                    <td class="text-bold-500">UI/UX</td>
+                                    <td>Remote</td>
+                                    <td>Austin,Taxes</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-bold-500">Michael Right</td>
+                                    <td>$15/hr</td>
+                                    <td class="text-bold-500">UI/UX</td>
+                                    <td>Remote</td>
+                                    <td>Austin,Taxes</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-bold-500">Michael Right</td>
+                                    <td>$15/hr</td>
+                                    <td class="text-bold-500">UI/UX</td>
+                                    <td>Remote</td>
+                                    <td>Austin,Taxes</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-bold-500">Michael Right</td>
+                                    <td>$15/hr</td>
+                                    <td class="text-bold-500">UI/UX</td>
+                                    <td>Remote</td>
+                                    <td>Austin,Taxes</td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+            </div>
+        </div>
+    </section>
+
+   
+</div>
+</div>
+
+<!-- modals -->
+<div class="modal fade text-left modal-borderless" id="border-less" tabindex="-1"
+role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Border-Less</h5>
+            <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
+                aria-label="Close">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+           <form action="#">
+                <div class="form-group">
+                    <label for="basicInput" >Mahsulot nomi</label>
+                    <input type="text" class="form-control" id="basicInput" placeholder="Mahsulot nomi">
+                    
+                </div>
+
+                input 3 ta (6x12x5)
+           </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-light-primary" data-bs-dismiss="modal">
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Orqaga</span>
+            </button>
+            <button type="button" class="btn btn-primary ms-1" data-bs-dismiss="modal">
+                <i class="bx bx-check d-block d-sm-none"></i>
+                <a href="#" class="d-none d-sm-block text-white">Saqlash</>
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+<!-- endmodals -->
+
+{% endblock content %}
