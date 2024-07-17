@@ -43,11 +43,7 @@ class ContainerProductsDetailView(View):
         
         container = Container.objects.filter(id=pk,status=True)[0]
         container_products = container.container_products.all()
-        
-        print()
-        print(container.container_products.all())
-        print()
-        
+   
         context = {
             "container":container,
             "product_sizes":product_sizes
@@ -64,7 +60,6 @@ class ContainerProductsDetailView(View):
             print("error select tanlash kere")
         
         
-        
         return  redirect(f'/container-products-detail/{pk}')
     
     
@@ -73,11 +68,12 @@ class ContainerTradeDetailView(View):
     def get(self, request,pk):
         
         container = Container.objects.filter(id=pk,status=True)[0]
-        
-        print(container.name)
+        clients = Client.objects.all()
+     
         
         context = {
             "container":container,
+            "clients":clients
         }
         
         return render(request, 'container-trade-detail.html', context)
@@ -103,7 +99,21 @@ class ContainerExpenceDetailView(View):
     
 class Clientiew(View):
     def get(self, request):
-        return render(request, 'clients.html')
+        clients = Client.objects.all().order_by('-id')
+        context = {
+            "clients":clients
+        }
+        return render(request, 'clients.html',context)
+    
+    def post(self,request):
+        name = request.POST['name']
+        phone = request.POST['phone']
+        
+        Client.objects.create(name=name,phone=phone)
+        
+        
+        return redirect('/clients')
+
     
 class PaymentView(View):
     def get(self, request):

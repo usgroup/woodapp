@@ -1,8 +1,8 @@
 from django.views import View
 from django.http import JsonResponse
-from .models import ProductSize,Container, Product
+from .models import ProductSize,Container, Product, Client, Order, OrderItem
 from datetime import datetime
-from .others_func import metr_to_cube
+from .others_func import metr_to_cube,process_order_data
 
 class AddSizeView(View):
     def post(self, request):
@@ -122,7 +122,7 @@ class EditProductInfoView(View):
         
             
             
-        return JsonResponse({'message': 'Prodcut Info updated successfully',"data":data})
+        return JsonResponse({'message': 'Product Info updated successfully',"data":data})
 
 
        
@@ -136,5 +136,101 @@ class DeleteProduct(View):
             "product_id":product_id
         }
         
-        return JsonResponse({'message': 'Prodcut deleted successfully',"data":data})
+        return JsonResponse({'message': 'Product deleted successfully',"data":data})
+        
+        
+class EditClientView(View):
+    def post(self, request):
+        name = request.POST['editName']
+        phone = request.POST['editPhone']
+        client_id = int(request.POST['client_id'])
+        
+        client = Client.objects.filter(id=client_id)[0]
+        
+        client.name = name
+        client.phone = phone
+        client.save()
+                
+                
+      
+        data = {
+            "client_name":client.name,
+            "client_phone":client.phone,
+            "client_debt_usd":client.debt_usd,
+            "client_debt_uzs":client.debt_uzs,
+            "client_id":client.id
+
+        }
+        print()
+        print(data)
+        print()
+        
+        
+        
+        return JsonResponse({'message': 'Produсt deleted successfully',"data":data})
+    
+class CreateOrderView(View):
+    
+    def post(self, request):
+        currencyType = int(request.POST['currencyType'])
+        usd_currency = int(request.POST['usd_currency'])
+        client_id = int(request.POST['client'])
+        totalSumma = int(request.POST['totalSumma'])
+        
+        
+        if currencyType == 1 and usd_currency <= 0:
+            return JsonResponse(data={'status':400,'error_message': 'Valyuta kursni kiritishni unutdingiz !'})
+        try:
+            debt_check = request.POST['debt_check']
+            if debt_check and client_id == 0:
+                return JsonResponse(data={'status':400,'error_message': 'Nasiya savdoda mijoz kiritish muhim !'})
+           
+            if debt_check and client_id > 0:
+                client = Client.objects.filter(id=client_id)[0]
+                
+                order = Order.objects.create(
+                                customer=client,
+                                currency=currencyType,
+                                sale_exchange_rate=usd_currency,
+                                total_summa=totalSumma,
+                                debt_status=True,
+                            )
+                
+            if currencyType == 1:
+                client.debt_usd = totalSumma
+            else:
+                client.debt_uzs = totalSumma
+                
+            client.save()   
+        except:
+            pass
+        
+        order = Order.objects.create(
+                currency=currencyType,
+                sale_exchange_rate=usd_currency,
+                total_summa=totalSumma,
+                debt_status=False,
+            )
+                
+        order_data = process_order_data(request)
+        
+        for i in order_data:
+            product = Product.objects.filter(id=int(i['product_id']))[0]
+
+            OrderItem.objects.create(
+                order_item=order,
+                product_item=product,
+                product_cost=int(i['product_cost']),
+                amount_sold=int(i['amount_sold']),
+                total_price=int(float(i['total_price'])),
+            )
+            
+            new_qty = product.rest_qty - int(i['amount_sold'])
+            product.rest_cube = metr_to_cube(product.product_size.product_size_x,product.product_size.product_size_y, product.product_size.product_size_z, new_qty)
+            product.rest_qty = new_qty
+            
+            product.save()
+            
+        #message add 
+        return JsonResponse({'status':200,'message': 'Prod successfully'})
         

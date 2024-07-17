@@ -106,7 +106,7 @@
                                                     <thead >
                                                         <tr>
                                                             <th>#</th>
-                                                            <th>Nomi</th>
+                                                            <th>O'lcham</th>
                                                             <th>Qoldiq ( dona ) </th>
                                                             <th>Qoldiq ( kub )</th>
                                                             <th>Narx</th>
@@ -117,39 +117,22 @@
                                                         
                                                     </thead>
                                                     <tbody class="products_tbody">
-                
+                               
+                                                        {% for product in container.container_products.all %}
                                                         <tr>
-                                                            <td class="text-bold-500">#</td>
-                                                            <td>Sasna 2x6x4</td>
-                                                            <td class="text-bold-500 total_qty_product">10</td>
-                                                            <td class="text-bold-500">105</td>
+                                                            
+                                                            <td></td>
+                                                            <td data-id="{{ product.id }}">{{ product.product_size }}</td>
+                                                            <td class="text-bold-500">{{ product.rest_qty }}</td>
+                                                            <td class="text-bold-500">{{ product.rest_cube }}</td>
                                                             <td><input type="number" min="0" class="w-100  product-cost" id="product_cost_id-1" style="font-size: 14px; border:none; "></td>
                                                             <td><input type="number" min="0" max="15"  class=" w-100 product-qty"  id="product_qty_id-1"  style="font-size: 14px; border:none;"></td>
                                                             <td id="product_total_sum-1" class="total-sum">0</td>
-                                                            
+                        
                                                         </tr>
-                                                        <tr>
-                                                            <td class="text-bold-500">#</td>
-                                                            <td>Sasna 2x6x4</td>
-                                                            <td class="text-bold-500">10</td>
-                                                            <td class="text-bold-500">105</td>
-                                                            <td><input type="number" min="0"  class=" w-100 product-cost" id="product_cost_id-1" style="font-size: 14px; border:none;"></td>
-                                                            <td><input type="number" min="0"  class=" w-100 product-qty"  id="product_qty_id-1"  style="font-size: 14px; border:none;"></td>
-
-                                                            <td id="product_total_sum-2" class="total-sum">0</td>
-                                                            
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-bold-500">#</td>
-                                                            <td>Sasna 2x6x4</td>
-                                                            <td class="text-bold-500">10</td>
-                                                            <td class="text-bold-500">105</td>
-                                                            <td><input type="number" class=" w-50 product-cost" id="product_cost_id-1" style="font-size: 14px; border:none;"></td>
-                                                            <td><input type="number"    class=" w-50 product-qty"  id="product_qty_id-1"  style="font-size: 14px; border:none;"></td>
-
-                                                            <td id="product_total_sum-2" class="total-sum">0</td>
-                                                            
-                                                        </tr>
+                                                        {% endfor %}
+                
+                                                        
                                                       
                                                         
                                                        
@@ -250,14 +233,15 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
                         <table class="table mb-0 table-lg" >
                             <thead>
                                 <tr>
-                                    <th>Nomi</th>
-                                    <th>Soni</th>
+                                    <th>O'lcham</th>
                                     <th>Narx</th>
+                                    <th>Soni</th>
+                                    <th>Jami</th>
                                 </tr>
                             </thead>
                             <tbody id="modal-products-tbody">
                                 <tr>
-                                    <td class="text-bold-500">Sasna 2x5x6</td>
+                                    <td class="text-bold-500" >Sasna 2x5x6</td>
                                     <td>10</td>
                                     <td class="text-bold-500">150000</td>
 
@@ -269,7 +253,7 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
                     </div>
                     <br> 
                     <div class="info-text " style="text-align: left;">
-                        <h6 >Jami: <span class="all_total_summa">0</span> so'm</h6>
+                        <h6 >Jami: <span class="all_total_summa" >0</span> so'm</h6>
                     </div>
 
                     
@@ -277,35 +261,52 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
                 </div>
                 <div class="col-md-4">
 
-                    <form action="#">
-
-                    <div class="form-check form-switch m-2">
-                        <input class="form-check-input" type="checkbox" id="switchDebt" >
-                        <label class="form-check-label" for="flexSwitchCheckChecked">Nasiyaga savdo</label>
+                <form action="#" method="post" id="orderForm"> {%csrf_token %}
+                    <div class="row">
+                        <div class="col-md-12 m-2">
+                            <select class="form-select" id="saleCurrency" name="currencyType">
+                                <option value="2" selected>UZS</option>
+                                <option value="1">USD</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 m-2" id="showCurrency" style="display: none;">
+                            <label class="form-label" >Kursni kiriting</label>
+                            <input class="form-control" type="number" value="0" width="100%" name="usd_currency" id="rate_Currency" placeholder="$" name="exchange_rate">
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-check form-switch m-2">
+                                <input class="form-check-input" type="checkbox" id="switchDebt" name="debt_check">
+                                <label class="form-check-label" for="flexSwitchCheckChecked">Nasiyaga savdo</label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group m-2">
-                        <select id="second_select_expense" class="searchable">
-                            <option value="0">Mijoz</option>
-                            <option value="2">Abdullo</option>
-                            <option value="3">Oyatillo</option>
-                            <option value="4">Abdulhamid</option>
+                    <span id="error-message" class="text-danger m-2" style="display: none;">Iltimos mijozni tanlang !</span>
+                    <div class="col-md-12 m-2">
+                        <select id="select_clients" class="searchable" name="client">
+                            <option value="0" selected>Mijoz kiriting</option>
+                            {% for client in clients %}
+                            <option value="{{ client.id }}">{{ client.name }}</option>
+                            {% endfor %}
                             
                         </select>
                     </div>
+                    <input type="text" id="totalSumma" name="totalSumma" style="display: none;">
+                    <div class="col-md-12 d-flex justify-content-end">
+                        <button type="button" class="btn btn-light-secondary mt-5 mr-3" data-bs-dismiss="modal">
+                            <i class="bx bx-x d-block d-sm-none"></i>
+                            <span class="d-none d-sm-block">Orqaga</span>
+                        </button>
+        
+                        <button type="submit" class="btn btn-success ms-1 mt-5"
+                             id="confirmBtn">
+                            <i class="bx bx-check d-block d-sm-none"></i>
+                            <span class="d-none d-sm-block">Tasdiqlash</span>
+                        </button>
+                    </div>
                     
-                   
 
                 </form>
-                <button type="button" class="btn btn-light-secondary mt-5 " data-bs-dismiss="modal">
-                    <i class="bx bx-x d-block d-sm-none"></i>
-                    <span class="d-none d-sm-block">Orqaga</span>
-                </button>
-
-                <button type="submit" class="btn btn-success ms-1 mt-5"
-                    data-bs-dismiss="modal">
-                    <i class="bx bx-check d-block d-sm-none"></i>
-                    <span class="d-none d-sm-block">Tasdiqlash</span>
-                </button>
+                
                 
                 
                 </div>
@@ -325,23 +326,8 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
     let $select_ = $('select.searchable').selectize({normalize:true})
     let selectize1 = $select_[0].selectize
 
-
-    $(document).ready(function() {
-        $('#switchDebt').on('change', function() {
-            if(this.checked){
-                $('.searchable').prop('required', true)
-                
-            }else{
-                $('.searchable').prop('required', false)
-
-            }
-            console.log('working')
-        });
-    });
-
+    const order_list = {}
     
-    
-
     $(document).ready(function() {
     function updateTotalSum() {
         $('.products_tbody tr').each(function() {
@@ -351,9 +337,6 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
 
             let cost = Math.abs(parseFloat($row.find('.product-cost').val()) || 0)
             let quantity = Math.abs(parseFloat($row.find('.product-qty').val()) || 0)
-
-            
-
 
             let totalSum = cost * quantity;
             $row.find('.total-sum').text(totalSum.toFixed(2));
@@ -370,31 +353,53 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
 
         let numberTotalSum = 0
 
+        
+        //order_list = []
+
         $('.products_tbody tr').each(function(index) {
             let $row = $(this);
-            let nomi = $row.find('td:nth-child(2)').text();
+            let size = $row.find('td:nth-child(2)').text();
             let cost = $row.find('.product-cost').val();
             let quantity = $row.find('.product-qty').val();
             let totalSum = $row.find('.total-sum').text();
             
+            let product_id = $row.find('td:nth-child(2)').attr('data-id');
+
+
             numberTotalSum += Number(totalSum)
 
-            if( cost === '' || cost.empty){
-                console.log(typeof cost)
+            if( cost === '' || cost.empty || totalSum === '0.00' ){
+               
                 modalTableBody.append('');
             }else{
 
                 let modalRow = '<tr>' +
-                    '<td>' + nomi + '</td>' +
+                    '<td>' + size + '</td>' +
+                    '<td>' + cost + '</td>' +
                     '<td>' + quantity + '</td>' +
                     '<td>' + totalSum + '</td>' +
                     '</tr>';
                 modalTableBody.append(modalRow);
+
+    
+                order_list[product_id]  = {
+                                        "product_id": product_id,
+                                        "product_cost": cost,
+                                        "amount_sold":quantity,
+                                        "total_price":totalSum,
+                                    }
+                
+
+
             }
 
         });
 
+        //console.log(order_list)
+
         all_total_sum.text(numberTotalSum)
+
+        $('#totalSumma').val(all_total_sum.text()) //this for another form 
 
         $('#xlarge').modal('show');
     });
@@ -406,8 +411,74 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
 
 
 $(document).ready(function() {
+
+    $('#saleCurrency').change(function(event) {
+        let selectedValue = $(this).val(); 
+        let showCurrency = $('#showCurrency').show()
+
+        if (selectedValue === '1'){
+            showCurrency.show()
+            rate_Currency.attr('required', true)
+        }else{
+            $('#rate_Currency').val('0')
+            showCurrency.hide()
+            
+        }
+
+   
+    })
+})
+
+$(document).ready(function() {
+
+    $('#confirmBtn').click(function(event) {
+        event.preventDefault();
+       
+        orderForm = $('#orderForm').serialize();
+        let msg = $('#error-message')
+
+        let addParam = {"order_list":order_list} 
+        
+        console.log(order_list)
+
+        console.log(orderForm)
+
+        let orderFormData = orderForm + '&' + $.param(addParam);
+
+        $.ajax({
+            url: '{% url "main:create-order" %}',  
+            type: 'POST',
+            data: orderFormData,
+            success: function(response) {
+                
+                if (response.status == 400){
+                    msg.text(response.error_message)
+                    msg.show()
+                }
+                if(response.status == 200 ){
+
+                    window.location.reload()
+                }
+                
+               
+            },
+            error: function(xhr, status, error) {
+
+                console.log('Error updating data: ' + error);
+            }
+        });
+
+    
+
+    })
+})
+
+
+
+$(document).ready(function() {
     // Handle form submission with AJAX
     $('#editContainerBtn').click(function(event) {
+        
         event.preventDefault();
 
 
@@ -431,6 +502,10 @@ $(document).ready(function() {
 
     })
 })
+
+
+
+
 
 </script>
 

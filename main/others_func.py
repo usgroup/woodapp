@@ -1,4 +1,7 @@
 from .models import *
+from django.http import JsonResponse
+from collections import defaultdict
+
 
 
 def metr_to_cube(x,y,z, qty):
@@ -40,4 +43,38 @@ def calc_end_write(request, pk):
     
     return True
 
+
+
+
+
+
+def transform_order_data(data):
+    """
+    Transforms raw POST data into a structured format.
+    """
+    orders = defaultdict(dict)
+    
+    for key, value in data.items():
+        if key.startswith('order_list['):
+            # Extract order_id and field_name from the key
+            parts = key.split('][')
+            order_id = parts[0].replace('order_list[', '')
+            field_name = parts[1].replace(']', '')
+            
+            # Store the value in the appropriate place
+            orders[order_id][field_name] = value
+    
+    # Convert defaultdict to list of dictionaries
+    return list(orders.values())
+
+def process_order_data(request):
+    """
+    Processes the POST data and returns the transformed data as JSON.
+    """
+    if request.method == 'POST':
+        raw_data = request.POST.dict()  # Convert QueryDict to regular dict
+        transformed_data = transform_order_data(raw_data)
+        
+        return transformed_data
+    
 

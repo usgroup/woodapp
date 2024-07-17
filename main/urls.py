@@ -29,5 +29,7 @@ urlpatterns = [
     path('update-container-info/', UpdateContainerInfoView.as_view(), name='update-container-info'),
     path('edit-product-info/', EditProductInfoView.as_view(), name='edit-product-info'),
     path('delete-product/', DeleteProduct.as_view(), name='delete-product'),
+    path('edit-client', EditClientView.as_view(), name='edit-client'),
+    path('create-order', CreateOrderView.as_view(), name='create-order'),
     
 ]

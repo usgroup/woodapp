@@ -45,10 +45,8 @@ class Product(Base): # info product
     rest_qty = models.IntegerField(blank=True, null=True, verbose_name="Qoldiq soni / dona")
     
     
-class SaleProduct(Base): #sotilganlar
-    product_size = models.ForeignKey(ProductSize, on_delete=models.PROTECT, verbose_name="Mahsulot razmeri")
-    selling_price = models.IntegerField(verbose_name="Sotilish narxi")
-    amount_sold = models.IntegerField(verbose_name="Sotilgan miqdori | dona")
+
+    
     
 
 class ExpenseType(Base): # chiqimlar turi
@@ -86,10 +84,38 @@ class Expense(Base): # chiqimlar
 
     
     
-# class Client(Base): # mijozlar
-#     name = models.CharField(max_length=255, verbose_name="Ismi")
-#     phone = models.CharField(max_length=13, verbose_name="telefon raqami")
+class Client(Base): # mijozlar
+    name = models.CharField(max_length=255, verbose_name="Ismi")
+    phone = models.CharField(max_length=13, verbose_name="telefon raqami")
+    debt_usd = models.IntegerField(verbose_name="Qarz USD", default=0)
+    debt_uzs = models.IntegerField(verbose_name="Qarz UZS", default=0)
     
-#     def __str__(self) -> str:
-#         return self.name
+    def __str__(self) -> str:
+        return self.name
+
     
+class Order(Base): #order
+    CURRENCY_TYPE = (
+        (1, "USD"),
+        (2, "UZS")
+    )
+    customer = models.ForeignKey(Client, on_delete=models.PROTECT, blank=True, null=True)
+    currency = models.IntegerField(choices=CURRENCY_TYPE, default=2)
+    sale_exchange_rate = models.IntegerField(verbose_name="Valyuta kursi")
+    total_summa = models.PositiveIntegerField(verbose_name="Total summa")
+    debt_status = models.BooleanField(default=False)
+    
+    def __str__(self) -> str:
+        return f"{self.customer} | {self.total_summa} | {self.debt_status} "
+
+
+
+class OrderItem(Base):
+    order_item = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product_item = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="Mahsulot")
+    product_cost = models.IntegerField(verbose_name="Mahsulot narxi")
+    amount_sold = models.IntegerField(verbose_name="Sotilgan miqdori | dona")
+    total_price = models.PositiveIntegerField(default=0)
+    
+    def __str__(self) -> str:
+        return f"{self.product_item} | {self.product_cost} | {self.amount_sold} "
