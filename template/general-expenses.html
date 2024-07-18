@@ -154,7 +154,7 @@
 <div class="modal fade text-left modal-borderless" id="border-less" tabindex="-1"
 role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
 <div class="modal-dialog modal-dialog-scrollable" role="document">
-    <div class="modal-content">
+    <div class="modal-content" style="height: 500px;">
         <div class="modal-header">
             <h5 class="modal-title">Chiqim turlari</h5>
             <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
@@ -163,43 +163,63 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
             </button>
         </div>
         <div class="modal-body">
-            <div class="row">
-                <div class="col-md-12">
-                      <form action="#">
-                      <div class="form-group d-flex">
-
-                          <input type="text" class="form-control m-2" placeholder="Chiqim turi">
-
-                          <button class="btn btn-success m-2" type="submit">Qo'shish</button>
-                      </div>
-
-
-                      </form>
-                  </div>
-                  
-              <div class="col-md-12 ">
-                  <div class="table-responsive">
-                      <table class="table table-bordered mb-0 ">
-                        <thead>
-                          <tr>
-                            <th>Nomi</th>
+            <form id="sizeForm">
+                {% csrf_token %}
+                <div class="row d-flex" >
+                    <h6 class="text-danger text-center msg-handle"></h6>
+                    <div class="col-md-9">
+                        <div class="form-group d-flex justify-content-end">
+                            <input type="text" class="form-control" name="expense_type_name" placeholder="Chiqim turi" required>
+                           
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <button class="btn badge bg-success p-2 mt-1" type="submit" id="addSizeButton">Qo'shish +</button>
+                    </div>
+                </div>
+            </form>
+            
+            <!-- table -->
+            <div class="table-responsive mt-3" style="overflow-y: scroll; max-height:300px;">
+                <table class="table table-bordered mb-0 table-expense" id="sizesTable" >
+                    <thead>
+                        <tr>
+                            <th>Chiqim turi nomi</th>
                             <th></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr id="row-1">
-                            <td id="name-1" class="m-2">Sasna 2x4x5</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in expense_types %}
+                        <tr>
                             <td class="text-bold-500">
-                              <i class="bi bi-pencil-square text-warning fs-5 cursor-pointer edit-btn" role="button" data-row-id="1"></i>
+                               <div class="sizeInfo-{{ s.id }}">
+                               {{ s.title }}
+                               </div>
+                               <form id='updateSizeForm-{{ s.id }}'>
+                                   {% csrf_token %}
+                                <div class="row editFormSize-{{ s.id }}" style="display: none;">
+
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" value="{{ s.title }}" name="expense_type_title">
+                                    </div>
+                                   
+                                    <input type="text" value="{{ s.id }}" name="expense_type_id" style="display: none;">
+                                </div>
+                                </form>
+
                             </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      </table>
-                  </div>
-              </div>
+                            <td class="text-center m-2">
+                                <a href="#" onclick="editSize('{{ s.id }}')" id="pensil-edit-{{ s.id }}"><i class="bi bi-pencil-square fs-5 text-warning edit-icon"></i></a>
+                                <a href="#" onclick="checkSize('{{ s.id }}')" id="check-edit-{{ s.id }}"style='display:none;' ><i class="bi bi-check-square fs-5 text-success check-icon"></i></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
+        
         <div class="modal-footer">
             <button type="button" class="btn btn-light-primary" data-bs-dismiss="modal">
                 <i class="bx bx-x d-block d-sm-none"></i>
@@ -216,6 +236,33 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
 
 
 <script>
+
+    $(document).ready(function() {
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    
+        let csrftoken = getCookie('csrftoken');
+    
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type)) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+        })
 
    let $select_ = $('select.searchable').selectize()
    let selectize1 = $select_[0].selectize
@@ -239,43 +286,137 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
 
 //expense 
 
-$(document).ready(function() {
-    $('.edit-btn').on('click', function() {
-      const rowId = $(this).data('row-id');
-      editRow(rowId);
-    });
-  });
 
-  function editRow(rowId) {
-    const nameTd = $(`#name-${rowId}`);
-    const nameValue = nameTd.text();
-    const actionTd = nameTd.next('td');
+    $(document).ready(function() {
+        // Handle form submission with AJAX
+        $('#addSizeButton').click(function(event) {
+            event.preventDefault();
+            let formData = $('#sizeForm').serialize();
+    
+            let isEmpty = false;
+    
+           
+            $('#sizeForm input').each(function() {
+                if ($(this).val().trim() === '') {
+                    isEmpty = true;
+                    return false; // Break out of the each loop
+                }
+            });
+            
+            if (isEmpty) {
+                $('.msg-handle').text("Bo'sh bo'lishi mumkin emas !")
+                return;
+            }
+    
+            $.ajax({
+                type: 'POST',
+                url: '{% url "main:add-expense-type" %}', 
+                data: formData,
+                success: function(response) {
+                    
+                    let newRow = `
+                        <tr>
+                            <td class="text-bold-500">
+                               <div class="sizeInfo-${ response.data.id }">
+                               ${ response.data.title }
+                               </div>
+                               <form id='updateSizeForm-${ response.data.id } '>
+                                   
+                                <div class="row editFormSize-${ response.data.id }" style="display: none;">
 
-    nameTd.html(`<input type="text" class="form-control" id="input-name-${rowId}" value="${nameValue}">`);
-    actionTd.html(`<i class="bi bi-check-square text-success fs-5 cursor-pointer save-btn" role="button" data-row-id="${rowId}"></i>`);
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" value="${ response.data.title }" name="expense_type_title" id="expense_type_title-${response.data.id}">
+                                    </div>
+                                   
+                                    <input type="text" value=${ response.data.id } name="expense_type_id" style="display:none;" id="expense_type_id-${response.data.id}">
+                                </div>
+                                </form>
 
-    $('.save-btn').on('click', function() {
-      const rowId = $(this).data('row-id');
-      saveRow(rowId);
-    });
-  }
+                            </td>
+                                <td class="text-center m-2">
+                                    <a href="#" onclick="editSize('${ response.data.id }')" id="pensil-edit-${ response.data.id }"><i class="bi bi-pencil-square fs-5 text-warning edit-icon"></i></a>
+                                    <a href="#" onclick="checkSize('${ response.data.id }')" id="check-edit-${ response.data.id }"style="display:none;" ><i class="bi bi-check-square fs-5 text-success check-icon"></i></a>
+                                </td>
+                        </tr>
+                    `;
+                    
+                    // Append the new row to the table body
+                    $('.table-expense tbody').append(newRow);
+                    $('#sizeForm')[0].reset();
+                    $('.msg-handle').text('')
 
-  function saveRow(rowId) {
-    const nameInput = $(`#input-name-${rowId}`);
-    const nameValue = nameInput.val();
-    const nameTd = $(`#name-${rowId}`);
-    const actionTd = nameTd.next('td');
+                    $(`.editFormSize-${ response.data.id }`).css({"display":"none"}) 
+                    $(`#check-edit-${ response.data.id }`).css({"display":"none"}) 
+                    //response = 0
+                },
+                error: function(error) {
+                    alert('Error adding size');
+                }
+            });
+        });
+    })
+    
+        function editSize(id) {
+            $(`#pensil-edit-${id}`).css({'display':'none'})
+            $(`.sizeInfo-${id}`).css({'display':'none'})
+            $(`.editFormSize-${id}`).css({'display':'flex'})
+            $(`#check-edit-${id}`).css({'display':'flex'})
+            
+            
+        }
 
-    nameTd.text(nameValue);
-    actionTd.html(`<i class="bi bi-pencil-square text-warning fs-5 cursor-pointer edit-btn" role="button" data-row-id="${rowId}"></i>`);
+        function checkSize(id){
+            $(`#check-edit-${id}`).css({'display':'none'})
+            $(`#pensil-edit-${id}`).css({'display':''})
+            $(`.sizeInfo-${id}`).css({'display':'flex'})
+            $(`.editFormSize-${id}`).css({'display':'none'})
 
-    $('.edit-btn').on('click', function() {
-      const rowId = $(this).data('row-id');
-      editRow(rowId);
-    });
-  }
+            let updateFormData = $(`#updateSizeForm-${id}`).serialize()
+      
+            if(updateFormData == ''){
+                let getData = {
+                    "expense_id": $(`#expense_type_id-${id}`).val(),
+                    "expense_type_title": $(`#expense_type_title-${id}`).val()
+                }
+                
+                console.log($(`#expense_type_id-${id}`).val(),  $(`#expense_type_title-${id}`).val())
+    
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url "main:edit-expense-type" %}', 
+                    data: getData,
+                    success: function(response) {
+                        
+                        $(`.sizeInfo-${id}`).text(response.data.title)
+                    
+                    },
+                    error: function(error) {
+                        alert('Error adding size');
+                    }
+                });
+                
+            }else{
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "main:edit-expense-type" %}', 
+                    data: updateFormData,
+                    success: function(response) {
+                        
+                        $(`.sizeInfo-${id}`).text(response.data.title)
+                    
+                    },
+                    error: function(error) {
+                        alert('Error adding size');
+                    }
+                });
+            }
+           
 
 
+           
+
+        }
+    
 
     
 </script>

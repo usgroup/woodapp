@@ -31,5 +31,7 @@ urlpatterns = [
     path('delete-product/', DeleteProduct.as_view(), name='delete-product'),
     path('edit-client', EditClientView.as_view(), name='edit-client'),
     path('create-order', CreateOrderView.as_view(), name='create-order'),
+    path('add-expense-type', AddExpenseTypeView.as_view(), name='add-expense-type'),
+    path('edit-expense-type', EditExpenseTypeView.as_view(), name='edit-expense-type'),
     
 ]

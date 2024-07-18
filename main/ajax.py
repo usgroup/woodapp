@@ -1,6 +1,6 @@
 from django.views import View
 from django.http import JsonResponse
-from .models import ProductSize,Container, Product, Client, Order, OrderItem
+from .models import ProductSize,Container, Product, Client, Order, OrderItem, ExpenseType, Expense
 from datetime import datetime
 from .others_func import metr_to_cube,process_order_data
 
@@ -232,5 +232,62 @@ class CreateOrderView(View):
             product.save()
             
         #message add 
-        return JsonResponse({'status':200,'message': 'Prod successfully'})
+        return JsonResponse({'status':200,'message': 'Product sale successfully'})
+    
+class AddExpenseTypeView(View):
+    def post(self, request):
+        
+        expense_type_name = request.POST['expense_type_name']
+        
+        expense_type = ExpenseType.objects.create(title=expense_type_name)
+        
+        data = {
+            "id": expense_type.id,
+            "title": expense_type.title,
+        }
+        
+        print(request.POST)
+        
+        return JsonResponse({'status':200,'message': 'ExpenseType added successfully', "data":data})
+
+
+class EditExpenseTypeView(View):
+    def get(self, request):
+        
+        expense_type_id = request.GET['expense_id']
+        expense_type_title = request.GET['expense_type_title']
+
+        
+        expense_type = ExpenseType.objects.filter(id=expense_type_id).first()
+        expense_type.title = expense_type_title
+        expense_type.save()
+    
+        
+        
+        data = {
+            "id": expense_type.id,
+            "title": expense_type.title,
+        }
+                
+        return JsonResponse({'status': 200, 'message': 'ExpenseType edited successfully', "data": data})
+    
+    def post(self, request):
+        
+
+        expense_type_title = request.POST.get('expense_type_title', None)
+        expense_type_id = int( request.POST.get('expense_type_id', None))
+
+        
+        expense_type = ExpenseType.objects.filter(id=expense_type_id).first()
+        expense_type.title = expense_type_title
+        expense_type.save()
+    
+        
+        data = {
+            "id": expense_type.id,
+            "title": expense_type.title,
+        }
+                
+        return JsonResponse({'status': 200, 'message': 'ExpenseType edited successfully', "data": data})
+
         

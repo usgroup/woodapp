@@ -122,7 +122,15 @@ class PaymentView(View):
     
 class GeneralExpence(View):
     def get(self, request):
-        return render(request, 'general-expenses.html')
+        
+        expense_types = ExpenseType.objects.all()
+        # workers = Worker.objects.all()
+        
+        context = {
+            "expense_types":expense_types,
+        }
+        
+        return render(request, 'general-expenses.html', context)
     
 
     
