@@ -168,7 +168,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                         </thead>
                         <tbody>
                             {% for s in all_product_size %}
-                            <tr>
+                            <tr id="tr_product_size-{{ s.id }}">
                                 <td class="text-bold-500">
                                    <div class="sizeInfo-{{ s.id }}">
                                     {{ s.product_size_x }} x {{ s.product_size_y }} x {{ s.product_size_z }}
@@ -193,6 +193,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                                 </td>
                                 <td class="text-center m-2">
                                     <a href="#" onclick="editSize('{{ s.id }}')" id="pensil-edit-{{ s.id }}"><i class="bi bi-pencil-square fs-5 text-warning edit-icon"></i></a>
+                                    <a href="#" onclick="deleteSize('{{ s.id }}')" id="trash-delete-{{ s.id }}"><i class="bi bi-trash-fill fs-5 text-danger edit-icon"></i></a>
                                     <a href="#" onclick="checkSize('{{ s.id }}')" id="check-edit-{{ s.id }}"style='display:none;' ><i class="bi bi-check-square fs-5 text-success check-icon"></i></a>
                                 </td>
                             </tr>
@@ -278,7 +279,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                 success: function(response) {
                     
                     let newRow = `
-                        <tr>
+                        <tr id="tr_product_size-${ response.data.id }">
                             <td class="text-bold-500">
                                    <div class="sizeInfo-${ response.data.id }">
                                     ${ response.data.size_x } x ${ response.data.size_y } x ${ response.data.size_z }
@@ -302,6 +303,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                                 </td>
                                 <td class="text-center m-2">
                                     <a href="#" onclick="editSize('${ response.data.id }')" id="pensil-edit-${ response.data.id }"><i class="bi bi-pencil-square fs-5 text-warning edit-icon"></i></a>
+                                    <a href="#" onclick="deleteSize('${ response.data.id }')" id="trash-delete-${ response.data.id }"><i class="bi bi-trash-fill fs-5 text-danger edit-icon"></i></a>
                                     <a href="#" onclick="checkSize('${ response.data.id }')" id="check-edit-${ response.data.id }" ><i class="bi bi-check-square fs-5 text-success check-icon"></i></a>
                                 </td>
                         </tr>
@@ -328,6 +330,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
             $(`.sizeInfo-${id}`).css({'display':'none'})
             $(`.editFormSize-${id}`).css({'display':'flex'})
             $(`#check-edit-${id}`).css({'display':'flex'})
+            $(`#trash-delete-${id}`).hide()
             
             
         }
@@ -337,6 +340,8 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
             $(`#pensil-edit-${id}`).css({'display':''})
             $(`.sizeInfo-${id}`).css({'display':'flex'})
             $(`.editFormSize-${id}`).css({'display':'none'})
+            $(`#trash-delete-${id}`).show()
+
 
             let updateFormData = $(`#updateSizeForm-${id}`).serialize()
       
@@ -354,6 +359,29 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                 },
                 error: function(xhr, status, error) {
                     console.log('Error updating data: ' + error);
+                }
+            });
+
+        }
+
+        function deleteSize(id){
+
+            deleteData = {
+                "id":id
+            }
+
+            $.ajax({
+                type: 'GET',
+                url: '{% url "main:delete-size" %}', 
+                data: deleteData,
+                success: function(response) {
+                    
+                    $(`#tr_product_size-${response.data.id}`).remove()
+                    console.log('working delete')
+                
+                },
+                error: function(error) {
+                    alert('Error adding size');
                 }
             });
 

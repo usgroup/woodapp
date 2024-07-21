@@ -22,30 +22,22 @@
             <div class="col-md-6">
 
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1" >Kirgan sanasi: </h6> <h6 class="text m-1 " id="container_come_date"> {{ container.come_date|date:"d/m/Y" }}</h6>
+                    <h6 class="text text-bold m-1" >Kelgan sanasi: </h6> <h6 class="text m-1 " id="container_come_date"> {{ container.come_date|date:"d/m/Y" }}</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Kirdi: </h6> <h6 class="text m-1">0</h6>
+                    <h6 class="text text-bold m-1">Harajatlar: </h6> <h6 class="text m-1">{{ general_expenses|floatformat:4}} $</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Sotildi: </h6> <h6 class="text m-1">0</h6>
+                    <h6 class="text text-bold m-1">Kutilayotgan tushum: </h6> <h6 class="text m-1"> {{ total_sales_revenue_usd|floatformat:4 }} $</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Qoldi: </h6> <h6 class="text m-1">0 </h6>
+                    <h6 class="text text-bold m-1">Tushgan tushum: </h6> <h6 class="text m-1"> {{ total_paid_sum_usd|floatformat:4 }} $</h6>
                 </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Foyda: </h6> <h6 class="text m-1">{{ profit|floatformat:4 }} $</h6>
+                </div> 
+               
             </div>
-            <div class="col-md-6">
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Kirgan sunma: </h6> <h6 class="text m-1">0 USD</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Sotilgan summa: </h6> <h6 class="text m-1"> 0 USD</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Harajat summa: </h6> <h6 class="text m-1">0 USD</h6>
-                </div>
-            </div>
-
 
                
             </div>

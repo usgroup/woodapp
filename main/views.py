@@ -41,13 +41,34 @@ class ContainerProductsDetailView(View):
     def get(self, request, pk):
         product_sizes = ProductSize.objects.all()
         
+        general_expenses = 0
+        
         container = Container.objects.filter(id=pk,status=True)[0]
         container_products = container.container_products.all()
+        
+        expenses = Expense.objects.filter(containers__id=pk)
+        
+        # #statictic
+        for e in expenses:  #buni qoshish kerak generalga 
+            general_expenses += e.container_sum
+       
+        for c in container_products: # productlarni qo'shilmasi
+            general_expenses += c.total_product_sum
+     
+        profit = container.total_paid_sum_usd - general_expenses
    
         context = {
             "container":container,
-            "product_sizes":product_sizes
+            "product_sizes":product_sizes,
+            "general_expenses":general_expenses,
+            "total_sales_revenue_usd":container.total_sales_revenue_usd,
+            "total_paid_sum_usd":container.total_paid_sum_usd,
+            "profit": profit
+            
         }
+        
+      
+        
         
         return render(request, 'container-products-detail.html', context)
     
@@ -84,10 +105,12 @@ class ContainerExpenceDetailView(View):
         
         container = Container.objects.filter(id=pk,status=True)[0]
         
-        print(container.name)
-        
+        print()
+        print(container.expense_set.all())
+        print()
+   
         context = {
-              "container":container,
+            "container":container,
         }
         
         return render(request, 'container-expence-detail.html',context)
@@ -124,16 +147,42 @@ class GeneralExpence(View):
     def get(self, request):
         
         expense_types = ExpenseType.objects.all()
-        # workers = Worker.objects.all()
+        workers = Worker.objects.all()
+        containers = Container.objects.filter(status=True)
         
         context = {
             "expense_types":expense_types,
+            "workers":workers,
+            "containers":containers
         }
         
         return render(request, 'general-expenses.html', context)
     
-
+class WorkerView(View):
+    def get(self, request):
+        
+        workers = Worker.objects.all()
+        
+        context = {
+            "workers":workers
+        }
+        
+        return render(request, 'workers.html', context)
     
+    def post(self,request):
+        name = request.POST['name']
+        phone = request.POST['phone']
+        birth_date = request.POST['birth_date']
+        
+        
+        worker = Worker.objects.create(
+            name=name,
+            phone=phone,
+            birth_date=birth_date
+            )
+        
+        return redirect('/workers')
+        
     
 
     
@@ -141,12 +190,35 @@ class GeneralExpence(View):
     
 class ArchiveContainers(View):
     def get(self,request):
-        return render(request, 'archive-containers.html')
+        
+        containers = Container.objects.filter(status=True).order_by('-id')
+        
+        context = {
+            "containers":containers
+        }
+        return render(request, 'archive-containers.html', context)
     
     
 class ArchiveContainerDetail(View):
-    def get(self,request):
-        return render(request, 'archive-container-detail.html')
+    def get(self,request, pk):
+        
+        container = Container.objects.filter(id=int(pk)).first()
+        order_items = OrderItem.objects.filter(product_item__product_container__id=int(pk))
+        
+        unique_orders = set()
+        
+        
+        for item in order_items:
+            unique_orders.add(item.order_item)
+        
+        
+        
+        context = {
+            "container":container,
+            "unique_orders":unique_orders
+        }
+        
+        return render(request, 'archive-container-detail.html', context)
     
     
     

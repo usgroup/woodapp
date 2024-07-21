@@ -12,45 +12,11 @@
 <div class="page-heading">
     <section class="section">
         <div class="card">
-            <div class="card-header d-flex ">
-                <h3 class="text m-1">Container 010-012</h3> 
+            <div class="card-header d-block ">
+                <h3 class="text m-1">{{ container.name }} konteyneri sotuv tarixi </h3> 
                
             </div>
-            <div class="card-body row">
 
-            <div class="col-md-6">
-
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1 ">Kirgan sanasi: </h6> <h6 class="text m-1 "> 11-11-2024</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Kirdi: </h6> <h6 class="text m-1">25 metr kub </h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Sotildi: </h6> <h6 class="text m-1"> 8 metr kub</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Qoldi: </h6> <h6 class="text m-1">17 metr kub</h6>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Kirgan sunma: </h6> <h6 class="text m-1">1500 USD</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Sotilgan summa: </h6> <h6 class="text m-1"> 600 USD</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Harajat summa: </h6> <h6 class="text m-1">50 USD</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Tugatilgan sana: </h6> <h6 class="text m-1">12-12-2024</h6>
-                </div>
-            </div>
-
-
-               
-            </div>
          </div>  
 
     </section>
@@ -59,8 +25,6 @@
     <div class="card-content">
         <div class="card-body">
             
-            
-
         
                    <!-- start 1 section -->
                     <section class="section mt-3">
@@ -70,42 +34,64 @@
                             <div class="row" id="table-inverse">
                                 <div class="col-md-12">
                                     <div class="card">
-                                       
                                         
                                         <div class="card-content m-3">
-                                        
-                                            <div class="table-responsive">
+
+                                            <div class="accordion accordion-flush" id="accordionFlushExample">
+
+                                                {% for order in unique_orders %}
+
+                                                <div class="accordion-item mt-3 ">
+                                                    <h2 class="accordion-header" id="flush-heading-{{ order.id }}">
+                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-{{ order.id }}" aria-expanded="false" aria-controls="flush-collapse-{{ order.id }}" style="background-color: #F2F7FF; border-radius:5px;">
+                                                           {{ order.customer.name }} |  Jami: {{ order.total_summa }} {% if order.currency == 1 %} $ {% else %} so'm {% endif %} | To'langan: {{ order.paid_summa }}  {% if order.currency == 1 %} $ {% else %} so'm {% endif %} | {{ order.created_at|date:'d/m/Y' }}
+                                                        </button>
+                                                    </h2>
+                                                    <div id="flush-collapse-{{ order.id }}" class="accordion-collapse collapse" aria-labelledby="flush-heading-{{ order.id }}" data-bs-parent="#accordionFlushExample">
+                                                        <div class="accordion-body">
+                                                            <div class="table-responsive">
                                                 
                                               
-                                                <table class="table table-bordered mb-0 " style="max-height: 40vh;">
-                
-                
-                                                    <thead>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>Nomi</th>
-                                                            <th>Qoldiq (dona) </th>
-                                                            <th>Qoldiq (kub) </th>
-                                                            <th>Narxi</th>
-                                                 
-                                                        </tr>
-                                                  
-                                                    </thead>
-                                                    <tbody>
-                
-                                                        <tr>
-                                                            <td class="text-bold-500">#</td>
-                                                            <td>Sasna 2x6x4</td>
-                                                            <td class="text-bold-500">10</td>
-                                                            <td class="text-bold-500">50 kub</td>
-                                                            <td class="text-bold-500">50 $</td>
-                                                          
-                                                  
-                                                        </tr>
-                                                        
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                                                <table class="table table-bordered mb-0 " style="max-height: 40vh;">
+                                
+                                
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>#</th>
+                                                                            <th>Nomi</th>
+                                                                            <th>Soni</th>
+                                                                            <th>Narxi</th>
+                                                                            <th>Jami</th>
+                                                                 
+                                                                        </tr>
+                                                                  
+                                                                    </thead>
+                                                                    <tbody>
+
+                                                                        {% for item in order.items.all %}
+                                                                        <tr>
+                                                                            <td class="text-bold-500">{{ forloop.counter }}</td>
+                                                                            <td>{{item.product_item.product_size}}</td>
+                                                                            <td class="text-bold-500">{{ item.amount_sold }}</td>
+                                                                            <td class="text-bold-500">{{ item.product_cost }}</td>
+                                                                            <td class="text-bold-500">{{ item.total_price }}</td>
+                                                                          
+                                                                  
+                                                                        </tr>
+                                                                        {% endfor %}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {% endfor %}
+                                                
+
+                                                </div>
+                                        
+                                          
                                      
                           
                                         </div>

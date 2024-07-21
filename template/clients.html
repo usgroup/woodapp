@@ -32,7 +32,6 @@
                                         <th>Telefon</th>
                                         <th>Qarz ( $ )</th>
                                         <th>Qarz ( so'm )</th>
-                                        <th>Balans</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -43,9 +42,7 @@
                                         <td id="td_phone-{{ c.id }}">{{ c.phone }}</td>
                                         <td>{{ c.debt_usd }}</td>
                                         <td>{{ c.debt_uzs }}</td>
-                                        <td>
-                                            <span class="text-danger">-15000</span>
-                                        </td>
+                                        
                                         <td><i class="bi bi-pencil-square text-warning fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
                                             data-bs-target="#default" onclick="getCliendId( '{{ c.id }}' )"></i>
                                         </td>

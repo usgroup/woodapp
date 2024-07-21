@@ -58,8 +58,6 @@
 
     <div class="card-content">
         <div class="card-body">
-
-            {{ request.path|slice:":2" }}
             
             <div class="list-group list-group-horizontal-sm mb-1 text-center" >
 
@@ -85,7 +83,7 @@
 
             </div>
 
-
+            
         
                    <!-- start 1 section -->
                     <section class="section mt-3">
@@ -107,30 +105,40 @@
                                                     <thead >
                                                         <tr>
                                                             <th>#</th>
-                                                            <th>Nomi</th>
-                                                            <th>Qoldiq ( dona ) </th>
-                                                            <th>Qoldiq ( kub )</th>
-                                                            <th>Narx</th>
-                                                            <th>Sotish (dona) </th>
-                                                            <th>Jami narxi</th>
+                                                            <th>Chiqim turi</th>
+                                                            <th>Ishchilar</th>
+                                                            <th>Summa</th>
+                                                            <th>Valyuta</th>
+                                                            <th>Valyuta kursi / so'm</th>
+                                                          
                                                         
                                                         </tr>
                                                        
                                                         </tr> 
                                                     </thead>
                                                     <tbody>
+                                                        {% for expense in container.expense_set.all %}
                 
                                                         <tr>
                                                             <td class="text-bold-500">#</td>
-                                                            <td>Sasna 2x6x4</td>
-                                                            <td class="text-bold-500">10</td>
-                                                            <td class="text-bold-500">105</td>
-                                                            <td><input type="number" class=" w-50" style="font-size: 14px; border:none;"></td>
-                                                            <td><input type="number" class=" w-25" style="font-size: 14px; border:none;"></td>
-                                                            <td>60000</td>
+                                                            {% if expense.expense_type == None %}
+                                                            <td></td>
+                                                            {% else %}
+                                                            <td>{{expense.expense_type}}</td>
+                                                            {% endif %}
+                                                            {% if expense.workers == None %}
+                                                            <td></td>
+                                                            {% else %}
+                                                            <td>{{expense.workers}}</td>
+                                                            {% endif %}
+
+                                                            <td class="text-bold-500">{{ expense.container_sum }}</td>
+                                                            <td class="text-bold-500">$</td>
+                                                            <td class="text-bold-500">{{ expense.exchange_rate }}</td>
+                                                            
                                                             
                                                         </tr>
-                                                        
+                                                        {% endfor %}
                                                         
                                                     </tbody>
                                                 </table>

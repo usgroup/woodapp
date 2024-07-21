@@ -119,7 +119,16 @@
 
             </li>
             <li
-                class="sidebar-item {% if request.path == '/archive-containers' %} active {% else%} {% endif %} ">
+                class="sidebar-item {% if request.path == '/workers' %} active {% else%} {% endif %} ">
+                <a href="{% url 'main:workers' %}" class='sidebar-link'>
+                    <i class="bi bi-person-gear"></i>
+                    <span>Ishchilar</span>
+                </a>
+                
+
+            </li>
+            <li
+                class="sidebar-item {% if request.path == '/trade-history' %} active {% else%} {% endif %} ">
                 <a href="{% url 'main:archive_containers' %}" class='sidebar-link'>
                     <i class="bi bi-archive"></i>
                     <span>Sotuv tarixi</span>

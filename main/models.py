@@ -24,7 +24,35 @@ class Container(Base):
     def __str__(self) -> str:
         return f"{self.name} | {self.come_date}"
     
+    @property
+    def total_sales_revenue_usd(self):
+        sales_revenue = 0
+        for product in self.container_products.all():
+            for item in product.pro_items.all():
+                if item.order_item.currency == 1:  # USD
+                    sales_revenue += item.total_price
+                elif item.order_item.currency == 2:  # UZS
+                    sales_revenue += item.total_price / item.order_item.sale_exchange_rate
+                
+        return sales_revenue
     
+    @property
+    def total_paid_sum_usd(self):
+        paid_sum = 0
+        processed_orders = set()
+        
+        for product in self.container_products.all():
+            for item in product.pro_items.all():
+                order = item.order_item
+                if order.id not in processed_orders:
+                    if order.currency == 1:  # USD
+                        paid_sum += order.paid_summa
+                    elif order.currency == 2:  # UZS
+                        paid_sum += order.paid_summa / order.sale_exchange_rate
+                    processed_orders.add(order.id)
+                    
+        return paid_sum
+      
     
 class ProductSize(Base): 
     product_size_x = models.FloatField(verbose_name="Eni")
@@ -43,6 +71,10 @@ class Product(Base): # info product
     come_cost = models.IntegerField(verbose_name="Kelgan narxi")
     rest_cube = models.FloatField(blank=True, null=True,verbose_name="Qoldiq miqdori / metr kub")
     rest_qty = models.IntegerField(blank=True, null=True, verbose_name="Qoldiq soni / dona")
+    
+    @property
+    def total_product_sum(self):
+        return self.come_cost * self.product_cube    # 1 kubasini kelgan narxini umumiy kubasiga ko'paytirilgani
     
     
 
@@ -75,9 +107,14 @@ class Expense(Base): # chiqimlar
     expense_type = models.ForeignKey(ExpenseType, on_delete=models.PROTECT, blank=True, null=True)
     workers = models.ForeignKey(Worker, on_delete=models.PROTECT, blank=True, null=True)
     currency = models.IntegerField(choices=CURRENCY_TYPE, default=1)
-    expense_summa = models.IntegerField(verbose_name="xarajat summasi")
+    expense_summa = models.FloatField(verbose_name="xarajat summasi")
     exchange_rate = models.IntegerField(verbose_name="Valyuta kursi")
-    expense_distribute = models.ManyToManyField(Container, verbose_name="Containerga chiqim")
+    containers = models.ManyToManyField(Container, verbose_name="Containerga chiqim")
+    
+        
+    @property
+    def container_sum(self): 
+        return self.expense_summa / self.containers.count()
     
     def __str__(self) -> str:
         return f"{self.expense_type} | {self.workers} | {self.expense_summa}"
@@ -103,7 +140,10 @@ class Order(Base): #order
     currency = models.IntegerField(choices=CURRENCY_TYPE, default=2)
     sale_exchange_rate = models.IntegerField(verbose_name="Valyuta kursi")
     total_summa = models.PositiveIntegerField(verbose_name="Total summa")
+    paid_summa = models.PositiveIntegerField(verbose_name="To'langan summa")
     debt_status = models.BooleanField(default=False)
+    
+    
     
     def __str__(self) -> str:
         return f"{self.customer} | {self.total_summa} | {self.debt_status} "
@@ -112,7 +152,7 @@ class Order(Base): #order
 
 class OrderItem(Base):
     order_item = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    product_item = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="Mahsulot")
+    product_item = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="Mahsulot", related_name='pro_items')
     product_cost = models.IntegerField(verbose_name="Mahsulot narxi")
     amount_sold = models.IntegerField(verbose_name="Sotilgan miqdori | dona")
     total_price = models.PositiveIntegerField(default=0)

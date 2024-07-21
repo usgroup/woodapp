@@ -240,12 +240,7 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
                                 </tr>
                             </thead>
                             <tbody id="modal-products-tbody">
-                                <tr>
-                                    <td class="text-bold-500" >Sasna 2x5x6</td>
-                                    <td>10</td>
-                                    <td class="text-bold-500">150000</td>
-
-                                </tr>
+                                <tr></tr>
                              
                                 
                             </tbody>
@@ -264,14 +259,18 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
                 <form action="#" method="post" id="orderForm"> {%csrf_token %}
                     <div class="row">
                         <div class="col-md-12 m-2">
-                            <select class="form-select" id="saleCurrency" name="currencyType">
+                            <select class="form-select" id="" name="currencyType">
                                 <option value="2" selected>UZS</option>
                                 <option value="1">USD</option>
                             </select>
                         </div>
-                        <div class="col-md-12 m-2" id="showCurrency" style="display: none;">
+                        <div class="col-md-12 m-2" id="showCurrency">
                             <label class="form-label" >Kursni kiriting</label>
-                            <input class="form-control" type="number" value="0" width="100%" name="usd_currency" id="rate_Currency" placeholder="$" name="exchange_rate">
+                            <input class="form-control" type="number" value="0" width="100%" name="usd_currency" id="rate_Currency" placeholder="$" >
+                        </div>
+                        <div class="col-md-12 m-2" id="givenSum">
+                            <label class="form-label" >Summa</label>
+                            <input class="form-control" type="number" value="0" width="100%" id="givenSumInput"  name="given_sum">
                         </div>
                         <div class="col-md-12">
                             <div class="form-check form-switch m-2">
@@ -298,7 +297,7 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
                         </button>
         
                         <button type="submit" class="btn btn-success ms-1 mt-5"
-                             id="confirmBtn">
+                             id="confirmBtn" disabled>
                             <i class="bx bx-check d-block d-sm-none"></i>
                             <span class="d-none d-sm-block">Tasdiqlash</span>
                         </button>
@@ -401,6 +400,13 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
 
         $('#totalSumma').val(all_total_sum.text()) //this for another form 
 
+        if (Number(all_total_sum.text()) > 0){
+            $("#confirmBtn").prop('disabled', false)
+        }else{
+            $("#confirmBtn").prop('disabled', true)
+
+        }
+
         $('#xlarge').modal('show');
     });
 
@@ -410,24 +416,7 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
 });
 
 
-$(document).ready(function() {
 
-    $('#saleCurrency').change(function(event) {
-        let selectedValue = $(this).val(); 
-        let showCurrency = $('#showCurrency').show()
-
-        if (selectedValue === '1'){
-            showCurrency.show()
-            rate_Currency.attr('required', true)
-        }else{
-            $('#rate_Currency').val('0')
-            showCurrency.hide()
-            
-        }
-
-   
-    })
-})
 
 $(document).ready(function() {
 

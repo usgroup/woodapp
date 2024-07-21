@@ -13,19 +13,22 @@ urlpatterns = [
     path('general-expense',GeneralExpence.as_view(), name='general-expense'),
     path('clients',Clientiew.as_view(), name='clients'),
     path('payments',PaymentView.as_view(), name='payments'),
+    path('workers',WorkerView.as_view(), name='workers'),
+    path('edit-worker', EditWorkerView.as_view(), name='edit-worker'),
     
     
     path('login',AuthLoginView.as_view(), name='login'),
     path('logout',  CustomLogoutView.as_view(), name='logout'),
     
     
-    path('archive-containers',ArchiveContainers.as_view(), name='archive_containers'),
-    path('archive-container-detail',ArchiveContainerDetail.as_view(), name='archive_container_detail'),
+    path('trade-history',ArchiveContainers.as_view(), name='archive_containers'),
+    path('trade-history-detail/<int:pk>',ArchiveContainerDetail.as_view(), name='archive_container_detail'),
     
     
     #ajax
     path('add-size/', AddSizeView.as_view(), name='add-size'),
     path('update-size/', UpdateSizeView.as_view(), name='update-size'),
+    path('delete-size/', DeleteSizeView.as_view(), name='delete-size'),
     path('update-container-info/', UpdateContainerInfoView.as_view(), name='update-container-info'),
     path('edit-product-info/', EditProductInfoView.as_view(), name='edit-product-info'),
     path('delete-product/', DeleteProduct.as_view(), name='delete-product'),
@@ -33,5 +36,10 @@ urlpatterns = [
     path('create-order', CreateOrderView.as_view(), name='create-order'),
     path('add-expense-type', AddExpenseTypeView.as_view(), name='add-expense-type'),
     path('edit-expense-type', EditExpenseTypeView.as_view(), name='edit-expense-type'),
+    path('delete-expense-type', DeleteExpenseTypeView.as_view(), name='delete-expense-type'),
+    
+    path('create-main-expense', CreateMainExpenseView.as_view(), name='create-main-expense'),
+    path('delete-worker', DeleteWorkerView.as_view(), name='delete-worker'),
+    
     
 ]

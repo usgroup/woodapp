@@ -21,10 +21,10 @@
 
 <div class="page-content"> 
     <section class="row ">
-        
+        {% for c in containers %}
         <div class="col-md-4 mt-2 ">
             <div class="card " >
-                <a href="{% url 'main:archive_container_detail' %}">
+                <a href="{% url 'main:archive_container_detail' c.id %}">
 
                 <div class="card-content " style="
                 background-image: url(static/assets/static/images/extra-images/container-bg.png); 
@@ -34,16 +34,16 @@
                 background-size: cover;">
                     <!-- <img class="img-fluid" src="../static/assets/static/images/extra-images/container-bg.png" alt="Card image cap"> -->
                     <div class="col-md-8 col-lg-12 col-xl-12 p-4">
-                        <h4 class="text-white font-bold">N:0001</h4>
-                        <h6 class="text-white font-semibold float-right" >03/07/2024</h6>
+                        <h4 class="text-white font-bold">{{ c.name }}</h4>
+                        <h6 class="text-white font-semibold float-right" >{{ c.come_date|date:"d/m/Y" }}</h6>
+
                     </div>
-                    <div class="justify-content-end ">
-                        <h5 class="text text-white text-end p-4 fs-4">Arxiv</>
-                    </div>
+                    
                 </div>
             </a>
             </div>
         </div>
+        {% endfor %}
         
        
           

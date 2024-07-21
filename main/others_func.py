@@ -44,10 +44,6 @@ def calc_end_write(request, pk):
     return True
 
 
-
-
-
-
 def transform_order_data(data):
     """
     Transforms raw POST data into a structured format.
@@ -77,4 +73,15 @@ def process_order_data(request):
         
         return transformed_data
     
+    
+def divide(currency, exchange_rate , ex_sum ):
+    
+    if currency == 1:
+        return ex_sum
+    if currency == 2:
+        division_sum = (ex_sum / exchange_rate)
+        
+    
+    
+    return division_sum
 

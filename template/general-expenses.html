@@ -12,224 +12,192 @@
                 </a>
             </header>
 
+            
+            
+
 
             <div class="page-heading">
-
-                <section class="section"> 
-
+                <section class="section">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="text">Chiqimlar</h3> 
+                            <h3 class="text">Chiqimlar</h3>
                             <div class="add-clients-btn d-flex justify-content-end" style="margin-top: -45px;">
-                                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#border-less" >Chiqim turi qo'shish +</a>
-                            </div> 
-                            
+                                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#border-less">Chiqim turi qo'shish +</a>
+                            </div>
                         </div>
                         <div class="row d-flex justify-content-center">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    
-                                        
-                                <select id="first_select_expense" class="searchable">
-                                    <option value="0">Chiqim turi</option>
-                                    <option value="2">Komunal to'lovlar</option>
-                                    <option value="3">Material uchun</option>
-                                    <option value="4">Thomas Edison</option>
-                                    <option value="5">Nikola</option>
-                                    <option value="6">Selectize</option>
-                                    <option value="7">Javascript</option>
-                                </select>
+                                    <select id="first_select_expense" class="searchable">
+                                        <option value="0" selected>Chiqim turi</option>
+                                        {% for ex in expense_types %}
+                                        <option value="{{ ex.id }}">{{ ex.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <p class="expense_type_error_msg text-center text-danger" style="display: none;">Chiqim turlaridan birini tanlang !</p>
 
-                            
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <div class="form-check form-switch d-flex justify-content-center mt-1" >
+                                <div class="form-check form-switch d-flex justify-content-center mt-1">
                                     <input class="form-check-input fs-4" type="checkbox" id="switchExpense">
-                                
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <select id="second_select_expense" class="searchable" disabled>
-                                        <option value="0">Ishchilar</option>
-                                        <option value="2">Beast</option>
-                                        <option value="3">Compatible</option>
-                                        <option value="4">Thomas Edison</option>
-                                        <option value="5">Nikola</option>
-                                        <option value="6">Selectize</option>
-                                        <option value="7">Javascript</option>
+                                        {% for w in workers %}
+                                        <option value="0" selected>Ishchilar</option>
+                                        <option value="{{ w.id }}">{{ w.name }}</option>
+                                        {% endfor %}
                                     </select>
+                                    <p class="workers_error_msg text-center text-danger" style="display: none;">Ishchilardan birini tanlang !</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="row d-flex justify-content-center mt-5 ">
+                        <div class="row d-flex justify-content-center mt-5">
                             <div class="col-md-2">
                                 <select class="form-select" id="basicSelect">
-                                    <option>Valyutani turi</option>
-                                    <option>USD</option>
-                                    <option>UZS</option>
+                                    <option >Valyutani turi</option>
+                                    <option value="1">USD</option>
+                                    <option value="2">UZS</option>
                                 </select>
+                                <p class="currency_type_error_msg text-center text-danger" style="display: none;">Valyuta turlaridan birini tanlang !</p>
+
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <input type="text" class="form-control" id="basicInput" placeholder="Summa">
+                                    <input type="number" class="form-control" id="ex_sumInput" placeholder="Summa">
                                 </div>
+                                <p class="summa_error_msg text-center text-danger" style="display: none;">Summa kiriting !</p>
+
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <input type="text" class="form-control" id="basicInput" placeholder="Kurs">
+                                    <input type="number" class="form-control" id="exchangeRateInput" placeholder="Kurs">
                                 </div>
+                                <p class="currency_summa_error_msg text-center text-danger" style="display: none;">Valyuta kursini kiriting !</p>
+
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <button class="btn btn-success w-100">Tasdiqlash</button>
+                                    <button class="btn btn-success w-100" id="submitButton">Tasdiqlash</button>
                                 </div>
-                            </div>
 
+                            </div>
                             <div class="table-responsive p-5">
+                                <p class="container_error_msg text-center text-danger" style="display: none;">Konteynerlardan birini belgilang !</p>
+
                                 <table class="table table-bordered mb-0 text-center">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>Container</th>
-                                            <th>Summa</th>
-                                            <th>Chiqim summa</th>
-                                            <th>Sotildi</th>
+                                            <th >#</th>
+                                            <th>Konteyner</th>
+                                       
                                             <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {% for c in containers %}
                                         <tr>
-                                            <td>#</td>
-                                            <td class="text-bold-500">00004</td>
-                                            <td>1000 $</td>
-                                            <td class="text-bold-500">50 $</td>
-                                            <td>500 $</td>
+                                            <td style="width: 5%;">{{ forloop.counter }}</td>
+                                            <td class="text-bold-500">{{ c.name  }}</td>
+                                           
                                             <td>
                                                 <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="form-check-input form-check-warning form-check-glow " checked="" name="customCheck" id="checkboxGlow6">
+                                                    <input type="checkbox" class="form-check-input container-check-input form-check-warning form-check-glow"  name="customCheck" id="{{ c.id }}" required>
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>#</td>
-                                            <td class="text-bold-500">00004</td>
-                                            <td>1000 $</td>
-                                            <td class="text-bold-500">50 $</td>
-                                            <td>500 $</td>
-                                            <td>
-                                                <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="form-check-input form-check-warning form-check-glow " checked="" name="customCheck" id="checkboxGlow6">
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>#</td>
-                                            <td class="text-bold-500">00004</td>
-                                            <td>1000 $</td>
-                                            <td class="text-bold-500">50 $</td>
-                                            <td>500 $</td>
-                                            <td>
-                                                <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="form-check-input form-check-warning form-check-glow " checked="" name="customCheck" id="checkboxGlow6">
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-
-                        
-                        
                     </div>
-
                 </section>
-
             </div>
 
+            
 
-             <!-- modals -->
-<div class="modal fade text-left modal-borderless" id="border-less" tabindex="-1"
-role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
-<div class="modal-dialog modal-dialog-scrollable" role="document">
-    <div class="modal-content" style="height: 500px;">
-        <div class="modal-header">
-            <h5 class="modal-title">Chiqim turlari</h5>
-            <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
-                aria-label="Close">
-                <i data-feather="x"></i>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form id="sizeForm">
-                {% csrf_token %}
-                <div class="row d-flex" >
-                    <h6 class="text-danger text-center msg-handle"></h6>
-                    <div class="col-md-9">
-                        <div class="form-group d-flex justify-content-end">
-                            <input type="text" class="form-control" name="expense_type_name" placeholder="Chiqim turi" required>
-                           
+
+
+
+<!-- modals -->
+        <div class="modal fade text-left modal-borderless" id="border-less" tabindex="-1"
+        role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content" style="height: 500px;">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chiqim turlari</h5>
+                    <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="sizeForm">
+                        {% csrf_token %}
+                        <div class="row d-flex" >
+                            <h6 class="text-danger text-center msg-handle"></h6>
+                            <div class="col-md-9">
+                                <div class="form-group d-flex justify-content-end">
+                                    <input type="text" class="form-control" name="expense_type_name" placeholder="Chiqim turi" required>
+                                
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <button class="btn badge bg-success p-2 mt-1 border-0 text-white" type="button" id="addSizeButton" >Qo'shish +</button >
+                            </div>
                         </div>
-                    </div>
+                    </form>
                     
-                    <div class="col-md-2">
-                        <button class="btn badge bg-success p-2 mt-1" type="submit" id="addSizeButton">Qo'shish +</button>
+                    <!-- table -->
+                    <div class="table-responsive mt-3" style="overflow-y: scroll; max-height:300px;">
+                        <table class="table table-bordered mb-0 table-expense" id="sizesTable" >
+                            <thead>
+                                <tr>
+                                    <th>Chiqim turi nomi</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in expense_types %}
+                                <tr id="tr_expense-{{ s.id }}">
+                                    <td class="text-bold-500">
+                                    <div class="sizeInfo-{{ s.id }}">
+                                    {{ s.title }}
+                                    </div>
+                                    <form id='updateSizeForm-{{ s.id }}'>
+                                        {% csrf_token %}
+                                        <div class="row editFormSize-{{ s.id }}" style="display: none;">
+
+                                            <div class="col-md-12">
+                                                <input type="text" class="form-control" value="{{ s.title }}" name="expense_type_title">
+                                            </div>
+                                        
+                                            <input type="text" value="{{ s.id }}" name="expense_type_id" style="display: none;">
+                                        </div>
+                                        </form>
+
+                                    </td>
+                                    <td class="text-center m-2">
+                                        <a href="#" onclick="editSize('{{ s.id }}')" id="pensil-edit-{{ s.id }}"><i class="bi bi-pencil-square fs-5 text-warning edit-icon"></i></a>
+                                        <a href="#" onclick="deleteExpense('{{ s.id }}')" id="trash-edit-{{ s.id }}"><i class="bi bi-trash-fill fs-5 text-danger delete-icon"></i></a>
+                                        <a href="#" onclick="checkSize('{{ s.id }}')" id="check-edit-{{ s.id }}"style='display:none;' ><i class="bi bi-check-square fs-5 text-success check-icon"></i></a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </form>
-            
-            <!-- table -->
-            <div class="table-responsive mt-3" style="overflow-y: scroll; max-height:300px;">
-                <table class="table table-bordered mb-0 table-expense" id="sizesTable" >
-                    <thead>
-                        <tr>
-                            <th>Chiqim turi nomi</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for s in expense_types %}
-                        <tr>
-                            <td class="text-bold-500">
-                               <div class="sizeInfo-{{ s.id }}">
-                               {{ s.title }}
-                               </div>
-                               <form id='updateSizeForm-{{ s.id }}'>
-                                   {% csrf_token %}
-                                <div class="row editFormSize-{{ s.id }}" style="display: none;">
-
-                                    <div class="col-md-4">
-                                        <input type="text" class="form-control" value="{{ s.title }}" name="expense_type_title">
-                                    </div>
-                                   
-                                    <input type="text" value="{{ s.id }}" name="expense_type_id" style="display: none;">
-                                </div>
-                                </form>
-
-                            </td>
-                            <td class="text-center m-2">
-                                <a href="#" onclick="editSize('{{ s.id }}')" id="pensil-edit-{{ s.id }}"><i class="bi bi-pencil-square fs-5 text-warning edit-icon"></i></a>
-                                <a href="#" onclick="checkSize('{{ s.id }}')" id="check-edit-{{ s.id }}"style='display:none;' ><i class="bi bi-check-square fs-5 text-success check-icon"></i></a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                
+                
             </div>
         </div>
-        
-        <div class="modal-footer">
-            <button type="button" class="btn btn-light-primary" data-bs-dismiss="modal">
-                <i class="bx bx-x d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">Orqaga</span>
-            </button>
-           
         </div>
-    </div>
-</div>
-</div>
 <!-- endmodals -->      
 
 
@@ -272,16 +240,162 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
     $(document).ready(function() {
         $('#switchExpense').on('change', function() {
             if(this.checked){
+
                 selectize1.disable()
                 selectize2.enable()
 
             }else{
                 selectize2.disable()
                 selectize1.enable()
+                
+
 
             }
         });
     });
+
+
+//main expense  
+
+$(document).ready(function() {
+    $('#submitButton').click(function(event) {
+        event.preventDefault();
+
+        let isValid = true;
+
+        // Check required selects
+        
+        if ($('#basicSelect').val() == 'Valyutani turi') {
+            isValid = false
+            $('.currency_type_error_msg').show()
+        }else{
+            isValid = true
+            $('.currency_type_error_msg').hide()
+        }
+
+        // Check required text inputs
+        if ($('#ex_sumInput').val().trim() === '') {
+            isValid = false;
+            $('.summa_error_msg').show()
+        }else{
+            isValid = true;
+            $('.summa_error_msg').hide()
+        }
+        
+        if ($('#exchangeRateInput').val().trim() === '') {
+            isValid = false;
+            $('.currency_summa_error_msg').show()
+        }else{
+            isValid = true;
+            $('.currency_summa_error_msg').hide()
+        }
+
+        // Check required checkboxes
+
+        if (!$('#switchExpense').is(':checked')) {
+
+            if ($('#first_select_expense').val() == '0') {
+                isValid = false;
+                $('.expense_type_error_msg').show()
+            }else{
+                isValid = true;
+                $('.expense_type_error_msg').hide()
+            }
+
+        }else{
+            $('.expense_type_error_msg').hide()
+
+            if ($('#second_select_expense').val() == '0') {
+                isValid = false;
+                $('.workers_error_msg').show()
+            }else{
+                isValid = true;
+                $('.workers_error_msg').hide()
+            }
+        }
+
+        if (!$('.container-check-input').is(':checked')) {
+            isValid = false;
+            $('.container_error_msg').show()
+        }else{
+            isValid = true;
+            $('.container_error_msg').hide()
+        }
+
+        if (!isValid) {
+            //alert('errorMessage');
+            return false;
+        }
+
+        // Collecting data from the form
+        let expenseType = $('#first_select_expense').val();
+        let worker = $('#second_select_expense').val();
+        let currency = $('#basicSelect').val();
+        let ex_sum = $('#ex_sumInput').val();
+        let exchangeRate = $('#exchangeRateInput').val();
+        
+        // Collecting checked checkboxes
+        let switchOnOff = [];
+        let checkedItems = [];
+        $('.container-check-input:checked').each(function() {
+            checkedItems.push($(this).attr('id'));
+        });
+        if ($('#switchExpense').is(':checked')) {
+            switchOnOff.push($(this).attr('id'));
+            
+        }
+
+        // Creating the data object to send to the backend
+        let formData = {
+            'expense_type': expenseType,
+            'worker': worker,
+            'currency': currency,
+            'ex_sum': ex_sum,
+            'exchange_rate': exchangeRate,
+            'checked_items': checkedItems,
+            'switchOnOff': switchOnOff,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        };
+
+        // Sending the AJAX request
+
+        console.log(formData)
+
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "main:create-main-expense" %}',
+            data: formData,
+            success: function(response) {
+                alert('Data submitted successfully!');
+                // Handle success response
+                
+                location.reload()
+
+                // Reset all inputs, selects, and checkboxes
+                $('#first_select_expense').val('0').trigger('change'); // Reset select to default option
+                $('#second_select_expense').val('0').trigger('change'); // Reset select to default option
+                $('#basicSelect').val('Valyutani turi'); // Reset select to default option
+                $('#ex_sumInput').val(''); // Clear ex_sum input
+                $('#exchangeRateInput').val(''); // Clear exchange rate input
+                $('.form-check-input').prop('checked', false); // Uncheck all checkboxes
+            },
+            error: function(error) {
+                alert('Error submitting data');
+                // Handle error response
+            }
+        });
+
+    });
+});
+
+
+
+
+
+//end main expense  
+
+
 
 
 //expense 
@@ -315,7 +429,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                 success: function(response) {
                     
                     let newRow = `
-                        <tr>
+                        <tr id="tr_expense-${ response.data.id }">
                             <td class="text-bold-500">
                                <div class="sizeInfo-${ response.data.id }">
                                ${ response.data.title }
@@ -324,7 +438,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                                    
                                 <div class="row editFormSize-${ response.data.id }" style="display: none;">
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-12">
                                         <input type="text" class="form-control" value="${ response.data.title }" name="expense_type_title" id="expense_type_title-${response.data.id}">
                                     </div>
                                    
@@ -335,6 +449,8 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                             </td>
                                 <td class="text-center m-2">
                                     <a href="#" onclick="editSize('${ response.data.id }')" id="pensil-edit-${ response.data.id }"><i class="bi bi-pencil-square fs-5 text-warning edit-icon"></i></a>
+                                    <a href="#" onclick="deleteExpense('${ response.data.id }')" id="trash-edit-${ response.data.id }"><i class="bi bi-trash-fill fs-5 text-danger delete-icon"></i></a>
+                                   
                                     <a href="#" onclick="checkSize('${ response.data.id }')" id="check-edit-${ response.data.id }"style="display:none;" ><i class="bi bi-check-square fs-5 text-success check-icon"></i></a>
                                 </td>
                         </tr>
@@ -347,7 +463,8 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
 
                     $(`.editFormSize-${ response.data.id }`).css({"display":"none"}) 
                     $(`#check-edit-${ response.data.id }`).css({"display":"none"}) 
-                    //response = 0
+                    
+                    
                 },
                 error: function(error) {
                     alert('Error adding size');
@@ -361,6 +478,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
             $(`.sizeInfo-${id}`).css({'display':'none'})
             $(`.editFormSize-${id}`).css({'display':'flex'})
             $(`#check-edit-${id}`).css({'display':'flex'})
+            $(`#trash-edit-${id}`).css({'display':'none'})
             
             
         }
@@ -368,8 +486,10 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
         function checkSize(id){
             $(`#check-edit-${id}`).css({'display':'none'})
             $(`#pensil-edit-${id}`).css({'display':''})
-            $(`.sizeInfo-${id}`).css({'display':'flex'})
+            $(`.sizeInfo-${id}`).show()
             $(`.editFormSize-${id}`).css({'display':'none'})
+            $(`#trash-edit-${id}`).show()
+
 
             let updateFormData = $(`#updateSizeForm-${id}`).serialize()
       
@@ -414,6 +534,29 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
 
 
            
+
+        }
+
+        function deleteExpense(id){
+
+            deleteData = {
+                "id":id
+            }
+
+            $.ajax({
+                type: 'GET',
+                url: '{% url "main:delete-expense-type" %}', 
+                data: deleteData,
+                success: function(response) {
+                    
+                    $(`#tr_expense-${response.data.id}`).remove()
+                    console.log('working delete')
+                
+                },
+                error: function(error) {
+                    alert('Error adding size');
+                }
+            });
 
         }
     
