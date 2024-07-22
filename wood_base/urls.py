@@ -19,7 +19,8 @@ from django.views.static import serve
 from django.urls import path, include, re_path
 from . import settings
 from django.conf.urls.static import static
-
+from django.conf.urls import handler404,handler500
+from main.views import handler_404, handler_500
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,3 +34,6 @@ urlpatterns = [
 #     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+handler404=handler_404
+handler500=handler_500

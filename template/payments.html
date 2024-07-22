@@ -85,43 +85,86 @@
                 </button>
             </div>
             <div class="modal-body">
-               <form action="#">
+                <form id="paymentForm" action="{% url 'main:payments' %}" method="post">
+                    {% csrf_token %}
                     <div class="form-group">
-                        <select class="form-select" id="basicSelect">
-                            <option>Mijozlarr</option>
-                            <option>Blade Runner</option>
-                            <option>Thor Ragnarok</option>
+                        <select id="client_select" class="searchable" required name="client">
+                            <option value="0" selected>Mijozni tanlang</option>
+                            {% for client in clients %}
+                            <option value="{{ client.id }}">{{ client.name }}</option>
+                            {% endfor %}
                         </select>
-                        
-                        
+                        <p class="client_error_msg text-center text-danger" style="display: none;">
+                            Mijozlardan birini tanlang !
+                        </p>
                     </div>
                     <div class="form-group">
-                        <select class="form-select w-45" id="basicSelect">
-                            <option>Valyutani turi</option>
-                            <option>USD</option>
-                            <option>UZS</option>
+                        <select class="form-select w-45" id="basicSelect" required name="currency_type">
+                            <option value="0" selected>Valyutani turi</option>
+                            <option value="USD">USD</option>
+                            <option value="UZS">UZS</option>
                         </select>
+                        <p class="currency_error_msg text-center text-danger" style="display: none;">
+                            Valyutalardan birini tanlang !
+                        </p>
                     </div>
                     <div class="form-group">
-                        <label for="basicInput">Summa</label>
-                        <input type="number" class="form-control" id="basicInput" placeholder="summa">
+                        <label for="exchangeRateInput" class="m-1">Valyuta kursi</label>
+                        <input type="number" class="form-control" id="exchangeRateInput" placeholder="$" required name="exchange_rate">
                     </div>
-               </form>
+                    <div class="form-group">
+                        <label for="paymentSumInput" class="m-1">Summa</label>
+                        <input type="number" class="form-control" id="paymentSumInput" placeholder="summa" required name="payment_sum">
+                    </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light-primary" data-bs-dismiss="modal">
                     <i class="bx bx-x d-block d-sm-none"></i>
                     <span class="d-none d-sm-block">Orqaga</span>
                 </button>
-                <button type="button" class="btn btn-primary ms-1" data-bs-dismiss="modal">
-                    <i class="bx bx-check d-block d-sm-none"></i>
-                    <a href="#" class="d-none d-sm-block text-white">Qo'shish</>
+                <button type="submit" class="btn btn-primary ms-1">
+                    Tasdiqlash
                 </button>
             </div>
+                </form>
         </div>
     </div>
-    </div>
+</div>
+
     <!-- endmodals -->         
+
+
+    <script>
+        let $select_ = $('.searchable').selectize()
+
+
+        document.getElementById('paymentForm').addEventListener('submit', function(event) {
+            var clientSelect = document.getElementById('client_select');
+            var currencySelect = document.getElementById('basicSelect');
+            
+            var valid = true;
+            
+            if (clientSelect.value === "0") {
+                valid = false;
+                $('.client_error_msg').show()
+            }else{
+                valid = true
+                $('.client_error_msg').hide()
+            }
+            if (currencySelect.value === "0") {
+                valid = false;
+                $('.currency_error_msg').show()
+            }else{
+                valid = true
+                $('.currency_error_msg').hide()
+            }
+            
+            if (!valid) {
+                event.preventDefault();
+            }
+        });
+        
+    </script>
 
 <script src="static/assets/extensions/simple-datatables/umd/simple-datatables.js"></script>
 <script src="static/assets/static/js/pages/simple-datatables.js"></script>

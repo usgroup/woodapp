@@ -25,9 +25,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ae7i65$$2x(tj14x%2+o=l%-ogx__dftds+dm78gdx4t(5fx8r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+
+if DEBUG:
+    from wood_base.locale_settings import *
+else:    
+    from wood_base.pro_settings import *
+
+
+
 
 
 # Application definition
@@ -76,20 +83,15 @@ WSGI_APPLICATION = 'wood_base.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+
 
 AUTH_USER_MODEL = 'main.CustomUser'
 
-LOGIN_URL = 'login  '
+LOGIN_URL = '/login'
 
 LOGIN_REDIRECT_URL = '/'
 
-LOGOUT_REDIRECT_URL = '/login/'
+LOGOUT_REDIRECT_URL = '/login'
 
 
 # Password validation

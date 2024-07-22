@@ -17,8 +17,8 @@ urlpatterns = [
     path('edit-worker', EditWorkerView.as_view(), name='edit-worker'),
     
     
-    path('login',AuthLoginView.as_view(), name='login'),
-    path('logout',  CustomLogoutView.as_view(), name='logout'),
+    path('login',login_view, name='login'),
+    path('logout',  logout_view, name='logout'),
     
     
     path('trade-history',ArchiveContainers.as_view(), name='archive_containers'),
@@ -40,6 +40,7 @@ urlpatterns = [
     
     path('create-main-expense', CreateMainExpenseView.as_view(), name='create-main-expense'),
     path('delete-worker', DeleteWorkerView.as_view(), name='delete-worker'),
-    
+    #search
+    path('search-container', SearchContainerView.as_view(), name='search-container'),
     
 ]

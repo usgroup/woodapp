@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
 from django.views import View
 from .models import *
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib import messages
 from datetime import datetime
 from .others_func import calc_end_write
-
 
 
 class HomeView(LoginRequiredMixin,View):
@@ -22,7 +21,7 @@ class HomeView(LoginRequiredMixin,View):
         }
         
         return render(request, 'index.html',context)
-    
+
     def post(self, request):
         
         container_name = request.POST['container_name']
@@ -36,7 +35,7 @@ class HomeView(LoginRequiredMixin,View):
         return redirect(f'/container-products-detail/{pk}')
     
     
-class ContainerProductsDetailView(View):
+class ContainerProductsDetailView(LoginRequiredMixin,View):
     
     def get(self, request, pk):
         product_sizes = ProductSize.objects.all()
@@ -84,7 +83,7 @@ class ContainerProductsDetailView(View):
         return  redirect(f'/container-products-detail/{pk}')
     
     
-class ContainerTradeDetailView(View):
+class ContainerTradeDetailView(LoginRequiredMixin,View):
     
     def get(self, request,pk):
         
@@ -100,7 +99,7 @@ class ContainerTradeDetailView(View):
         return render(request, 'container-trade-detail.html', context)
     
     
-class ContainerExpenceDetailView(View):
+class ContainerExpenceDetailView(LoginRequiredMixin,View):
     def get(self, request, pk):
         
         container = Container.objects.filter(id=pk,status=True)[0]
@@ -120,7 +119,7 @@ class ContainerExpenceDetailView(View):
 
 
     
-class Clientiew(View):
+class Clientiew(LoginRequiredMixin,View):
     def get(self, request):
         clients = Client.objects.all().order_by('-id')
         context = {
@@ -138,12 +137,24 @@ class Clientiew(View):
         return redirect('/clients')
 
     
-class PaymentView(View):
+class PaymentView(LoginRequiredMixin,View):
     def get(self, request):
-        return render(request, 'payments.html')
+        clients = Client.objects.all()
+        context = {
+            "clients":clients
+        }
+        return render(request, 'payments.html', context )
+    
+    def post(self, request):
+        print()
+        print(request.POST)
+        print()
+        
+        
+        return redirect('/payments')
     
     
-class GeneralExpence(View):
+class GeneralExpence(LoginRequiredMixin,View):
     def get(self, request):
         
         expense_types = ExpenseType.objects.all()
@@ -158,7 +169,7 @@ class GeneralExpence(View):
         
         return render(request, 'general-expenses.html', context)
     
-class WorkerView(View):
+class WorkerView(LoginRequiredMixin,View):
     def get(self, request):
         
         workers = Worker.objects.all()
@@ -188,7 +199,7 @@ class WorkerView(View):
     
     
     
-class ArchiveContainers(View):
+class ArchiveContainers(LoginRequiredMixin,View):
     def get(self,request):
         
         containers = Container.objects.filter(status=True).order_by('-id')
@@ -199,7 +210,7 @@ class ArchiveContainers(View):
         return render(request, 'archive-containers.html', context)
     
     
-class ArchiveContainerDetail(View):
+class ArchiveContainerDetail(LoginRequiredMixin,View):
     def get(self,request, pk):
         
         container = Container.objects.filter(id=int(pk)).first()
@@ -221,17 +232,28 @@ class ArchiveContainerDetail(View):
         return render(request, 'archive-container-detail.html', context)
     
     
-    
-    
-class AuthLoginView(LoginView):
-    template_name = 'auth-login.html' 
 
-    def form_invalid(self, form):
-        
-        messages.error(self.request, 'Login yoki parol noto`g`ri!')
-        
-        return super().form_invalid(form)
-    
 
-class CustomLogoutView(LogoutView):
-    next_page = '/login'
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('/')  # Redirect to a home page or dashboard
+        else:
+            messages.error(request, "Login yoki parol notog'ri")
+            return render(request, 'auth-login.html', {'error': 'Invalid credentials'})
+    return render(request, 'auth-login.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('/login')
+
+
+def handler_404(request, exception):
+    return render(request, 'error-404.html')
+
+def handler_500(request):
+    return render(request, 'errors/500.html')

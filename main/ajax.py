@@ -4,6 +4,8 @@ from .models import *
 from datetime import datetime
 from .others_func import metr_to_cube, process_order_data, divide
 from django.shortcuts import redirect
+from django.db.models import Q
+
 
 
 class AddSizeView(View):
@@ -200,25 +202,22 @@ class CreateOrderView(View):
             return JsonResponse(data={'status':400,'error_message': 'Valyuta kursni kiritishni unutdingiz !'})
         if difference_sum < 0 and client_id == 0:
             return JsonResponse(data={'status':400,'error_message': "Mijoz hisobiga ortiqcha pul yozilishi uchun, mijozni kiriting !"})
-        # if paid_summa == 0:
-        #     return JsonResponse(data={'status':400,'error_message': "Pul miqdori kirilmadi"})
-        if paid_summa == 0 and debt_check:
-                return True
+
         if debt_check == None and paid_summa == 0:
                 return JsonResponse(data={'status':400,'error_message': "Pul miqdori kirilmadi"})
-        if debt_check == None and client_id == 0 and difference_sum < 0:
+        if debt_check == None and client_id == 0 and difference_sum <= 0:
                 return JsonResponse(data={'status':400,'error_message': "Yetarli pul miqdori kiritilmagan. Shu sababli mijozni tanlang !"})
         
         try:
-            debt_check = request.POST['debt_check', None]
+            # debt_check = request.POST['debt_check']
             
             print(debt_check)
             
-            if debt_check and client_id == 0:
+            if debt_check is not None and client_id == 0:
                 return JsonResponse(data={'status':400,'error_message': 'Nasiya savdoda mijoz kiritish muhim !'})
            
            
-            if debt_check and client_id > 0:
+            if debt_check is not None and client_id > 0:
                 client = Client.objects.filter(id=client_id)[0]
                 
                 order = Order.objects.create(
@@ -437,4 +436,46 @@ class DeleteWorkerView(View):
         worker.delete()
         
         return JsonResponse({'status': 200, 'message': 'Message deleted successfully'})
+
+
+class SearchContainerView(View):
+    def get(self, request):
         
+        value =  request.GET.get('value')
+        result = {
+            'status':200,
+            'data':[]
+        }
+
+        value = value.strip() if value else None
+        
+        query = Q(name__icontains=value) | Q(come_date__icontains=value)
+        
+        if value:
+            containers = Container.objects.filter(query)
+            
+            
+            for c in containers:
+                date_obj = datetime.strptime(str(c.come_date), '%Y-%m-%d')
+                formatted_date_str = date_obj.strftime('%d/%m/%Y')
+                
+                result['data'].append(
+                    {
+                    "container_id":c.id,
+                    "container_name":c.name,
+                    "container_come_date":formatted_date_str,
+                    }
+                )
+        else:
+            containers = Container.objects.filter(status=True)
+            for c in containers:
+                date_obj = datetime.strptime(str(c.come_date), '%Y-%m-%d')
+                formatted_date_str = date_obj.strftime('%d/%m/%Y')
+                result['data'].append(
+                    {
+                    "container_id":c.id,
+                    "container_name":c.name,
+                    "container_come_date":formatted_date_str,
+                    }
+                )
+        return JsonResponse(result)

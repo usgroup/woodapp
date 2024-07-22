@@ -46,8 +46,8 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <select id="second_select_expense" class="searchable" disabled>
-                                        {% for w in workers %}
                                         <option value="0" selected>Ishchilar</option>
+                                        {% for w in workers %}
                                         <option value="{{ w.id }}">{{ w.name }}</option>
                                         {% endfor %}
                                     </select>
