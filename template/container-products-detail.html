@@ -31,7 +31,7 @@
                     <h6 class="text text-bold m-1">Kutilayotgan tushum: </h6> <h6 class="text m-1"> {{ total_sales_revenue_usd|floatformat:4 }} $</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Tushgan tushum: </h6> <h6 class="text m-1"> {{ total_paid_sum_usd|floatformat:4 }} $</h6>
+                    <h6 class="text text-bold m-1">Tushgan tushum: </h6> <h6 class="text m-1"> {{ container_paid_amount|floatformat:4 }} $</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
                     <h6 class="text text-bold m-1">Foyda: </h6> <h6 class="text m-1">{{ profit|floatformat:4 }} $</h6>
@@ -57,17 +57,29 @@
                 <a class="list-group-item list-group-item-action active" href="{% url 'main:container-products-detail' container.id %}" role="tab">Mahsulotlar</a>
                 <a class="list-group-item list-group-item-action " href="{% url 'main:container-trade-detail' container.id %}" role="tab">Sotuv</a>
                 <a class="list-group-item list-group-item-action " href="{% url 'main:container-expence-detail' container.id %}" role="tab">Chiqimlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-trade-history' container.id %}" role="tab">Sotuv tarixi</a>
+
 
                 {% elif  request.path|slice:":24" == '/container-trade-detail/' %}
 
-                <a class="list-group-item list-group-item-action " href="{% url 'main:container-products-detail' %}" role="tab">Mahsulotlar</a>
-                <a class="list-group-item list-group-item-action active" href="{% url 'main:container-trade-detail' %}" role="tab">Sotuv</a>
-                <a class="list-group-item list-group-item-action " href="{% url 'main:container-expence-detail' %}" role="tab">Chiqimlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-products-detail' container.id  %}" role="tab">Mahsulotlar</a>
+                <a class="list-group-item list-group-item-action active" href="{% url 'main:container-trade-detail' container.id   %}" role="tab">Sotuv</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-expence-detail' container.id  %}" role="tab">Chiqimlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-trade-history' container.id %}" role="tab">Sotuv tarixi</a>
+
                
                 {% elif  request.path|slice:":27" == '/container-expence-detail' %}
-                <a class="list-group-item list-group-item-action " href="{% url 'main:container-products-detail' %}" role="tab">Mahsulotlar</a>
-                <a class="list-group-item list-group-item-action " href="{% url 'main:container-trade-detail' %}" role="tab">Sotuv</a>
-                <a class="list-group-item list-group-item-action active" href="{% url 'main:container-expence-detail' %}" role="tab">Chiqimlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-products-detail' container.id   %}" role="tab">Mahsulotlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-trade-detail'  container.id  %}" role="tab">Sotuv</a>
+                <a class="list-group-item list-group-item-action active" href="{% url 'main:container-expence-detail' container.id  %}" role="tab">Chiqimlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-trade-history' container.id %}" role="tab">Sotuv tarixi</a>
+
+
+                {% elif  request.path|slice:":24" == '/container-trade-history' %}
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-products-detail' container.id %}" role="tab">Mahsulotlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-trade-detail' container.id  %} " role="tab">Sotuv</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:container-expence-detail' container.id  %} " role="tab">Chiqimlar</a>
+                <a class="list-group-item list-group-item-action active" href="{% url 'main:container-trade-history' container.id %}" role="tab">Sotuv tarixi</a>
                 {% else %}
                 {% endif %}
             </div>

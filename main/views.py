@@ -54,14 +54,15 @@ class ContainerProductsDetailView(LoginRequiredMixin,View):
         for c in container_products: # productlarni qo'shilmasi
             general_expenses += c.total_product_sum
      
-        profit = container.total_paid_sum_usd - general_expenses
+     
+        profit = container.paid_amount - general_expenses
    
         context = {
             "container":container,
             "product_sizes":product_sizes,
             "general_expenses":general_expenses,
             "total_sales_revenue_usd":container.total_sales_revenue_usd,
-            "total_paid_sum_usd":container.total_paid_sum_usd,
+            "container_paid_amount":container.paid_amount,
             "profit": profit
             
         }
@@ -113,7 +114,28 @@ class ContainerExpenceDetailView(LoginRequiredMixin,View):
         }
         
         return render(request, 'container-expence-detail.html',context)
-    
+
+class ContainerTradeHistoryView(View):
+    def get(self, request,pk):
+        
+        container = Container.objects.filter(id=int(pk)).first()
+        order_items = OrderItem.objects.filter(product_item__product_container__id=int(pk))
+        
+        unique_orders = set()
+        
+        
+        for item in order_items:
+            unique_orders.add(item.order_item)
+        
+        unique_orders = list(unique_orders)
+        unique_orders.sort(key=lambda x: x.id, reverse=True)
+        
+        context = {
+            "container":container,
+            "unique_orders":unique_orders
+        }
+        
+        return render(request, 'container-trade-history.html',context)
     
     
 
@@ -140,18 +162,16 @@ class Clientiew(LoginRequiredMixin,View):
 class PaymentView(LoginRequiredMixin,View):
     def get(self, request):
         clients = Client.objects.all()
+        containers = Container.objects.filter(status=True)
+        payments = Payment.objects.all().order_by('-id')
+        
+        
         context = {
-            "clients":clients
+            "clients":clients,
+            "containers":containers,
+            "payments":payments,
         }
         return render(request, 'payments.html', context )
-    
-    def post(self, request):
-        print()
-        print(request.POST)
-        print()
-        
-        
-        return redirect('/payments')
     
     
 class GeneralExpence(LoginRequiredMixin,View):
@@ -194,8 +214,6 @@ class WorkerView(LoginRequiredMixin,View):
         
         return redirect('/workers')
         
-    
-
     
     
     

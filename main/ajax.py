@@ -2,7 +2,7 @@ from django.views import View
 from django.http import JsonResponse
 from .models import *
 from datetime import datetime
-from .others_func import metr_to_cube, process_order_data, divide
+from .others_func import metr_to_cube, process_order_data, divide, calc_end_write
 from django.shortcuts import redirect
 from django.db.models import Q
 
@@ -192,26 +192,21 @@ class CreateOrderView(View):
         usd_currency = int(request.POST['usd_currency'])
         client_id = int(request.POST['client'])
         totalSumma = int(request.POST['totalSumma'])
-        paid_summa = int(request.POST['given_sum'])
         debt_check = request.POST.get('debt_check', None)
+        container_id = request.POST['container_id']
         
-        difference_sum = totalSumma - paid_summa
+        container = Container.objects.filter(id=int(container_id)).first()
+        
+        print()
+        print(container_id)
+        print()
         
       
         if usd_currency <= 0:
             return JsonResponse(data={'status':400,'error_message': 'Valyuta kursni kiritishni unutdingiz !'})
-        if difference_sum < 0 and client_id == 0:
-            return JsonResponse(data={'status':400,'error_message': "Mijoz hisobiga ortiqcha pul yozilishi uchun, mijozni kiriting !"})
 
-        if debt_check == None and paid_summa == 0:
-                return JsonResponse(data={'status':400,'error_message': "Pul miqdori kirilmadi"})
-        if debt_check == None and client_id == 0 and difference_sum <= 0:
-                return JsonResponse(data={'status':400,'error_message': "Yetarli pul miqdori kiritilmagan. Shu sababli mijozni tanlang !"})
-        
         try:
             # debt_check = request.POST['debt_check']
-            
-            print(debt_check)
             
             if debt_check is not None and client_id == 0:
                 return JsonResponse(data={'status':400,'error_message': 'Nasiya savdoda mijoz kiritish muhim !'})
@@ -219,62 +214,48 @@ class CreateOrderView(View):
            
             if debt_check is not None and client_id > 0:
                 client = Client.objects.filter(id=client_id)[0]
-                
+               
                 order = Order.objects.create(
+                                container_order=container,
                                 customer=client,
                                 currency=currencyType,
                                 sale_exchange_rate=usd_currency,
-                                total_summa=totalSumma,
-                                paid_summa=paid_summa,  
                                 debt_status=True,
                             )
                 
-            if currencyType == 1:
-                client.debt_usd -= paid_summa
-            else:
-                client.debt_uzs -= paid_summa
+                client_account, created = ClientAccount.objects.get_or_create(
+                    container_client=container,
+                    client_info=client,
+                )
                 
-            client.save()   
+                print(client_account)
+                
+                if currencyType == 1:
+                    client_account.debt_usd -= totalSumma
+                else:
+                    client_account.debt_uzs -= totalSumma
+                    
+                client_account.save()
         except:
             pass
-        
-    
-        if difference_sum < 0 and client_id > 0:
-            client = Client.objects.filter(id=client_id)[0]
-            
-            order = Order.objects.create(
-                customer=client,
-                currency=currencyType,
-                sale_exchange_rate=usd_currency,
-                total_summa=totalSumma,
-                paid_summa=paid_summa,
-                debt_status=False,
-            )
-            
-            if currencyType == 1:
-                client.debt_usd += abs(difference_sum)
-            else:
-                client.debt_uzs += abs(difference_sum)
-                
-            client.save()  
             
         if client_id > 0:
             client = Client.objects.filter(id=client_id)[0]
             order = Order.objects.create(
+                    container_order=container,
                     customer=client,
                     currency=currencyType,
                     sale_exchange_rate=usd_currency,
-                    total_summa=totalSumma,
-                    paid_summa=paid_summa,
                     debt_status=False,
                 )
             
+            
+            
         else:
             order = Order.objects.create(
+                    container_order=container,
                     currency=currencyType,
                     sale_exchange_rate=usd_currency,
-                    total_summa=totalSumma,
-                    paid_summa=paid_summa,
                     debt_status=False,
                 )
                 
@@ -288,7 +269,7 @@ class CreateOrderView(View):
                 product_item=product,
                 product_cost=int(i['product_cost']),
                 amount_sold=int(i['amount_sold']),
-                total_price=int(float(i['total_price'])),
+           
             )
             
             new_qty = product.rest_qty - int(i['amount_sold'])
@@ -301,6 +282,48 @@ class CreateOrderView(View):
         
         #message add 
         return JsonResponse({'status':200,'message': 'Product sale successfully'})
+    
+    
+class EditOrderItem(View):
+    def post(self, request):
+        item_id = int(request.POST['order_item_id'])
+        qty_item = int(request.POST['qty_item'])
+        cost_item = int(request.POST['cost_item'])
+        
+        print()
+        print(request.POST)
+        print()
+        
+        order_item = OrderItem.objects.filter(id=item_id).first()
+        last_product = order_item.product_item ## product
+        last_product_size = order_item.product_item.product_size ## product size
+        last_amount_sold = order_item.amount_sold
+        last_product_cost = order_item.product_cost 
+        
+        last_product.rest_qty += last_amount_sold
+        last_cube = metr_to_cube(last_product_size.product_size_x, last_product_size.product_size_y, last_product_size.product_size_z, last_amount_sold  )
+        last_product.rest_cube -= float(last_cube)
+        
+        ##edit
+        
+        last_product.rest_qty -= qty_item
+        new_cube = metr_to_cube(last_product_size.product_size_x, last_product_size.product_size_y,last_product_size.product_size_z, qty_item  )
+        
+        order_item.product_cost  = cost_item
+        last_product.rest_cube += float(new_cube)
+        
+        order_item.amount_sold = qty_item
+        
+        order_item.save()
+        last_product.save()
+        
+                        
+        
+        
+        return JsonResponse({'status':200,'message': 'Order item edited successfully'})
+        
+    
+
     
 class AddExpenseTypeView(View):
     def post(self, request):
@@ -479,3 +502,122 @@ class SearchContainerView(View):
                     }
                 )
         return JsonResponse(result)
+    
+
+
+class CreatePaymentView(View):
+    def post(self,request):
+        
+        print()
+        print(request.POST)
+        print()
+        client_id = int(request.POST['client'])
+        container = int(request.POST['container'])
+        currency_type = int(request.POST['currency_type'])
+        exchange_rate = int(request.POST['exchange_rate'])
+        payment_sum = float(request.POST['payment_sum'])
+        
+        container = Container.objects.filter(id=container).first()
+      
+        
+        client = Client.objects.filter(id=client_id).first()
+        client_account = ClientAccount.objects.filter(client_info=client, container_client=container).first()
+        
+        payment, created = Payment.objects.get_or_create(
+            client_account=client_account,
+            currency=currency_type,
+        )
+        if not created:
+            payment.sale_exchange_rate = exchange_rate
+            payment.payment_amount += payment_sum
+        else:
+            payment.sale_exchange_rate = exchange_rate
+            payment.payment_amount = payment_sum
+        
+        if currency_type == 1:
+            client_account.debt_usd += payment_sum
+            container.paid_amount += payment_sum
+        else:
+            client_account.debt_uzs += payment_sum 
+            container.paid_amount += (payment_sum / exchange_rate)
+        
+        
+        payment.save()
+        client_account.save()
+        container.save()
+        
+        return JsonResponse({'status': 200, 'message': 'Payment created successfully'})
+    
+class EditPaymentView(View):
+    def post(self, request):
+        payment_id = int(request.POST['payment_id'])
+        payment_sum = int(request.POST['payment_sum'])
+        currency_type = int(request.POST['currency_type'])
+        exchange_rate = int(request.POST['exchange_rate'])
+        
+        
+        payment = Payment.objects.filter(id=payment_id).first()
+        container = payment.client_account.container_client
+        last_client_info = payment.client_account
+        last_payment_amount = payment.payment_amount
+        last_currency = payment.currency
+        last_sale_exchange_rate = payment.sale_exchange_rate
+        
+        if last_currency == 2:
+            container.paid_amount -= (last_payment_amount/last_sale_exchange_rate)
+            last_client_info.debt_uzs -= last_payment_amount
+            last_payment_amount -= last_payment_amount
+        if last_currency == 1:
+            container.paid_amount -= last_payment_amount
+            last_client_info.debt_usd -= last_payment_amount
+            last_payment_amount -= last_payment_amount
+            
+        
+        ###
+        
+        if currency_type == 2:
+            container.paid_amount += (payment_sum / exchange_rate)
+            last_client_info.debt_uzs += payment_sum
+            
+            last_payment_amount += payment_sum
+
+        if currency_type == 1:
+            container.paid_amount += payment_sum 
+            last_client_info.debt_usd += payment_sum
+            
+            last_payment_amount += payment_sum
+
+            
+            
+        last_client_info.save()
+        last_payment_amount.save()
+        container.save()
+        payment.save()
+        
+        print()
+        print(request.POST)
+        print()
+        
+        return JsonResponse({'status': 200, 'message': 'Payment edited successfully'})
+        
+    
+
+class GetClientDebt(View):
+    def post(self, request):
+        client_id = int(request.POST['client_id'])
+        container_id = int(request.POST['container_id'])
+        client = Client.objects.filter(id=client_id).first()
+        container = Container.objects.filter(id=container_id).first() 
+        
+        if not client or not container:
+            return JsonResponse({'status': 400, 'message': 'Invalid client or container ID'}, status=400)
+        
+        client_account, created = ClientAccount.objects.get_or_create(client_info=client, container_client=container)
+        
+        data = {
+            "debt_usd": client_account.debt_usd,
+            "debt_uzs": client_account.debt_uzs,
+        }
+        
+        return JsonResponse({'status': 200, 'message': 'Get client debt successfully', 'data': data})
+

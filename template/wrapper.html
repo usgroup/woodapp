@@ -31,18 +31,32 @@
 
 <!-- messages -->
 
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div id="liveToast" class="toast fade hide" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header ">
+                        <strong class="me-auto"></strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        Hello, world! This is a toast message.
+                    </div>
+                </div>
+            </div>
 
-</div>
+
 
 <!-- endmessages -->
 
 <body>
     <script src="/static/assets///static/js/initTheme.js"></script>
     <div id="app">
-
+        
+        
         <div id="sidebar">
             <div class="sidebar-wrapper active">
-    <div class="sidebar-header position-relative">
+                <div class="sidebar-header position-relative">
+
+        
         <div class="d-flex justify-content-between align-items-center">
             <div class="logo">
                 <a href="index.html"><img src="/static/assets//compiled/svg/logo.svg" alt="Logo" srcset=""></a>
@@ -80,8 +94,11 @@
             </div>
         </div>
     </div>
+    <button type="button" class="btn btn-primary float-end" id="liveToastBtn">Show live toast</button>
     <div class="sidebar-menu">
         <ul class="menu">
+
+            
             
             <li
                 class="sidebar-item {% if request.path == '/' %} active {% else%} {% endif %} ">
@@ -170,7 +187,8 @@
     
     
     <script src="/static/assets//compiled/js/app.js"></script>
-    
+
+    <script src="/static/assets/static/js/pages/component-toasts.js"></script>
 
     
 <!-- Need: Apexcharts -->

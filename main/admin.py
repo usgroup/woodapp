@@ -13,6 +13,8 @@ admin.site.register(ExpenseType)
 admin.site.register(Worker)
 admin.site.register(Expense)
 admin.site.register(Client)
+admin.site.register(ClientAccount)
+admin.site.register(Payment)
 
 
 

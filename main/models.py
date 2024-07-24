@@ -19,7 +19,9 @@ class Container(Base):
     name = models.CharField(max_length=255, verbose_name="Container nomi")
     come_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
+    paid_amount = models.FloatField(default=0, verbose_name="Container balansi", blank=True, null=True)
     status = models.BooleanField(default=True)
+    
     
     def __str__(self) -> str:
         return f"{self.name} | {self.come_date}"
@@ -36,22 +38,7 @@ class Container(Base):
                 
         return sales_revenue
     
-    @property
-    def total_paid_sum_usd(self):
-        paid_sum = 0
-        processed_orders = set()
-        
-        for product in self.container_products.all():
-            for item in product.pro_items.all():
-                order = item.order_item
-                if order.id not in processed_orders:
-                    if order.currency == 1:  # USD
-                        paid_sum += order.paid_summa
-                    elif order.currency == 2:  # UZS
-                        paid_sum += order.paid_summa / order.sale_exchange_rate
-                    processed_orders.add(order.id)
-                    
-        return paid_sum
+    
       
     
 class ProductSize(Base): 
@@ -76,7 +63,7 @@ class Product(Base): # info product
     def total_product_sum(self):
         return self.come_cost * self.product_cube    # 1 kubasini kelgan narxini umumiy kubasiga ko'paytirilgani
     
-    
+   
 
     
     
@@ -124,25 +111,48 @@ class Expense(Base): # chiqimlar
 class Client(Base): # mijozlar
     name = models.CharField(max_length=255, verbose_name="Ismi")
     phone = models.CharField(max_length=13, verbose_name="telefon raqami")
-    debt_usd = models.IntegerField(verbose_name="Qarz USD", default=0)
-    debt_uzs = models.IntegerField(verbose_name="Qarz UZS", default=0)
+    
+    @property
+    def debt_usd(self):
+        debt_usd = 0
+        for c in self.client_account.all():
+            debt_usd += c.debt_usd
+        return debt_usd
+    
+    @property
+    def debt_uzs(self):
+        debt_uzs = 0
+        for c in self.client_account.all():
+            debt_uzs += c.debt_uzs
+        return debt_uzs
     
     def __str__(self) -> str:
         return self.name
 
+class ClientAccount(Base):
+    container_client = models.ForeignKey(Container, on_delete=models.PROTECT, blank=True, null=True)
+    client_info = models.ForeignKey(Client, on_delete=models.PROTECT, blank=True, null=True, related_name='client_account')
+    debt_usd = models.IntegerField(verbose_name="Qarz USD", default=0)
+    debt_uzs = models.IntegerField(verbose_name="Qarz UZS", default=0)
     
+
 class Order(Base): #order
     CURRENCY_TYPE = (
         (1, "USD"),
         (2, "UZS")
     )
+    container_order = models.ForeignKey(Container, on_delete=models.PROTECT, blank=True, null=True)
     customer = models.ForeignKey(Client, on_delete=models.PROTECT, blank=True, null=True)
     currency = models.IntegerField(choices=CURRENCY_TYPE, default=2)
     sale_exchange_rate = models.IntegerField(verbose_name="Valyuta kursi")
-    total_summa = models.PositiveIntegerField(verbose_name="Total summa")
-    paid_summa = models.PositiveIntegerField(verbose_name="To'langan summa")
     debt_status = models.BooleanField(default=False)
     
+    @property
+    def total_summa(self):
+        order_sum = 0
+        for item in self.items.all():
+            order_sum += item.total_price
+        return order_sum
     
     
     def __str__(self) -> str:
@@ -155,7 +165,24 @@ class OrderItem(Base):
     product_item = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="Mahsulot", related_name='pro_items')
     product_cost = models.IntegerField(verbose_name="Mahsulot narxi")
     amount_sold = models.IntegerField(verbose_name="Sotilgan miqdori | dona")
-    total_price = models.PositiveIntegerField(default=0)
+    
+    @property
+    def total_price(self):
+        return self.product_cost * self.amount_sold
     
     def __str__(self) -> str:
         return f"{self.product_item} | {self.product_cost} | {self.amount_sold} "
+    
+    
+class Payment(Base):
+    client_account = models.ForeignKey(ClientAccount, on_delete=models.PROTECT, blank=True, null=True)
+    CURRENCY_TYPE = (
+        (1, "USD"),
+        (2, "UZS")
+    )
+    currency = models.IntegerField(choices=CURRENCY_TYPE, default=2)
+    sale_exchange_rate = models.IntegerField(verbose_name="Valyuta kursi", default=0)
+    payment_amount = models.FloatField(verbose_name="To'langan summa", default=0)
+    
+    def __str__(self) -> str:
+        return f"{self.client_account} | {self.payment_amount} "

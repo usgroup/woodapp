@@ -10,6 +10,7 @@ urlpatterns = [
     path('container-products-detail/<int:pk>',ContainerProductsDetailView.as_view(), name='container-products-detail'),
     path('container-trade-detail/<int:pk>',ContainerTradeDetailView.as_view(), name='container-trade-detail'),
     path('container-expence-detail/<int:pk>',ContainerExpenceDetailView.as_view(), name='container-expence-detail'),
+    path('container-trade-history/<int:pk>',ContainerTradeHistoryView.as_view(), name='container-trade-history'),
     path('general-expense',GeneralExpence.as_view(), name='general-expense'),
     path('clients',Clientiew.as_view(), name='clients'),
     path('payments',PaymentView.as_view(), name='payments'),
@@ -42,5 +43,9 @@ urlpatterns = [
     path('delete-worker', DeleteWorkerView.as_view(), name='delete-worker'),
     #search
     path('search-container', SearchContainerView.as_view(), name='search-container'),
+    path('create-payment', CreatePaymentView.as_view(), name='create-payment'),
+    path('edit-payment', EditPaymentView.as_view(), name='edit-payment'),
+    path('get-client-debt', GetClientDebt.as_view(), name='get-client-debt'),
+    path('edit-order-item', EditOrderItem.as_view(), name='edit-order-item'),
     
 ]
