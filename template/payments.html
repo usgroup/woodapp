@@ -287,9 +287,14 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                         data: formData,
                         success: function(response) {
                             location.reload()
+
+                            messageToast(response.status, response.message)
+
                         },
                         error: function(error) {
                             alert('Error submitting data');
+                            messageToast(status, error)
+
                             // Handle error response
                         }
                     });
@@ -344,13 +349,15 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                     data: formData,
                     success: function(response) {
 
-                        
-                        
-                        console.log('Success:', response);
+
+                        messageToast(response.status, response.message)
+
                     },
                     error: function(error) {
                         // Handle error
                         console.log('Error:', error);
+                        messageToast(status, error)
+                        
                     }
                 });
 
@@ -378,6 +385,7 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                         $('.debt_info').html(`
                         Qarz: ${response.data.debt_usd} $ | ${response.data.debt_uzs} so'm
                         `)
+                    
                         console.log('Success:', response);
                     },
                     error: function(error) {

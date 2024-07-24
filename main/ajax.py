@@ -29,7 +29,7 @@ class AddSizeView(View):
          
         }
 
-        return JsonResponse({'message': 'Size added successfully',"data": data})
+        return JsonResponse({'status':200,'message':"Yangi o'lcham qo'shildi !", "data": data})
     
 
 class UpdateSizeView(View):
@@ -53,7 +53,7 @@ class UpdateSizeView(View):
             "id":product_size.id
         }
   
-        return JsonResponse({'message': 'Size updated successfully',"data":data})
+        return JsonResponse({'status':200, 'message': "O'lcham yangilandi !","data":data})
     
 
 class DeleteSizeView(View):
@@ -66,7 +66,7 @@ class DeleteSizeView(View):
             "id":id
         }
         
-        return JsonResponse({'status': 200, 'message': 'Product Size deleted successfully', "data": data})
+        return JsonResponse({'status': 200, 'message': "O'lcham o'chirildi !", "data": data})
     
 class UpdateContainerInfoView(View):
     def post(self, request):
@@ -88,7 +88,8 @@ class UpdateContainerInfoView(View):
         
         
         
-        return JsonResponse({'message': 'Container Info updated successfully',"data":data})
+        return JsonResponse({'status': 200, 'message': "Konteyner ma'lumotlari yangilandi !", "data": data})
+
         
         
 class EditProductInfoView(View):
@@ -138,7 +139,7 @@ class EditProductInfoView(View):
         
             
             
-        return JsonResponse({'message': 'Product Info updated successfully',"data":data})
+        return JsonResponse({'status': 200, 'message': "Mahsulot ma'lumotlari yangilandi !", "data": data})
 
 
        
@@ -152,7 +153,8 @@ class DeleteProduct(View):
             "product_id":product_id
         }
         
-        return JsonResponse({'message': 'Product deleted successfully',"data":data})
+        return JsonResponse({'status': 200, 'message': "Mahsulot o'chirildi !", "data": data})
+
         
         
 class EditClientView(View):
@@ -183,7 +185,8 @@ class EditClientView(View):
         
         
         
-        return JsonResponse({'message': 'Produсt deleted successfully',"data":data})
+        return JsonResponse({'status': 200, 'message': "Mijoz ma'lumotlari yangilandi !", "data": data})
+
     
 class CreateOrderView(View):
     
@@ -281,7 +284,8 @@ class CreateOrderView(View):
        
         
         #message add 
-        return JsonResponse({'status':200,'message': 'Product sale successfully'})
+        return JsonResponse({'status': 200, 'message': "Mahsulot sotildi ! To'lov qilishni unutmang !"})
+
     
     
 class EditOrderItem(View):
@@ -290,19 +294,16 @@ class EditOrderItem(View):
         qty_item = int(request.POST['qty_item'])
         cost_item = int(request.POST['cost_item'])
         
-        print()
-        print(request.POST)
-        print()
-        
         order_item = OrderItem.objects.filter(id=item_id).first()
         last_product = order_item.product_item ## product
         last_product_size = order_item.product_item.product_size ## product size
+        order = order_item.order_item ## order
         last_amount_sold = order_item.amount_sold
         last_product_cost = order_item.product_cost 
         
         last_product.rest_qty += last_amount_sold
         last_cube = metr_to_cube(last_product_size.product_size_x, last_product_size.product_size_y, last_product_size.product_size_z, last_amount_sold  )
-        last_product.rest_cube -= float(last_cube)
+        last_product.rest_cube += float(last_cube)
         
         ##edit
         
@@ -310,17 +311,85 @@ class EditOrderItem(View):
         new_cube = metr_to_cube(last_product_size.product_size_x, last_product_size.product_size_y,last_product_size.product_size_z, qty_item  )
         
         order_item.product_cost  = cost_item
-        last_product.rest_cube += float(new_cube)
+        last_product.rest_cube -= float(new_cube)
         
         order_item.amount_sold = qty_item
+        
+        if order.debt_status:
+        
+            client_account = ClientAccount.objects.filter(container_client=order.container_order, client_info=order.customer).first()
+            
+            if order.currency == 1:
+                client_account.debt_usd -= -(last_product_cost * last_amount_sold)
+                client_account.debt_usd += -(cost_item * qty_item)
+                
+            if order.currency == 2:
+                client_account.debt_uzs -= -(last_product_cost * last_amount_sold)
+                client_account.debt_uzs += -(cost_item * qty_item)
+            
+            client_account.save()
+            
+        order_item.save()
+        last_product.save()
+        
+                    
+        
+        return JsonResponse({'status': 200, 'message': "Buyurtmaga o'zgarishlar kiritildi !"})
+
+    
+    
+class ReturnOrderItem(View):
+    
+    def post(self,request):
+        order_item_id = int(request.POST['order_item_id'])
+        return_qty = int( request.POST['return_qty'])
+        
+        order_item = OrderItem.objects.filter(id=order_item_id).first()
+        
+        last_product = order_item.product_item ## product
+        last_product_size = order_item.product_item.product_size ## product size
+        order = order_item.order_item ## order
+        
+        last_amount_sold = order_item.amount_sold
+        last_product_cost = order_item.product_cost 
+        
+        
+        last_product.rest_qty += last_amount_sold
+        last_cube = metr_to_cube(last_product_size.product_size_x, last_product_size.product_size_y, last_product_size.product_size_z, last_amount_sold  )
+        last_product.rest_cube += float(last_cube)
+        
+        # return
+        order_item.return_qty = 0
+        order_item.return_qty += return_qty
+        new_qty = last_amount_sold - return_qty
+        
+        
+        last_product.rest_qty -= new_qty
+        last_cube = metr_to_cube(last_product_size.product_size_x, last_product_size.product_size_y, last_product_size.product_size_z, new_qty  )
+        last_product.rest_cube -= float(last_cube)
+        
+        order_item.amount_sold = new_qty   
+        
+        if order.debt_status:
+        
+            client_account = ClientAccount.objects.filter(container_client=order.container_order, client_info=order.customer).first()
+            
+            if order.currency == 1:
+                client_account.debt_usd -= -(last_product_cost * last_amount_sold)
+                client_account.debt_usd += -(last_product_cost * new_qty)
+                
+            if order.currency == 2:
+                client_account.debt_uzs -= -(last_product_cost * last_amount_sold)
+                client_account.debt_uzs += -(last_product_cost * new_qty)
+            
+            client_account.save()
         
         order_item.save()
         last_product.save()
         
-                        
+        return JsonResponse({'status': 200, 'message': "Buyurtma qaytarib olindi !"})
+
         
-        
-        return JsonResponse({'status':200,'message': 'Order item edited successfully'})
         
     
 
@@ -339,7 +408,7 @@ class AddExpenseTypeView(View):
         
         print(request.POST)
         
-        return JsonResponse({'status':200,'message': 'ExpenseType added successfully', "data":data})
+        return JsonResponse({'status':200,'message': "Chiqim turi qo'shildi !", "data":data})
 
 
 class EditExpenseTypeView(View):
@@ -360,7 +429,8 @@ class EditExpenseTypeView(View):
             "title": expense_type.title,
         }
                 
-        return JsonResponse({'status': 200, 'message': 'ExpenseType edited successfully', "data": data})
+        return JsonResponse({'status':200,'message': "Chiqim turi ma'lumotlari yangilandi !", "data":data})
+
     
     def post(self, request):
         
@@ -379,7 +449,8 @@ class EditExpenseTypeView(View):
             "title": expense_type.title,
         }
                 
-        return JsonResponse({'status': 200, 'message': 'ExpenseType edited successfully', "data": data})
+        return JsonResponse({'status':200,'message': "Chiqim turi ma'lumotlari yangilandi !", "data":data})
+
 
 class DeleteExpenseTypeView(View):
     def get(self, requets):
@@ -391,7 +462,7 @@ class DeleteExpenseTypeView(View):
             "id":id
         }
         
-        return JsonResponse({'status': 200, 'message': 'ExpenseType deleted successfully', "data": data})
+        return JsonResponse({'status': 200, 'message': "Chiqim turi o'chirildi !", "data": data})
 
 
 
@@ -434,7 +505,8 @@ class CreateMainExpenseView(View):
           
 
         
-        return JsonResponse({'status': 200, 'message': 'Expense created successfully'})
+        return JsonResponse({'status':200,'message': "Chiqim qilindi !"})
+
     
     
 class EditWorkerView(View):
@@ -458,7 +530,8 @@ class DeleteWorkerView(View):
         worker = Worker.objects.filter(id=int(id)).first()
         worker.delete()
         
-        return JsonResponse({'status': 200, 'message': 'Message deleted successfully'})
+        return JsonResponse({'status':200,'message': "Ishchi o'chirildi !"})
+
 
 
 class SearchContainerView(View):
@@ -545,8 +618,9 @@ class CreatePaymentView(View):
         payment.save()
         client_account.save()
         container.save()
-        
-        return JsonResponse({'status': 200, 'message': 'Payment created successfully'})
+
+        return JsonResponse({'status':200,'message': "To'lov amalga oshirildi !"})
+
     
 class EditPaymentView(View):
     def post(self, request):
@@ -598,7 +672,8 @@ class EditPaymentView(View):
         print(request.POST)
         print()
         
-        return JsonResponse({'status': 200, 'message': 'Payment edited successfully'})
+        return JsonResponse({'status':200,'message': "To'lov ma'lumotlari yangilandi !"})
+
         
     
 
@@ -620,4 +695,10 @@ class GetClientDebt(View):
         }
         
         return JsonResponse({'status': 200, 'message': 'Get client debt successfully', 'data': data})
+    
+
+
+
+
+
 

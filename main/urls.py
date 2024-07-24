@@ -47,5 +47,8 @@ urlpatterns = [
     path('edit-payment', EditPaymentView.as_view(), name='edit-payment'),
     path('get-client-debt', GetClientDebt.as_view(), name='get-client-debt'),
     path('edit-order-item', EditOrderItem.as_view(), name='edit-order-item'),
+    path('return-order-item', ReturnOrderItem.as_view(), name='return-order-item'),
+    #filter
+    # path('filter-orders/', FilterOrdersView.as_view(), name='filter-orders'),
     
 ]

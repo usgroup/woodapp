@@ -189,9 +189,14 @@
 
                 $(`#td_worker-${ id }`).remove()
 
+                messageToast(response.status, response.message)
+
+
             },
             error: function(xhr, status, error) {
                 console.log('Error updating data: ' + error);
+                messageToast(status, error)
+
             }
         });
     }

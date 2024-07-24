@@ -88,6 +88,11 @@
 
 
         <section class="section mt-3">
+
+
+            
+
+
                         <div class="card">
                          
                             <div class="row d-flex justify-content-space-evenly p-4">
@@ -116,7 +121,7 @@
 
                                             <div class="accordion accordion-flush" id="accordionFlushExample">
 
-                                                {% for order in unique_orders %}
+                                                {% for order in orders %}
 
                                                 <div class="accordion-item mt-3 ">
                                                     <h2 class="accordion-header" id="flush-heading-{{ order.id }}">
@@ -141,12 +146,12 @@
                                                                             <th>Valyuta</th>
                                                                             <th>Jami</th>
                                                                             <th></th>
+                                                                            <th></th>
                                                                  
                                                                         </tr>
                                                                   
                                                                     </thead>
                                                                     <tbody>
-
                                                                         {% for item in order.items.all %}
                                                                         <tr>
                                                                             <td class="text-bold-500">{{ forloop.counter }}</td>
@@ -157,6 +162,11 @@
                                                                             <td class="text-bold-500">{{ item.total_price }}</td>
                                                                             <td class="text-bold-500 text-center">
                                                                                 <i class="bi bi-pencil-square text-warning fs-5 cursor-pointer" role="button" data-bs-toggle="modal" data-bs-target="#default" onclick="editItem(' {{ item.id }} ')"></i>
+                                                                            </td>
+                                                                            <td class="text-bold-500 text-center " style="width:5%;">
+                                                                                <span class="badge bg-secondary" type="button" data-bs-toggle="modal"
+                                                                                data-bs-target="#inlineForm" onclick="returnItem('{{ item.id }}')">Qaytarish</span>
+                                                                                
                                                                             </td>
                                                                           
                                                                   
@@ -185,6 +195,9 @@
                 
                 
                         </div>
+
+
+
                     </section> 
             
         </div>
@@ -273,12 +286,52 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
 </div>
 
 
+
+<div class="modal fade text-left" id="inlineForm" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel33" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+    role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel33">Mahsulotni qaytarib olish</h4>
+            <button type="button" class="close" data-bs-dismiss="modal"
+                aria-label="Close">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <form action="#" method="post" id="returnItemForm">
+            {% csrf_token %}
+            <div class="modal-body">
+                <label for="returnItemQty">Mahsulot sonini kiriting </label>
+                <div class="form-group">
+                    <input id="returnItemQty" type="number" class="form-control mt-2" name="return_qty" required >
+                    <h6 class="text-danger text-start msg-handle mt-2" style="display: none;">Bo'sh bo'lishi mumkin emas !</h6>
+
+                    <input id="returnItemId" type="number" placeholder="0" class="form-control mt-2" name="order_item_id" style="display: none;">
+                </div>
+              
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary"
+                    data-bs-dismiss="modal">
+                    <i class="bx bx-x d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Close</span>
+                </button>
+                <button type="submit" class="btn btn-secondary ms-1" id="returnFormBtn" >
+                    Saqlash
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+
 <script>
     $(document).ready(function() {
         // Handle form submission with AJAX
         $('#editContainerBtn').click(function(event) {
+            
             event.preventDefault();
-
 
             let editContainerForm = $(`#editContainerName`).serialize()
 
@@ -291,9 +344,14 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                     $('#container_name').text(`Konteyner raqami: ${response.data.container_name}`)
                     $('#container_come_date').text(response.data.container_come_date)
 
+                    messageToast(response.status, response.message)
+
+
                 },
                 error: function(xhr, status, error) {
-                    console.log('Error updating data: ' + error);
+                    console.log('Error updating data: ' + error);                    
+                    messageToast(status, error)
+
                 }
             });
 
@@ -317,27 +375,77 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
     $(document).ready(function() {
 
         $('#EditItemBtn').click(function(event) { 
-
+          
             let editItemForm = $(`#editItemForm`).serialize()
-
             $.ajax({
                 url: '{% url "main:edit-order-item" %}',  
                 type: 'POST',
                 data: editItemForm,
                 success: function(response) {
+
                     location.reload()
+                    messageToast(response.status, response.message)
+
                 },
                 error: function(xhr, status, error) {
                     console.log('Error updating data: ' + error);
+                    messageToast(status, error)
+
                 }
             });
+            
 
         })
 
     })
     
 
+    function returnItem(ItemId){
+        $('#returnItemId').val(ItemId)
+    }
 
+    $(document).ready(function() {
+
+        $('#returnFormBtn').click(function(event) { 
+
+            if ($('#returnItemQty').val().trim() === '') {
+                $('.msg-handle').show()
+                return false
+            }else{
+                $('.msg-handle').hide()
+
+            
+                event.preventDefault();
+                let returnItemForm = $(`#returnItemForm`).serialize()
+            
+            $.ajax({
+                url: '{% url "main:return-order-item" %}',  
+                type: 'POST',
+                data: returnItemForm,
+                success: function(response) {
+                    location.reload()
+
+                    messageToast(response.status, response.message)
+
+
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error updating data: ' + error);
+
+                    messageToast(status, error)
+
+                }
+            });
+
+            }
+
+       
+
+        })
+
+    })
+
+    
 
 </script>
 

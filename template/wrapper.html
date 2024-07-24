@@ -38,10 +38,25 @@
                         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
                     <div class="toast-body">
-                        Hello, world! This is a toast message.
+                        
                     </div>
                 </div>
             </div>
+
+            <script>
+                function messageToast(status, msg){
+                    if (Number(status) === 200){
+                        $('.toast-header').addClass('bg-success')
+                        $('.toast-body').html(`<h6 class="text">${msg}</h6>`)
+
+                    }else{
+                        $('.toast-header').addClass('bg-danger')
+                        $('.toast-body').html(`<h6 class="text">${msg}</h6>`)
+                    }
+                    $('.toast').toast('show');
+
+                }
+            </script>
 
 
 
@@ -94,7 +109,9 @@
             </div>
         </div>
     </div>
-    <button type="button" class="btn btn-primary float-end" id="liveToastBtn">Show live toast</button>
+    
+    <button type="button" class="btn btn-primary float-end" id="liveToastBtn" style="display: none;">Show live toast</button>
+
     <div class="sidebar-menu">
         <ul class="menu">
 

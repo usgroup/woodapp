@@ -316,7 +316,12 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
 
                     $(`.editFormSize-${ response.data.id }`).css({"display":"none"}) 
                     $(`#check-edit-${ response.data.id }`).css({"display":"none"}) 
-                    response = 0
+
+                    
+                    messageToast(response.status, response.message)
+
+                   
+
                 },
                 error: function(error) {
                     alert('Error adding size');
@@ -353,12 +358,16 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                 success: function(response) {
 
                 $(`.sizeInfo-${response.data.id}`).html(`${response.data.product_size_x} x ${response.data.product_size_y} x ${response.data.product_size_z}` )
+                
+                messageToast(response.status, response.message)
                     
-
-
                 },
                 error: function(xhr, status, error) {
                     console.log('Error updating data: ' + error);
+
+                    messageToast(response.status, error)
+
+
                 }
             });
 
@@ -378,10 +387,14 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                     
                     $(`#tr_product_size-${response.data.id}`).remove()
                     console.log('working delete')
+
+                    messageToast(response.status, response.message)
+
                 
                 },
                 error: function(error) {
-                    alert('Error adding size');
+                    messageToast(response.status,"Error adding size")
+
                 }
             });
 

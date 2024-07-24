@@ -394,10 +394,14 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
 
                     $('#container_name').text(`Konteyner raqami: ${response.data.container_name}`)
                     $('#container_come_date').text(response.data.container_come_date)
+                    messageToast(response.status, response.message)
+
 
                 },
                 error: function(xhr, status, error) {
                     console.log('Error updating data: ' + error);
+                    messageToast(status, error)
+
                 }
             });
 
@@ -453,10 +457,15 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                                                   
                            
                     `) 
+
+                    messageToast(response.status, response.message)
+
     
                 },
                 error: function(xhr, status, error) {
                     console.log('Error updating data: ' + error);
+                    messageToast(status, error)
+
                 }
             });
 
@@ -481,11 +490,15 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                 data: deleteForm,
                 success: function(response) {
                     $(`#tr_product_info-${response.data.product_id}`).remove()
-                    console.log('working')
+                    
+                    messageToast(response.status, response.message)
+
 
                 },
                 error: function(xhr, status, error) {
                     console.log('Error updating data: ' + error);
+                    messageToast(status, error)
+
                 }
             });
         })

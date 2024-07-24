@@ -165,7 +165,8 @@ class OrderItem(Base):
     product_item = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="Mahsulot", related_name='pro_items')
     product_cost = models.IntegerField(verbose_name="Mahsulot narxi")
     amount_sold = models.IntegerField(verbose_name="Sotilgan miqdori | dona")
-    
+    return_qty = models.IntegerField(default=0,verbose_name="Qaytarilgan tovar miqdori", blank=True, null=True)
+   
     @property
     def total_price(self):
         return self.product_cost * self.amount_sold

@@ -119,20 +119,11 @@ class ContainerTradeHistoryView(View):
     def get(self, request,pk):
         
         container = Container.objects.filter(id=int(pk)).first()
-        order_items = OrderItem.objects.filter(product_item__product_container__id=int(pk))
-        
-        unique_orders = set()
-        
-        
-        for item in order_items:
-            unique_orders.add(item.order_item)
-        
-        unique_orders = list(unique_orders)
-        unique_orders.sort(key=lambda x: x.id, reverse=True)
+        orders = Order.objects.filter(container_order=container)
         
         context = {
             "container":container,
-            "unique_orders":unique_orders
+            "orders":orders
         }
         
         return render(request, 'container-trade-history.html',context)

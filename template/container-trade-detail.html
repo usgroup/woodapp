@@ -457,6 +457,8 @@ $(document).ready(function() {
                 if(response.status == 200 ){
 
                     window.location.reload()
+                    messageToast(response.status, response.message)
+
                 }
                 
                
@@ -464,6 +466,8 @@ $(document).ready(function() {
             error: function(xhr, status, error) {
 
                 console.log('Error updating data: ' + error);
+                messageToast(status, error)
+
             }
         });
 
@@ -492,9 +496,13 @@ $(document).ready(function() {
                 $('#container_name').text(`Konteyner raqami: ${response.data.container_name}`)
                 $('#container_come_date').text(response.data.container_come_date)
 
+                messageToast(response.status, response.message)
+
             },
             error: function(xhr, status, error) {
                 console.log('Error updating data: ' + error);
+                messageToast(status, error)
+
             }
         });
 

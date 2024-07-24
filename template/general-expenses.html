@@ -367,8 +367,9 @@ $(document).ready(function() {
             url: '{% url "main:create-main-expense" %}',
             data: formData,
             success: function(response) {
-                alert('Data submitted successfully!');
+               // alert('Data submitted successfully!');
                 // Handle success response
+                messageToast(response.status, response.message)
                 
                 location.reload()
 
@@ -381,9 +382,12 @@ $(document).ready(function() {
                 $('.form-check-input').prop('checked', false); // Uncheck all checkboxes
             },
             error: function(error) {
-                alert('Error submitting data');
+               // alert('Error submitting data');
                 // Handle error response
+                messageToast(status, error)
+
             }
+
         });
 
     });
@@ -464,10 +468,13 @@ $(document).ready(function() {
                     $(`.editFormSize-${ response.data.id }`).css({"display":"none"}) 
                     $(`#check-edit-${ response.data.id }`).css({"display":"none"}) 
                     
+                    messageToast(response.status, response.message)
                     
                 },
                 error: function(error) {
                     alert('Error adding size');
+                    messageToast(status, error)
+
                 }
             });
         });
@@ -550,11 +557,15 @@ $(document).ready(function() {
                 success: function(response) {
                     
                     $(`#tr_expense-${response.data.id}`).remove()
-                    console.log('working delete')
+
+                    messageToast(response.status, response.message)
+
                 
                 },
                 error: function(error) {
-                    alert('Error adding size');
+                    //alert('Error adding size');
+                    messageToast(status, error)
+
                 }
             });
 
