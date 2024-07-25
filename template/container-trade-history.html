@@ -95,23 +95,32 @@
 
                         <div class="card">
                          
+                            <form action="#">
                             <div class="row d-flex justify-content-space-evenly p-4">
+
                                 <div class="col-md-3">
-                                    <input type="date" class="form-control">
+                                    <input type="date" class="form-control" id="start_date" name="start_date">
+                                    <input type="number" class="form-control" id="container_id" name="container_id" value="{{ container.id }}" style="display: none;">
                                 </div>
                                 <div class="col-md-1">
                                     <h6 class="mt-2">dan</h6>
                                 </div>
                                 <div class="col-md-3">
-                                    <input type="date" class="form-control">
+                                    <input type="date" class="form-control " id="end_date" name="end_date">
                                 </div>
                                 <div class="col-md-1">
                                     <h6 class="mt-2">gacha</h6>
                                 </div>
                                 <div class="col-md-4">
-                                    <button class="btn btn-info  w-50 text-white" type="button">Filtrlash</button>
+                                    <button class="btn btn-info  w-50 text-white" type="button" id="filterBtn">Filtrlash</button>
                                 </div>
+                                <div class="col-md-12 mt-3 ml-1">
+                                    <h6 class="text-danger" id="error_date" style="display: none;">2 ta sana kiritishni unutmang !</h6>
+                                    <h6 class="text-danger" id="error_date_greater" style="display: none;">Sana ma'lumotlari noto'g'ri kiritildi !</h6>
+                                </div>
+                                
                             </div>
+                        </form>
 
                             <div class="row" id="table-inverse">
                                 <div class="col-md-12">
@@ -440,6 +449,143 @@ aria-labelledby="myModalLabel33" aria-hidden="true">
             }
 
        
+
+        })
+
+    })
+
+    
+    $(document).ready(function() {
+
+        $('#filterBtn').click(function(event) {
+            let container_id = $('#container_id').val()
+            let startDate = $('#start_date').val()
+            let endDate = $('#end_date').val()
+
+            if (!endDate && !startDate){
+                $('#error_date').show()
+            }
+            if(new Date(startDate) > new Date(endDate) ){
+                $('#error_date_greater').show()
+            }
+            else{
+                $('#error_date_greater').hide()
+                $('#error_date').hide()
+
+                getData = {
+                    startDate:startDate,
+                    endDate:endDate,
+                    container_id:container_id
+                }
+
+
+            $.ajax({
+                url: '{% url "main:filter-orders" %}',  
+                type: 'GET',
+                data: getData,
+                success: function(response) {
+
+
+                    if (response.status === 200) {
+
+                        let orders = response.data;
+                        let ordersHtml = '';
+
+                        orders.forEach(order => {
+                            ordersHtml += `
+                            <div class="accordion-item mt-3">
+                                <h2 class="accordion-header" id="flush-heading-${order.id}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-${order.id}" aria-expanded="false" aria-controls="flush-collapse-${order.id}" style="background-color: #F2F7FF; border-radius:5px;">
+                                        ${order.customer_name} |  Jami: ${order.total_summa} ${order.currency === 1 ? '$' : 'so\'m'} | ${order.created_at}
+                                    </button>
+                                </h2>
+                                <div id="flush-collapse-${order.id}" class="accordion-collapse collapse" aria-labelledby="flush-heading-${order.id}" data-bs-parent="#accordionFlushExample">
+                                    <div class="accordion-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered mb-0" style="max-height: 40vh;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Nomi</th>
+                                                        <th>Soni</th>
+                                                        <th>Narxi</th>
+                                                        <th>Valyuta</th>
+                                                        <th>Jami</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>`;
+                            order.items.forEach((item, index) => {
+                                ordersHtml += `
+                                <tr>
+                                    <td class="text-bold-500">${index + 1}</td>
+                                    <td>${item.product_size}</td>
+                                    <td id="td_item_qty-${item.id}" class="text-bold-500">${item.amount_sold}</td>
+                                    <td id="td_item_cost-${item.id}" class="text-bold-500">${item.product_cost}</td>
+                                    <td id="td_item_cost-${item.id}" class="text-bold-500">${order.currency === 1 ? '$' : 'so\'m'}</td>
+                                    <td class="text-bold-500">${item.total_price}</td>
+                                    <td class="text-bold-500 text-center">
+                                        <i class="bi bi-pencil-square text-warning fs-5 cursor-pointer" role="button" data-bs-toggle="modal" data-bs-target="#default" onclick="editItem('${item.id}')"></i>
+                                    </td>
+                                    <td class="text-bold-500 text-center" style="width:5%;">
+                                        <span class="badge bg-secondary" type="button" data-bs-toggle="modal" data-bs-target="#inlineForm" onclick="returnItem('${item.id}')">Qaytarish</span>
+                                    </td>
+                                </tr>`;
+                            });
+                            ordersHtml += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                        });
+
+                        $('#accordionFlushExample').html(ordersHtml);
+                    } else {
+                        console.log('Error:', response.message);
+                    }
+
+
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error updating data: ' + error);
+
+                    messageToast(status, error)
+
+                }
+            });
+
+
+
+            }
+
+
+         })
+
+
+        $('#start_date').change(function(event) { 
+            let startDate = $(this).val()
+            let endDate = $('#end_date').val()
+
+            if (endDate && startDate){
+                $('#error_date').hide()
+            }else{
+                $('#error_date').show()
+            }       
+
+        })
+
+        $('#end_date').change(function(event) { 
+            let startDate = $('#start_date').val()
+            let endDate = $(this).val()
+
+            if (endDate && startDate){
+                $('#error_date').hide()
+            }else{
+                $('#error_date').show()
+            }      
 
         })
 

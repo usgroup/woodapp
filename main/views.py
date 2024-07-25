@@ -13,7 +13,7 @@ class HomeView(LoginRequiredMixin,View):
     def get(self, request):
         
         containers = Container.objects.filter(status=True).order_by('-id')
-        all_product_size = ProductSize.objects.all()
+        all_product_size = ProductSize.objects.filter(status=True)
         
         context = {
             "containers":containers,
@@ -88,7 +88,7 @@ class ContainerTradeDetailView(LoginRequiredMixin,View):
     
     def get(self, request,pk):
         
-        container = Container.objects.filter(id=pk,status=True)[0]
+        container = Container.objects.filter(id=pk)[0]
         clients = Client.objects.all()
      
         
@@ -103,7 +103,7 @@ class ContainerTradeDetailView(LoginRequiredMixin,View):
 class ContainerExpenceDetailView(LoginRequiredMixin,View):
     def get(self, request, pk):
         
-        container = Container.objects.filter(id=pk,status=True)[0]
+        container = Container.objects.filter(id=pk)[0]
         
         print()
         print(container.expense_set.all())
@@ -119,7 +119,7 @@ class ContainerTradeHistoryView(View):
     def get(self, request,pk):
         
         container = Container.objects.filter(id=int(pk)).first()
-        orders = Order.objects.filter(container_order=container)
+        orders = Order.objects.filter(container_order=container).order_by('-id')
         
         context = {
             "container":container,
@@ -211,7 +211,7 @@ class WorkerView(LoginRequiredMixin,View):
 class ArchiveContainers(LoginRequiredMixin,View):
     def get(self,request):
         
-        containers = Container.objects.filter(status=True).order_by('-id')
+        containers = Container.objects.filter(status=False).order_by('-id')
         
         context = {
             "containers":containers
@@ -223,24 +223,50 @@ class ArchiveContainerDetail(LoginRequiredMixin,View):
     def get(self,request, pk):
         
         container = Container.objects.filter(id=int(pk)).first()
-        order_items = OrderItem.objects.filter(product_item__product_container__id=int(pk))
         
-        unique_orders = set()
-        
-        
-        for item in order_items:
-            unique_orders.add(item.order_item)
-        
+        orders = Order.objects.filter(container_order=container).order_by('-id')
         
         
         context = {
             "container":container,
-            "unique_orders":unique_orders
+            "unique_orders":orders
         }
         
-        return render(request, 'archive-container-detail.html', context)
+        return render(request, 'archive-container-products-detail.html', context)
     
     
+class ArchiveContainerExpenseDetail(View):
+    def get(self, request, pk):
+        
+        container = Container.objects.filter(id=pk)[0]
+        
+        print()
+        print(container.expense_set.all())
+        print()
+   
+        context = {
+            "container":container,
+        }
+        
+        return render(request, 'archive-expence-history-detail.html',context)
+    
+    
+class ArchiveContainerTradeDetail(View):
+      def get(self, request,pk):
+        
+        container = Container.objects.filter(id=int(pk)).first()
+        orders = Order.objects.filter(container_order=container).order_by('-id')
+        
+        context = {
+            "container":container,
+            "orders":orders
+        }
+        
+        return render(request, 'archive-trade-history.html',context)
+    
+    
+    
+
 
 
 def login_view(request):

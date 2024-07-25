@@ -10,26 +10,36 @@ from django.db.models import Q
 
 class AddSizeView(View):
     def post(self, request):
-        size_x = int(request.POST.get('product_size_x'))
-        size_y = int(request.POST.get('product_size_y'))
-        size_z = int(request.POST.get('product_size_z'))
-
-        product_size = ProductSize.objects.create(
+        size_x = float(request.POST.get('product_size_x'))
+        size_y = float(request.POST.get('product_size_y'))
+        size_z = float(request.POST.get('product_size_z'))
+        
+        check_product_size = ProductSize.objects.filter( 
             product_size_x=size_x,
             product_size_y=size_y,
             product_size_z=size_z
             )
+        
+        if check_product_size.exists():
+            
+            return JsonResponse({'status':400,'message':"Ushbu o'lcham hozirda mavjud !"})
+        
+        else:
+            product_size = ProductSize.objects.create(
+                product_size_x=size_x,
+                product_size_y=size_y,
+                product_size_z=size_z
+                )
 
+            data = {
+                "size_x": float(product_size.product_size_x),
+                "size_y": float(product_size.product_size_y),
+                "size_z": float(product_size.product_size_y),
+                "id":product_size.id,
+            
+            }
 
-        data = {
-            "size_x": float(product_size.product_size_x),
-            "size_y": float(product_size.product_size_y),
-            "size_z": float(product_size.product_size_y),
-            "id":product_size.id,
-         
-        }
-
-        return JsonResponse({'status':200,'message':"Yangi o'lcham qo'shildi !", "data": data})
+            return JsonResponse({'status':200,'message':"Yangi o'lcham qo'shildi !", "data": data})
     
 
 class UpdateSizeView(View):
@@ -39,29 +49,41 @@ class UpdateSizeView(View):
         update_size_y = float(request.POST['update_size_y'])
         update_size_z = float(request.POST['update_size_z'])
         
-        product_size = ProductSize.objects.filter(id=product_size_id)[0]
         
-        product_size.product_size_x = update_size_x
-        product_size.product_size_y = update_size_y
-        product_size.product_size_z = update_size_z
-        product_size.save()
+        check_product_size = ProductSize.objects.filter( 
+            product_size_x=update_size_x,
+            product_size_y=update_size_y,
+            product_size_z=update_size_z
+            )
         
-        data = {
-            "product_size_x": product_size.product_size_x ,
-            "product_size_y": product_size.product_size_y,
-            "product_size_z":product_size.product_size_z,
-            "id":product_size.id
-        }
-  
-        return JsonResponse({'status':200, 'message': "O'lcham yangilandi !","data":data})
+        if check_product_size.exists():
+            
+            return JsonResponse({'status':400,'message':"Ushbu o'lcham hozirda mavjud !"})
+        
+        else:
+            product_size = ProductSize.objects.filter(id=product_size_id)[0]
+            
+            product_size.product_size_x = update_size_x
+            product_size.product_size_y = update_size_y
+            product_size.product_size_z = update_size_z
+            product_size.save()
+            
+            data = {
+                "product_size_x": product_size.product_size_x ,
+                "product_size_y": product_size.product_size_y,
+                "product_size_z":product_size.product_size_z,
+                "id":product_size.id
+            }
+    
+            return JsonResponse({'status':200, 'message': "O'lcham yangilandi !","data":data})
     
 
 class DeleteSizeView(View):
     def get(self, requets):
         id = int(requets.GET['id'])
         product_size = ProductSize.objects.filter(id=id).first()
-        product_size.delete()
-
+        product_size.status = False
+        product_size.save()
         data = {
             "id":id
         }
@@ -199,11 +221,7 @@ class CreateOrderView(View):
         container_id = request.POST['container_id']
         
         container = Container.objects.filter(id=int(container_id)).first()
-        
-        print()
-        print(container_id)
-        print()
-        
+       
       
         if usd_currency <= 0:
             return JsonResponse(data={'status':400,'error_message': 'Valyuta kursni kiritishni unutdingiz !'})
@@ -281,7 +299,21 @@ class CreateOrderView(View):
             
             product.save()
         
-       
+        counter = 0
+        check_products_count = Product.objects.filter(product_container=container)
+        
+        for p in check_products_count:
+            counter += p.rest_qty
+        
+        print(counter)
+        print(counter)
+        print(counter)
+            
+        if counter <= 0:
+            container.status = False
+            container.save()
+        
+      
         
         #message add 
         return JsonResponse({'status': 200, 'message': "Mahsulot sotildi ! To'lov qilishni unutmang !"})
@@ -625,7 +657,7 @@ class CreatePaymentView(View):
 class EditPaymentView(View):
     def post(self, request):
         payment_id = int(request.POST['payment_id'])
-        payment_sum = int(request.POST['payment_sum'])
+        payment_sum = float(request.POST['payment_sum'])
         currency_type = int(request.POST['currency_type'])
         exchange_rate = int(request.POST['exchange_rate'])
         
@@ -633,18 +665,18 @@ class EditPaymentView(View):
         payment = Payment.objects.filter(id=payment_id).first()
         container = payment.client_account.container_client
         last_client_info = payment.client_account
-        last_payment_amount = payment.payment_amount
+        payment.payment_amount = payment.payment_amount
         last_currency = payment.currency
         last_sale_exchange_rate = payment.sale_exchange_rate
         
         if last_currency == 2:
-            container.paid_amount -= (last_payment_amount/last_sale_exchange_rate)
-            last_client_info.debt_uzs -= last_payment_amount
-            last_payment_amount -= last_payment_amount
+            container.paid_amount -= (payment.payment_amount/last_sale_exchange_rate)
+            last_client_info.debt_uzs -= payment.payment_amount
+            payment.payment_amount -= payment.payment_amount
         if last_currency == 1:
-            container.paid_amount -= last_payment_amount
-            last_client_info.debt_usd -= last_payment_amount
-            last_payment_amount -= last_payment_amount
+            container.paid_amount -= payment.payment_amount
+            last_client_info.debt_usd -= payment.payment_amount
+            payment.payment_amount -= payment.payment_amount
             
         
         ###
@@ -653,18 +685,18 @@ class EditPaymentView(View):
             container.paid_amount += (payment_sum / exchange_rate)
             last_client_info.debt_uzs += payment_sum
             
-            last_payment_amount += payment_sum
+            payment.payment_amount += payment_sum
 
         if currency_type == 1:
             container.paid_amount += payment_sum 
             last_client_info.debt_usd += payment_sum
             
-            last_payment_amount += payment_sum
+            payment.payment_amount += payment_sum
 
             
             
         last_client_info.save()
-        last_payment_amount.save()
+        # payment.payment_amount.save()
         container.save()
         payment.save()
         
@@ -696,8 +728,90 @@ class GetClientDebt(View):
         
         return JsonResponse({'status': 200, 'message': 'Get client debt successfully', 'data': data})
     
+    
+class FilterOrdersView(View):
+    def get(self, request):
+        start_date = request.GET['startDate']
+        end_date = request.GET['endDate']
+        
+        container_id = request.GET['container_id']
+        container = Container.objects.filter(id=int(container_id)).first()
+        
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date =  datetime.strptime(end_date, '%Y-%m-%d').date()
+            
+            orders = Order.objects.filter(container_order=container, created_at__range=[start_date, end_date])
+            
+        except :
+            orders = Order.objects.filter(container_order=container)
 
 
+        data = []
+        for order in orders:
+            order_data = {
+                'id': order.id,
+                'customer_name': order.customer.name,
+                'total_summa': order.total_summa,
+                'currency': order.currency,
+                'created_at': order.created_at.strftime('%Y-%m-%d'),
+                'items': []
+            }
+            for item in order.items.all():
+                order_data['items'].append({
+                    'id': item.id,
+                    'product_size': f"{item.product_item.product_size.product_size_x} x {item.product_item.product_size.product_size_y} x {item.product_item.product_size.product_size_z}",
+                    'amount_sold': item.amount_sold,
+                    'product_cost': item.product_cost,
+                    'total_price': item.total_price
+                })
+            data.append(order_data)
+            
+            
+        return JsonResponse({'status': 200, 'message': 'filter order successfully', 'data': data})
+        
+
+
+class CutProductView(View):
+    def post(self, request):
+        product_id = int(request.POST['product_id'])
+        cut_qty = int(request.POST['cut_qty'])
+        
+        print(cut_qty)
+        print(cut_qty)
+        print(cut_qty)
+        
+        product_ = Product.objects.filter(id=product_id).first()
+        
+        product_.rest_qty -= cut_qty
+        
+        new_cube = metr_to_cube(product_.product_size.product_size_x, product_.product_size.product_size_y, product_.product_size.product_size_z, cut_qty)
+        
+        product_.rest_cube -= new_cube
+        
+        product, created = Product.objects.get_or_create(
+            product_container=product_.product_container,
+            product_size=product_.product_size,
+            is_cut=True,
+        
+        )
+        product.product_qty += 0
+        product.product_cube += 0
+        
+        product.rest_qty += cut_qty
+        product.rest_cube += new_cube
+        
+        product_.save()
+        product.save()
+        
+        
+        
+        data = { 
+            
+        }
+        
+        return JsonResponse({'status': 200, 'message': 'Mahsulot kesildi !', 'data': data})
+        
 
 
 

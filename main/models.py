@@ -45,6 +45,7 @@ class ProductSize(Base):
     product_size_x = models.FloatField(verbose_name="Eni")
     product_size_y = models.FloatField(verbose_name="Bo'yi")
     product_size_z = models.FloatField(verbose_name="Balandligi")
+    status = models.BooleanField(default=True, blank=True, null=True)
     
     def __str__(self) -> str:
         return f"{self.product_size_x} x {self.product_size_y} x {self.product_size_z}"
@@ -53,11 +54,13 @@ class ProductSize(Base):
 class Product(Base): # info product
     product_container = models.ForeignKey(Container, on_delete=models.CASCADE, verbose_name="cointainer nomi", related_name="container_products")
     product_size = models.ForeignKey(ProductSize, on_delete=models.PROTECT, verbose_name="Mahsulot razmeri", related_name="products")
-    product_qty = models.IntegerField(verbose_name="Mahsulot soni / dona")
-    product_cube = models.FloatField(verbose_name="Mahsulot miqdori / metr kub")
-    come_cost = models.IntegerField(verbose_name="Kelgan narxi")
-    rest_cube = models.FloatField(blank=True, null=True,verbose_name="Qoldiq miqdori / metr kub")
-    rest_qty = models.IntegerField(blank=True, null=True, verbose_name="Qoldiq soni / dona")
+    product_qty = models.IntegerField(verbose_name="Mahsulot soni / dona", default=0)
+    product_cube = models.FloatField(verbose_name="Mahsulot miqdori / metr kub", default=0)
+    come_cost = models.IntegerField(verbose_name="Kelgan narxi", default=0)
+    rest_cube = models.FloatField(default=0,verbose_name="Qoldiq miqdori / metr kub")
+    rest_qty = models.IntegerField(default=0, verbose_name="Qoldiq soni / dona")
+    
+    is_cut = models.BooleanField(default=False, null=True, blank=True)
     
     @property
     def total_product_sum(self):

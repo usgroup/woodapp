@@ -164,7 +164,7 @@
                 
                                                         <tr id="tr_product_info-{{  product.id }}">
                                                             <td class="text-bold-500">#</td>
-                                                            <td id="td_product_size-{{ product.product_size.id }}">{{ product.product_size }}</td>
+                                                            <td id="td_product_size-{{ product.product_size.id }}">{{ product.product_size }} {% if product.is_cut %} (kesilgan) {% else %}{% endif %}</td>
                                                             <td class="text-bold-500" id="td_product_qty-{{ product.id }}">{{ product.product_qty }}</td>
                                                             <td class="text-bold-500" >{{ product.product_cube }}</td>
                                                             <td class="text-bold-500" id="td_product_cost-{{ product.id }}">{{ product.come_cost }}</td>
@@ -176,6 +176,10 @@
 
                                                             <td><i class="bi bi-trash-fill text-danger fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
                                                                 data-bs-target="#danger" onclick="getProduct('{{ product.id }}')"></i></td>
+
+                                                            <td><i class="bi bi-gear-wide text-primary fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
+                                                                data-bs-target="#inlineForm" onclick="getCutProduct('{{ product.id }}')"></i>
+                                                            </td>
                                                   
                                                         </tr>
                                                         {% endfor %}
@@ -359,6 +363,51 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
 
 <!-- endmodals 2 -->
 
+<!-- modals 3 -->
+
+            <div class="modal fade text-left" id="inlineForm" tabindex="-1" role="dialog"
+                    aria-labelledby="myModalLabel33" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                        role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="myModalLabel33">Kesish</h4>
+                                <button type="button" class="close" data-bs-dismiss="modal"
+                                    aria-label="Close">
+                                    <i data-feather="x"></i>
+                                </button>
+                            </div>
+                            <form action="#" id="cutProductForm" method="post"> {% csrf_token %}
+                                <div class="modal-body">
+                                    <label for="email">Kesish soni</label>
+                                    <div class="form-group">
+                                        <input id="cut_qty" type="number" placeholder="Soni" class="form-control mt-2" name="cut_qty" required >
+                                        <input id="cutProductId" type="number" class="form-control mt-2" style="display: none;" name="product_id">
+                                            
+                                    </div>
+                                    
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light-secondary"
+                                        data-bs-dismiss="modal">
+                                        <i class="bx bx-x d-block d-sm-none"></i>
+                                        <span class="d-none d-sm-block">Orqaga</span>
+                                    </button>
+                                    <button type="submit" class="btn btn-primary ms-1" id="cutProductBtn">
+                                        Tasdiqlash
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    </div>
+
+
+
+<!-- endmodals 3 -->
+
+
+
 
 <script>
 
@@ -377,6 +426,55 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
         return cookieValue;
     }
     const csrftoken = getCookie('csrftoken');
+
+
+
+    function getCutProduct(product_id){
+        $('#cutProductId').val(product_id)
+    }
+
+    $(document).ready(function() {
+        // Handle form submission with AJAX
+        $('#cutProductBtn').click(function(event) {
+            event.preventDefault();
+
+            cut_data = $('#cutProductForm').serialize()
+
+            console.log(cut_data)
+            console.log(cut_data)
+
+            $.ajax({
+                url: '{% url "main:cut-product" %}',  
+                type: 'POST',
+                data: cut_data,
+                success: function(response) {
+
+                    location.reload()
+
+                    console.log(response.data)
+                   
+                    messageToast(response.status, response.message)
+
+
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error updating data: ' + error);
+                    messageToast(status, error)
+
+                }
+            });
+
+
+
+        })
+    })
+
+
+
+
+
+
+
 
     $(document).ready(function() {
         // Handle form submission with AJAX

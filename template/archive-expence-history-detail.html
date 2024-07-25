@@ -1,0 +1,173 @@
+
+    
+{% extends 'wrapper.html' %}
+
+{% block content %}
+
+<div id="main">
+    <header class="mb-3">
+        <a href="#" class="burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </a>
+    </header>
+
+<div class="page-heading">
+    <section class="section">
+        <div class="card">
+            <div class="card-header d-flex ">
+                <h3 class="text m-1" id="container_name">Konteyner raqami: {{ container.name }}</h3> 
+                
+                </div>
+                <div class="card-body row">
+
+            <div class="col-md-6">
+
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1 ">Kirgan sanasi: </h6> <h6 class="text m-1 " id="container_come_date"> {{ container.come_date|date:"d/m/Y" }}</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Kirdi: </h6> <h6 class="text m-1">25 metr kub </h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Sotildi: </h6> <h6 class="text m-1"> 8 metr kub</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Qoldi: </h6> <h6 class="text m-1">17 metr kub</h6>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Kirgan sunma: </h6> <h6 class="text m-1">1500 USD</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Sotilgan summa: </h6> <h6 class="text m-1"> 600 USD</h6>
+                </div>
+                <div class="card-text d-flex flex-wrap">
+                    <h6 class="text text-bold m-1">Harajat summa: </h6> <h6 class="text m-1">50 USD</h6>
+                </div>
+            </div>
+
+
+               
+            </div>
+         </div>  
+
+    </section>
+
+
+    <div class="card-content">
+        <div class="card-body">
+            
+            <div class="list-group list-group-horizontal-sm mb-1 text-center" >
+
+
+                {% if request.path|slice:":32"  == "/archive-product-history-detail/" %}
+
+                <a class="list-group-item list-group-item-action active" href="{% url 'main:archive-product-detail' container.id %}" role="tab">Mahsulotlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:archive-expense-container-detail' container.id %}" role="tab">Chiqimlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:archive-trade-history-detail' container.id %}" role="tab">Sotuv tarixi</a>
+
+
+                {% elif  request.path|slice:":32" == '/archive-expense-history-detail/' %}
+
+                <a class="list-group-item list-group-item-action " href="{% url 'main:archive-product-detail' container.id %}" role="tab">Mahsulotlar</a>
+                <a class="list-group-item list-group-item-action active" href="{% url 'main:archive-expense-container-detail' container.id %}" role="tab">Chiqimlar</a>
+                <a class="list-group-item list-group-item-action " href="{% url 'main:archive-trade-history-detail' container.id %}" role="tab">Sotuv tarixi</a>
+
+                {% elif  request.path|slice:":30" == '/archive-trade-history-detail/' %}
+               
+                <a class="list-group-item list-group-item-action " href="{% url 'main:archive-product-detail' container.id %}" role="tab">Mahsulotlar</a>
+                <a class="list-group-item list-group-item-action active" href="{% url 'main:archive-expense-container-detail' container.id %}" role="tab">Chiqimlar</a>
+                <a class="list-group-item list-group-item-action active" href="{% url 'main:archive-trade-history-detail' container.id %}" role="tab">Sotuv tarixi</a>
+                {% else %}
+                {% endif %}
+
+            </div>
+
+            
+        
+                   <!-- start 1 section -->
+                    <section class="section mt-3">
+                        <div class="card">
+                         
+                
+                            <div class="row" id="table-inverse">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                       
+                                        
+                                        <div class="card-content m-3">
+                                        
+                                            <div class="table-responsive">
+                                              
+                                                <table class="table table-bordered mb-0 mt-2 text-center" style="max-height: 40vh;">
+                
+                
+                                                    <thead >
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Chiqim turi</th>
+                                                            <th>Ishchilar</th>
+                                                            <th>Summa</th>
+                                                            <th>Valyuta</th>
+                                                            <th>Valyuta kursi / so'm</th>
+                                                          
+                                                        
+                                                        </tr>
+                                                       
+                                                        </tr> 
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for expense in container.expense_set.all %}
+                
+                                                        <tr>
+                                                            <td class="text-bold-500">#</td>
+                                                            {% if expense.expense_type == None %}
+                                                            <td></td>
+                                                            {% else %}
+                                                            <td>{{expense.expense_type}}</td>
+                                                            {% endif %}
+                                                            {% if expense.workers == None %}
+                                                            <td></td>
+                                                            {% else %}
+                                                            <td>{{expense.workers}}</td>
+                                                            {% endif %}
+
+                                                            <td class="text-bold-500">{{ expense.container_sum }}</td>
+                                                            <td class="text-bold-500">$</td>
+                                                            <td class="text-bold-500">{{ expense.exchange_rate }}</td>
+                                                            
+                                                            
+                                                        </tr>
+                                                        {% endfor %}
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                     
+                          
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                
+                
+                        </div>
+                    </section> 
+                    <!-- end 1 section -->
+
+                
+            </div>
+        </div>
+    </div>
+
+
+
+   
+</div> 
+
+</div>
+
+
+{% endblock content %}

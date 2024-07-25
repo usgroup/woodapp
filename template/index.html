@@ -277,54 +277,59 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                 url: '{% url "main:add-size" %}', 
                 data: formData,
                 success: function(response) {
-                    
-                    let newRow = `
-                        <tr id="tr_product_size-${ response.data.id }">
-                            <td class="text-bold-500">
-                                   <div class="sizeInfo-${ response.data.id }">
-                                    ${ response.data.size_x } x ${ response.data.size_y } x ${ response.data.size_z }
-                                   </div>
-                                   <form id=updateSizeForm-${ response.data.id }>
-                                    <div class="row editFormSize-${ response.data.id } style="display: none;">
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" value="${ response.data.size_x }" name="update_size_x">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" value="${ response.data.size_y }" name="update_size_y">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" value="${ response.data.size_z }" name="update_size_z">
-                                        </div>
-                                        <input type="text" value=${ response.data.id } name="product_size_id" style="display: none;">
 
-                                    </div>
-                                    </form>
+                    if(response.status == 200){
 
-                                </td>
-                                <td class="text-center m-2">
-                                    <a href="#" onclick="editSize('${ response.data.id }')" id="pensil-edit-${ response.data.id }"><i class="bi bi-pencil-square fs-5 text-warning edit-icon"></i></a>
-                                    <a href="#" onclick="deleteSize('${ response.data.id }')" id="trash-delete-${ response.data.id }"><i class="bi bi-trash-fill fs-5 text-danger edit-icon"></i></a>
-                                    <a href="#" onclick="checkSize('${ response.data.id }')" id="check-edit-${ response.data.id }" ><i class="bi bi-check-square fs-5 text-success check-icon"></i></a>
-                                </td>
-                        </tr>
-                    `;
+                        let newRow = `
+                            <tr id="tr_product_size-${ response.data.id }">
+                                <td class="text-bold-500">
+                                       <div class="sizeInfo-${ response.data.id }">
+                                        ${ response.data.size_x } x ${ response.data.size_y } x ${ response.data.size_z }
+                                       </div>
+                                       <form id=updateSizeForm-${ response.data.id }>
+                                        <div class="row editFormSize-${ response.data.id } style="display: none;">
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" value="${ response.data.size_x }" name="update_size_x">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" value="${ response.data.size_y }" name="update_size_y">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" value="${ response.data.size_z }" name="update_size_z">
+                                            </div>
+                                            <input type="text" value=${ response.data.id } name="product_size_id" style="display: none;">
+    
+                                        </div>
+                                        </form>
+    
+                                    </td>
+                                    <td class="text-center m-2">
+                                        <a href="#" onclick="editSize('${ response.data.id }')" id="pensil-edit-${ response.data.id }"><i class="bi bi-pencil-square fs-5 text-warning edit-icon"></i></a>
+                                        <a href="#" onclick="deleteSize('${ response.data.id }')" id="trash-delete-${ response.data.id }"><i class="bi bi-trash-fill fs-5 text-danger edit-icon"></i></a>
+                                        <a href="#" onclick="checkSize('${ response.data.id }')" id="check-edit-${ response.data.id }" ><i class="bi bi-check-square fs-5 text-success check-icon"></i></a>
+                                    </td>
+                            </tr>
+                        `;
+                        $('table tbody').append(newRow);
+                        $(`.editFormSize-${ response.data.id }`).css({"display":"none"}) 
+                        $(`#check-edit-${ response.data.id }`).css({"display":"none"}) 
+                    }
                     
                     // Append the new row to the table body
-                    $('table tbody').append(newRow);
+                    $('#sizeForm')[0].reset();
+                    $('.msg-handle').text('')
+
+
+                    
+                    messageToast(response.status, response.message)
+                },
+                error: function(error) {
+                    messageToast(status, error)
                     $('#sizeForm')[0].reset();
                     $('.msg-handle').text('')
 
                     $(`.editFormSize-${ response.data.id }`).css({"display":"none"}) 
                     $(`#check-edit-${ response.data.id }`).css({"display":"none"}) 
-
-                    
-                    messageToast(response.status, response.message)
-
-                   
-
-                },
-                error: function(error) {
-                    alert('Error adding size');
                 }
             });
         });
@@ -357,15 +362,20 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                 data: updateFormData,
                 success: function(response) {
 
-                $(`.sizeInfo-${response.data.id}`).html(`${response.data.product_size_x} x ${response.data.product_size_y} x ${response.data.product_size_z}` )
+                    if(response.status == 200){
+                        $(`.sizeInfo-${response.data.id}`).html(`${response.data.product_size_x} x ${response.data.product_size_y} x ${response.data.product_size_z}` )
+                    }else{
+                        messageToast(response.status, response.message)
+
+                    }
+
                 
-                messageToast(response.status, response.message)
                     
                 },
                 error: function(xhr, status, error) {
                     console.log('Error updating data: ' + error);
 
-                    messageToast(response.status, error)
+                    messageToast(status, error)
 
 
                 }

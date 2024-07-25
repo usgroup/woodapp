@@ -151,7 +151,7 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
 <div class="modal-dialog modal-dialog-scrollable" role="document">
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="myModalLabel1">Mahsulotni tahrirlash</h5>
+            <h5 class="modal-title" id="myModalLabel1">To'lov ma'lumotlarini tahrirlash</h5>
             <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
                 aria-label="Close">
                 <i data-feather="x"></i>
@@ -168,21 +168,21 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                         <option value="1">USD</option>
                         <option value="2">UZS</option>
                     </select>
-                    <p class="currency_error_msg text-start text-danger mt-1" style="display: none;">
+                    <p class="modal_currency_error_msg text-start text-danger mt-1" style="display: none;">
                         Valyutalardan birini tanlang !
                     </p>
                 </div>
                 <div class="form-group">
                     <label for="exchangeRateInput" class="m-1">Valyuta kursi</label>
                     <input type="number" class="form-control" id="modal_exchangeRateInput" placeholder="$" required name="exchange_rate">
-                    <p class="exchange_rate_error_msg text-start text-danger mt-1" style="display: none;">
+                    <p class="modal_exchange_rate_error_msg text-start text-danger mt-1" style="display: none;">
                         Valyuta kursini kiriting !
                     </p>
                 </div>
                 <div class="form-group">
                     <label for="paymentSumInput" class="m-1">Summa</label>
                     <input type="number" class="form-control" id="modal_paymentSumInput" placeholder="summa" required name="payment_sum">
-                    <p class="summa_error_msg text-start text-danger mt-1" style="display: none;">
+                    <p class="modal_summa_error_msg text-start text-danger mt-1" style="display: none;">
                         Summani kiriting !
                     </p>
                 </div>
@@ -194,7 +194,7 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                 <i class="bx bx-x d-block d-sm-none"></i>
                 <span class="d-none d-sm-block">Orqaga</span>
             </button>
-            <button type="button" class="btn btn-primary ms-1" data-bs-dismiss="modal" id="updateProductBtn">
+            <button type="submit" class="btn btn-primary ms-1"  id="updateProductBtn">
                 <i class="bx bx-check d-block d-sm-none"></i>
                 <span class="d-none d-sm-block">Saqlash</span>
             </button>
@@ -342,6 +342,31 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                 
                 formData = $('#editPaymentForm').serialize()
 
+                if ($('#modal_currencySelect').val() === "0") {
+                    valid = false;
+                    $('.modal_currency_error_msg').show()
+                  
+                }else{
+                    valid = true
+                    $('.modal_currency_error_msg').hide()
+                }
+
+                if ($('#modal_paymentSumInput').val().trim() === '') {
+                    valid = false;
+                    $('.modal_summa_error_msg').show()
+                }else{
+                    $('.modal_summa_error_msg').hide()
+                }
+
+                if ($('#modal_exchangeRateInput').val().trim() === '') {
+                    valid = false;
+                    $('.modal_exchange_rate_error_msg').show()
+                }else{
+                    $('.modal_exchange_rate_error_msg').hide()
+                }
+
+                if (valid) {
+
       
                 $.ajax({
                     url: '{% url "main:edit-payment" %}',  // Replace with your actual URL
@@ -360,7 +385,7 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                         
                     }
                 });
-
+            }
 
             })
         })

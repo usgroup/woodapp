@@ -23,7 +23,9 @@ urlpatterns = [
     
     
     path('trade-history',ArchiveContainers.as_view(), name='archive_containers'),
-    path('trade-history-detail/<int:pk>',ArchiveContainerDetail.as_view(), name='archive_container_detail'),
+    path('archive-product-history-detail/<int:pk>',ArchiveContainerDetail.as_view(), name='archive-product-detail'),
+    path('archive-expense-history-detail/<int:pk>',ArchiveContainerExpenseDetail.as_view(), name='archive-expense-container-detail'),
+    path('archive-trade-history-detail/<int:pk>',ArchiveContainerTradeDetail.as_view(), name='archive-trade-history-detail'),
     
     
     #ajax
@@ -49,6 +51,7 @@ urlpatterns = [
     path('edit-order-item', EditOrderItem.as_view(), name='edit-order-item'),
     path('return-order-item', ReturnOrderItem.as_view(), name='return-order-item'),
     #filter
-    # path('filter-orders/', FilterOrdersView.as_view(), name='filter-orders'),
+    path('filter-orders', FilterOrdersView.as_view(), name='filter-orders'),
+    path('cut-product', CutProductView.as_view(), name='cut-product'),
     
 ]

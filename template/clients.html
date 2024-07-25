@@ -122,19 +122,22 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                     
                     
                 </div>
+                <h6 class="text-danger" id="error_name" style="display: none;">Maydon bo'sh bo'lishi mumkin emas !</h6>
+
                     <label for="basicInput">Telefon</label>
                 <div class="form-group">
                     <input type="text" class="form-control" id="editPhoneId" placeholder="phone" name="editPhone" maxlength="13">
                     <input type="number" class="form-control" id="clientID"  style="display: none;" name="client_id" > 
                 </div>
+                <h6 class="text-danger" id="error_phone" style="display: none;">Maydon bo'sh bo'lishi mumkin emas !</h6>
            </form>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn" data-bs-dismiss="modal">
                 <i class="bx bx-x d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">Close</span>
+                <span class="d-none d-sm-block">Orqaga</span>
             </button>
-            <button type="button" class="btn btn-warning ms-1" data-bs-dismiss="modal" id="EditClientBtn">
+            <button type="button" class="btn btn-warning ms-1" id="EditClientBtn" >
                 <i class="bx bx-check d-block d-sm-none"></i>
                 <span class="d-none d-sm-block text-white">O'zgartirish</span>
             </button>
@@ -159,42 +162,66 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
         
         $('#EditClientBtn').click(function(event) {
             event.preventDefault()
-            let deleteForm = $(`#EditClientForm`).serialize()
 
-            $.ajax({
-                url: '{% url "main:edit-client" %}',  
-                type: 'POST',
-                data: deleteForm,
-                success: function(response) {
+            isEmpty = false
+
+            if ($('#editNameId').val().trim() === '') {
+                isEmpty = true;
+                $('#error_name').show()
+                return false; 
+            }else{
+                isEmpty = false;
+                $('#error_name').hide()
+            }
+
+            if ($('#editPhoneId').val().trim() === '') {
+                isEmpty = true;
+                $('#error_phone').show()
+                return false; 
+            }else{
+                isEmpty = false;
+                $('#error_phone').hide()
+            }
+            
+            if(!isEmpty){
+                $('#error_name').hide()
+                $('#error_phone').hide()
+
+                let deleteForm = $(`#EditClientForm`).serialize()
+                $.ajax({
+                    url: '{% url "main:edit-client" %}',  
+                    type: 'POST',
+                    data: deleteForm,
+                    success: function(response) {
+                        
+                        $(`#tr_client-${response.data.client_id}`).html(`
+    
+                                    <td id="td_name-${response.data.client_id}">${response.data.client_name}</td>
+                                    <td id="td_phone-${response.data.client_id}">${response.data.client_phone}</td>
+                                    <td>${response.data.client_debt_usd}</td>
+                                    <td>${response.data.client_debt_uzs}</td>
+                                    <td><i class="bi bi-pencil-square text-warning fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
+                                        data-bs-target="#default" onclick="getCliendId( '${response.data.client_id}' )"></i>
+                                    </td>
+                        `)
+    
+                        messageToast(response.status, response.message)
+                        
+                        $('#default').modal('hide');
                     
-                    console.log(response.data.client_id)
+    
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error updating data: ' + error);
+                        messageToast(status, error)
+    
+                    }
+                });
 
-                    
-
-                    $(`#tr_client-${response.data.client_id}`).html(`
-
-                                <td id="td_name-${response.data.client_id}">${response.data.client_name}</td>
-                                <td id="td_phone-${response.data.client_id}">${response.data.client_phone}</td>
-                                <td>${response.data.client_debt_usd}</td>
-                                <td>${response.data.client_debt_uzs}</td>
-                                <td>
-                                    <span class="text-danger">-15000 </span>
-                                </td>
-                                <td><i class="bi bi-pencil-square text-warning fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
-                                    data-bs-target="#default" onclick="getCliendId( '${response.data.client_id}' )"></i>
-                                </td>
-                    `)
-
-                    messageToast(response.status, response.message)
+            }
 
 
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error updating data: ' + error);
-                    messageToast(status, error)
 
-                }
-            });
         })
     })
 
