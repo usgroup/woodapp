@@ -264,6 +264,17 @@ class ArchiveContainerTradeDetail(View):
         
         return render(request, 'archive-trade-history.html',context)
     
+
+class UsersView(LoginRequiredMixin,View):
+    def get(self, request):
+        
+        users = CustomUser.objects.all()
+        
+        context = {
+            "users":users
+        }
+        
+        return render(request, 'users.html', context)
     
     
 

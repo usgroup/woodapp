@@ -21,6 +21,15 @@ urlpatterns = [
     path('login',login_view, name='login'),
     path('logout',  logout_view, name='logout'),
     
+    path('users',  UsersView.as_view(), name='users'),
+    # path('create-user',  CreateUsersView.as_view(), name='create-user'),
+    # path('edit-user',  EditUsersView.as_view(), name='edit-user'),
+    
+    # path('users', UserListView.as_view(), name='user-list'),
+    path('add-user/', AddUserView.as_view(), name='add-user'),
+    path('edit-user/<int:user_id>/', EditUserView.as_view(), name='edit-user'),
+    path('delete-user/<int:user_id>/', DeleteUserView.as_view(), name='delete-user'),
+    
     
     path('trade-history',ArchiveContainers.as_view(), name='archive_containers'),
     path('archive-product-history-detail/<int:pk>',ArchiveContainerDetail.as_view(), name='archive-product-detail'),

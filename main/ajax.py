@@ -811,6 +811,147 @@ class CutProductView(View):
         }
         
         return JsonResponse({'status': 200, 'message': 'Mahsulot kesildi !', 'data': data})
+    
+
+# class CreateUsersView(View):
+    
+#     def post(self,request):
+#         username = request.POST['username']
+#         first_name = request.POST['first_name']
+#         user_type = int(request.POST['user_type'])
+#         password = request.POST['password']
+#         confirm_password = request.POST['confirm_password']
+        
+#         user = CustomUser.objects.filter(username=username).exists()
+#         if user:
+#             return JsonResponse({'status': 200, 'message': 'Bunday nomli foydalanuvchi mavjud !'})
+#         else:
+#             user = CustomUser.objects.create_user(
+#                 username=username,
+#                 first_name=first_name,
+#                 password=password
+#             )
+            
+#             if user_type == 2:
+#                 user.is_active = False
+#                 user.save()
+            
+#             print()
+#             print(request.POST)
+#             print()
+            
+            
+#             return JsonResponse({'status': 200, 'message': 'Foydalanuvchi yaratildi !'})
+        
+# class EditUsersView(View):
+#     def post(self, request):
+#         try:
+#             edit_user_id = int(request.POST['edit_user_id'])
+#             username = request.POST['username']
+#             first_name = request.POST['first_name']
+#             user_type = int(request.POST['user_type'])
+#             password = request.POST['password']
+#             confirm_password = request.POST['confirm_password']
+        
+#             user = CustomUser.objects.filter(id=edit_user_id).first()
+#             user.username = username
+#             user.first_name = first_name
+            
+#             user.set_password(user, password)
+            
+#             if user_type == 1:
+#                 user.is_active = True
+#             if user_type == 2:
+#                 user.is_active = False
+                
+#             user.save()
+            
+#             print(user)
+#         except:
+#             pass
+        
+#         print()
+#         print(request.POST)
+#         print()
+            
+        
+#         return JsonResponse({'status': 200, 'message': 'Foydalanuvchi tahrirlandi !'})
+    
+    
+    
+    # chat
+    
+    
+    
+# views.py
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.views import View
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
+# List users and render the main page
+# class UserListView(View):
+#     def get(self, request):
+#         users = CustomUser.objects.all()
+#         return render(request, 'user_list.html', {'users': users})
+
+# Create a new user
+@method_decorator(csrf_exempt, name='dispatch')
+class AddUserView(View):
+    def post(self, request):
+        username = request.POST.get('username')
+        first_name = request.POST.get('first_name')
+        user_type = request.POST.get('user_type')
+        password = request.POST.get('password')
+
+        if not all([username, first_name, user_type, password]):
+            return JsonResponse({'status': 'error', 'message': 'All fields are required'})
+
+        if CustomUser.objects.filter(username=username).exists():
+            return JsonResponse({'status': 'error', 'message': 'Username already exists'})
+
+        user = CustomUser(
+            username=username,
+            first_name=first_name,
+            is_active=(user_type == '1')
+        )
+        user.set_password(password)
+        user.save()
+        return JsonResponse({'status': 'success', 'message': 'User added successfully'})
+
+# Edit an existing user
+@method_decorator(csrf_exempt, name='dispatch')
+class EditUserView(View):
+    def post(self, request, user_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+
+        username = request.POST.get('username')
+        first_name = request.POST.get('first_name')
+        user_type = request.POST.get('user_type')
+        password = request.POST.get('password')
+
+        if not all([username, first_name, user_type]):
+            return JsonResponse({'status': 'error', 'message': 'All fields are required'})
+
+        user.username = username
+        user.first_name = first_name
+        user.is_active = (user_type == '1')
+        if password:
+            user.set_password(password)
+        user.save()
+        return JsonResponse({'status': 'success', 'message': 'User updated successfully'})
+
+# Delete a user
+@method_decorator(csrf_exempt, name='dispatch')
+class DeleteUserView(View):
+    def post(self, request, user_id):
+        user = get_object_or_404(CustomUser, id=user_id)
+        user.delete()
+        return JsonResponse({'status': 'success', 'message': 'User deleted successfully'})
+
         
 
 
