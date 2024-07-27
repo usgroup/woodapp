@@ -12,6 +12,7 @@ urlpatterns = [
     path('container-expence-detail/<int:pk>',ContainerExpenceDetailView.as_view(), name='container-expence-detail'),
     path('container-trade-history/<int:pk>',ContainerTradeHistoryView.as_view(), name='container-trade-history'),
     path('general-expense',GeneralExpence.as_view(), name='general-expense'),
+    path('all-expenses',AllExpense.as_view(), name='all-expenses'),
     path('clients',Clientiew.as_view(), name='clients'),
     path('payments',PaymentView.as_view(), name='payments'),
     path('workers',WorkerView.as_view(), name='workers'),
@@ -61,6 +62,10 @@ urlpatterns = [
     path('return-order-item', ReturnOrderItem.as_view(), name='return-order-item'),
     #filter
     path('filter-orders', FilterOrdersView.as_view(), name='filter-orders'),
+    path('filter-expenses', FilterExpenseView.as_view(), name='filter-expenses'),
+    
     path('cut-product', CutProductView.as_view(), name='cut-product'),
+    
+    path('edit-expense',EditExpenseView.as_view(), name='edit-expense'),
     
 ]

@@ -1,14 +1,20 @@
 from django.views import View
 from django.http import JsonResponse
 from .models import *
-from datetime import datetime
+from datetime import datetime, date
 from .others_func import metr_to_cube, process_order_data, divide, calc_end_write
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from .decorator_handle import check_active_user, check_active_user_view
+
 
 
 
 class AddSizeView(View):
+    
+    @check_active_user
     def post(self, request):
         size_x = float(request.POST.get('product_size_x'))
         size_y = float(request.POST.get('product_size_y'))
@@ -17,7 +23,8 @@ class AddSizeView(View):
         check_product_size = ProductSize.objects.filter( 
             product_size_x=size_x,
             product_size_y=size_y,
-            product_size_z=size_z
+            product_size_z=size_z,
+            status=True
             )
         
         if check_product_size.exists():
@@ -38,11 +45,14 @@ class AddSizeView(View):
                 "id":product_size.id,
             
             }
+            
+           
 
             return JsonResponse({'status':200,'message':"Yangi o'lcham qo'shildi !", "data": data})
     
 
 class UpdateSizeView(View):
+    @check_active_user
     def post(self, request):
         product_size_id = int(request.POST['product_size_id'])
         update_size_x = float(request.POST['update_size_x'])
@@ -79,6 +89,7 @@ class UpdateSizeView(View):
     
 
 class DeleteSizeView(View):
+    @check_active_user
     def get(self, requets):
         id = int(requets.GET['id'])
         product_size = ProductSize.objects.filter(id=id).first()
@@ -91,6 +102,7 @@ class DeleteSizeView(View):
         return JsonResponse({'status': 200, 'message': "O'lcham o'chirildi !", "data": data})
     
 class UpdateContainerInfoView(View):
+    @check_active_user
     def post(self, request):
         id = int(request.POST['container_id'])
         name = request.POST['name']
@@ -116,6 +128,7 @@ class UpdateContainerInfoView(View):
         
 class EditProductInfoView(View):
     
+    @check_active_user
     def post(self, request):
         product_size_id = int(request.POST['select_size'])
         product_come_cost = float(request.POST['come_cost'])
@@ -166,6 +179,7 @@ class EditProductInfoView(View):
 
        
 class DeleteProduct(View):
+    @check_active_user
     def post(self, request):
         product_id = int(request.POST['product_id'])
         
@@ -180,6 +194,7 @@ class DeleteProduct(View):
         
         
 class EditClientView(View):
+    @check_active_user
     def post(self, request):
         name = request.POST['editName']
         phone = request.POST['editPhone']
@@ -201,9 +216,6 @@ class EditClientView(View):
             "client_id":client.id
 
         }
-        print()
-        print(data)
-        print()
         
         
         
@@ -212,6 +224,7 @@ class EditClientView(View):
     
 class CreateOrderView(View):
     
+    @check_active_user
     def post(self, request):
         currencyType = int(request.POST['currencyType'])
         usd_currency = int(request.POST['usd_currency'])
@@ -249,7 +262,6 @@ class CreateOrderView(View):
                     client_info=client,
                 )
                 
-                print(client_account)
                 
                 if currencyType == 1:
                     client_account.debt_usd -= totalSumma
@@ -305,12 +317,9 @@ class CreateOrderView(View):
         for p in check_products_count:
             counter += p.rest_qty
         
-        print(counter)
-        print(counter)
-        print(counter)
-            
         if counter <= 0:
             container.status = False
+            container.end_date=date.today()
             container.save()
         
       
@@ -321,6 +330,7 @@ class CreateOrderView(View):
     
     
 class EditOrderItem(View):
+    @check_active_user
     def post(self, request):
         item_id = int(request.POST['order_item_id'])
         qty_item = int(request.POST['qty_item'])
@@ -427,6 +437,7 @@ class ReturnOrderItem(View):
 
     
 class AddExpenseTypeView(View):
+    @check_active_user
     def post(self, request):
         
         expense_type_name = request.POST['expense_type_name']
@@ -438,12 +449,12 @@ class AddExpenseTypeView(View):
             "title": expense_type.title,
         }
         
-        print(request.POST)
         
         return JsonResponse({'status':200,'message': "Chiqim turi qo'shildi !", "data":data})
 
 
 class EditExpenseTypeView(View):
+    @check_active_user
     def get(self, request):
         
         expense_type_id = request.GET['expense_id']
@@ -464,6 +475,7 @@ class EditExpenseTypeView(View):
         return JsonResponse({'status':200,'message': "Chiqim turi ma'lumotlari yangilandi !", "data":data})
 
     
+    @check_active_user
     def post(self, request):
         
 
@@ -485,6 +497,7 @@ class EditExpenseTypeView(View):
 
 
 class DeleteExpenseTypeView(View):
+    @check_active_user
     def get(self, requets):
         id = int(requets.GET['id'])
         expense_type = ExpenseType.objects.filter(id=id).first()
@@ -499,6 +512,7 @@ class DeleteExpenseTypeView(View):
 
 
 class CreateMainExpenseView(View):
+    @check_active_user
     def post(self, request):
         expense_type_id = int(request.POST['expense_type'])
         worker_id = request.POST.get('worker', None)
@@ -524,7 +538,6 @@ class CreateMainExpenseView(View):
             )
             expense.containers.set(checked_items)  
             expense.save() 
-            print(expense.containers, 'create')         
         else:
             expense = Expense.objects.create(
                     workers=workers,
@@ -538,10 +551,36 @@ class CreateMainExpenseView(View):
 
         
         return JsonResponse({'status':200,'message': "Chiqim qilindi !"})
+    
+class EditExpenseView(View):
+    
+    def get(self, request):
+        
+        expense_id = int(request.GET['expense_id'])
+        expense = Expense.objects.filter(id=expense_id).first()
+        expense.is_active = False
+        expense.save()
+        
+        return JsonResponse({'status':200,'message': "Chiqim o'chirildi !"})
+        
+    
+    def post(self, request):
+        expense_id = int(request.POST['expense_id'])
+        expense_summa = float(request.POST['expense_summa'])
+        exchange_rate = int(request.POST['exchange_rate'])
+        
+        expense = Expense.objects.filter(id=expense_id).first()
+        expense.expense_summa = expense_summa
+        expense.exchange_rate = exchange_rate
+        expense.save()
+
+        
+        return JsonResponse({'status':200,'message': "Chiqim tahrirlandi !"})
 
     
     
 class EditWorkerView(View):
+    @check_active_user_view
     def post(self,request):
         worker_id = int(request.POST['worker_id'])
         name = request.POST['name']
@@ -557,6 +596,8 @@ class EditWorkerView(View):
         return redirect('/workers')
 
 class DeleteWorkerView(View):
+    
+    @check_active_user
     def get(self,request):
         id = request.GET.get('id')
         worker = Worker.objects.filter(id=int(id)).first()
@@ -567,6 +608,7 @@ class DeleteWorkerView(View):
 
 
 class SearchContainerView(View):
+    
     def get(self, request):
         
         value =  request.GET.get('value')
@@ -611,11 +653,10 @@ class SearchContainerView(View):
 
 
 class CreatePaymentView(View):
+    @check_active_user
     def post(self,request):
         
-        print()
-        print(request.POST)
-        print()
+    
         client_id = int(request.POST['client'])
         container = int(request.POST['container'])
         currency_type = int(request.POST['currency_type'])
@@ -655,6 +696,7 @@ class CreatePaymentView(View):
 
     
 class EditPaymentView(View):
+    @check_active_user
     def post(self, request):
         payment_id = int(request.POST['payment_id'])
         payment_sum = float(request.POST['payment_sum'])
@@ -699,17 +741,14 @@ class EditPaymentView(View):
         # payment.payment_amount.save()
         container.save()
         payment.save()
-        
-        print()
-        print(request.POST)
-        print()
-        
+
         return JsonResponse({'status':200,'message': "To'lov ma'lumotlari yangilandi !"})
 
         
     
 
 class GetClientDebt(View):
+    @check_active_user
     def post(self, request):
         client_id = int(request.POST['client_id'])
         container_id = int(request.POST['container_id'])
@@ -769,18 +808,56 @@ class FilterOrdersView(View):
             
             
         return JsonResponse({'status': 200, 'message': 'filter order successfully', 'data': data})
+    
+
+class FilterExpenseView(View):
+    def get(self, request):
+        start_date = request.GET['startDate']
+        end_date = request.GET['endDate']
+        
+        data = []
+        
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date =  datetime.strptime(end_date, '%Y-%m-%d').date()
+            
+            expenses = Expense.objects.filter(is_active=True,created_at__range=[start_date, end_date])
+            
+        except :
+            expenses = Expense.objects.filter(is_active=True)
+        
+        for e in expenses:
+            expense_data = {
+                "expense_id":e.id,
+                "created_at":e.created_at.strftime('%Y-%m-%d'),
+                "expense_type":e.expense_type.title,
+                "workers":e.workers,
+                "currency":e.currency,
+                "expense_summa":e.expense_summa,
+                "container_sum":e.container_sum,
+                "exchange_rate":e.exchange_rate,
+                "containers":[],
+                
+            }
+            for c in e.containers.all():
+                expense_data['containers'].append({
+                    'name':c.name
+                })
+            data.append(expense_data)
+    
+        
+        return JsonResponse({'status': 200, 'message': 'filter expense successfully', 'data': data})
+        
         
 
 
 class CutProductView(View):
+    @check_active_user
     def post(self, request):
         product_id = int(request.POST['product_id'])
         cut_qty = int(request.POST['cut_qty'])
         
-        print(cut_qty)
-        print(cut_qty)
-        print(cut_qty)
-        
+     
         product_ = Product.objects.filter(id=product_id).first()
         
         product_.rest_qty -= cut_qty
@@ -813,94 +890,20 @@ class CutProductView(View):
         return JsonResponse({'status': 200, 'message': 'Mahsulot kesildi !', 'data': data})
     
 
-# class CreateUsersView(View):
-    
-#     def post(self,request):
-#         username = request.POST['username']
-#         first_name = request.POST['first_name']
-#         user_type = int(request.POST['user_type'])
-#         password = request.POST['password']
-#         confirm_password = request.POST['confirm_password']
-        
-#         user = CustomUser.objects.filter(username=username).exists()
-#         if user:
-#             return JsonResponse({'status': 200, 'message': 'Bunday nomli foydalanuvchi mavjud !'})
-#         else:
-#             user = CustomUser.objects.create_user(
-#                 username=username,
-#                 first_name=first_name,
-#                 password=password
-#             )
-            
-#             if user_type == 2:
-#                 user.is_active = False
-#                 user.save()
-            
-#             print()
-#             print(request.POST)
-#             print()
-            
-            
-#             return JsonResponse({'status': 200, 'message': 'Foydalanuvchi yaratildi !'})
-        
-# class EditUsersView(View):
-#     def post(self, request):
-#         try:
-#             edit_user_id = int(request.POST['edit_user_id'])
-#             username = request.POST['username']
-#             first_name = request.POST['first_name']
-#             user_type = int(request.POST['user_type'])
-#             password = request.POST['password']
-#             confirm_password = request.POST['confirm_password']
-        
-#             user = CustomUser.objects.filter(id=edit_user_id).first()
-#             user.username = username
-#             user.first_name = first_name
-            
-#             user.set_password(user, password)
-            
-#             if user_type == 1:
-#                 user.is_active = True
-#             if user_type == 2:
-#                 user.is_active = False
-                
-#             user.save()
-            
-#             print(user)
-#         except:
-#             pass
-        
-#         print()
-#         print(request.POST)
-#         print()
-            
-        
-#         return JsonResponse({'status': 200, 'message': 'Foydalanuvchi tahrirlandi !'})
-    
-    
-    
-    # chat
-    
-    
-    
-# views.py
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
-from django.views import View
-from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 
-# List users and render the main page
-# class UserListView(View):
-#     def get(self, request):
-#         users = CustomUser.objects.all()
-#         return render(request, 'user_list.html', {'users': users})
+    
+    
+    
 
-# Create a new user
+
+
+
+
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class AddUserView(View):
+    @check_active_user
     def post(self, request):
         username = request.POST.get('username')
         first_name = request.POST.get('first_name')
@@ -916,13 +919,14 @@ class AddUserView(View):
         user = CustomUser(
             username=username,
             first_name=first_name,
-            is_active=(user_type == '1')
+            is_staff=(user_type == '1')
         )
         user.set_password(password)
         user.save()
         return JsonResponse({'status': 'success', 'message': 'User added successfully'})
 
 # Edit an existing user
+
 @method_decorator(csrf_exempt, name='dispatch')
 class EditUserView(View):
     def post(self, request, user_id):
@@ -938,13 +942,14 @@ class EditUserView(View):
 
         user.username = username
         user.first_name = first_name
-        user.is_active = (user_type == '1')
+        user.is_staff = (user_type == '1')
         if password:
             user.set_password(password)
         user.save()
         return JsonResponse({'status': 'success', 'message': 'User updated successfully'})
 
 # Delete a user
+
 @method_decorator(csrf_exempt, name='dispatch')
 class DeleteUserView(View):
     def post(self, request, user_id):

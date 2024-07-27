@@ -4,8 +4,10 @@ from django.views import View
 from .models import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from datetime import datetime
-from .others_func import calc_end_write
+from datetime import datetime,date
+from .others_func import calc_end_write,container_info
+
+from .decorator_handle import check_active_user_view
 
 
 class HomeView(LoginRequiredMixin,View):
@@ -22,6 +24,7 @@ class HomeView(LoginRequiredMixin,View):
         
         return render(request, 'index.html',context)
 
+    @check_active_user_view
     def post(self, request):
         
         container_name = request.POST['container_name']
@@ -38,41 +41,13 @@ class HomeView(LoginRequiredMixin,View):
 class ContainerProductsDetailView(LoginRequiredMixin,View):
     
     def get(self, request, pk):
-        product_sizes = ProductSize.objects.all()
-        
-        general_expenses = 0
-        
-        container = Container.objects.filter(id=pk,status=True)[0]
-        container_products = container.container_products.all()
-        
-        expenses = Expense.objects.filter(containers__id=pk)
-        
-        # #statictic
-        for e in expenses:  #buni qoshish kerak generalga 
-            general_expenses += e.container_sum
        
-        for c in container_products: # productlarni qo'shilmasi
-            general_expenses += c.total_product_sum
-     
-     
-        profit = container.paid_amount - general_expenses
-   
-        context = {
-            "container":container,
-            "product_sizes":product_sizes,
-            "general_expenses":general_expenses,
-            "total_sales_revenue_usd":container.total_sales_revenue_usd,
-            "container_paid_amount":container.paid_amount,
-            "profit": profit
-            
-        }
-        
+        context = container_info(request,pk)
       
-        
         
         return render(request, 'container-products-detail.html', context)
     
-    
+    @check_active_user_view
     def post(self, request, pk):
         
         if int(request.POST['select_size']) > 0:
@@ -87,15 +62,19 @@ class ContainerProductsDetailView(LoginRequiredMixin,View):
 class ContainerTradeDetailView(LoginRequiredMixin,View):
     
     def get(self, request,pk):
+        product_list = []
+        context = container_info(request, pk)
+        products = Product.objects.filter(product_container=context['container'])
         
-        container = Container.objects.filter(id=pk)[0]
+        for p in products:
+            if p.rest_qty > 0:
+                product_list.append(p)
+  
         clients = Client.objects.all()
      
         
-        context = {
-            "container":container,
-            "clients":clients
-        }
+        context["clients"] = clients
+        context["product_list"] = product_list
         
         return render(request, 'container-trade-detail.html', context)
     
@@ -103,28 +82,22 @@ class ContainerTradeDetailView(LoginRequiredMixin,View):
 class ContainerExpenceDetailView(LoginRequiredMixin,View):
     def get(self, request, pk):
         
-        container = Container.objects.filter(id=pk)[0]
-        
-        print()
-        print(container.expense_set.all())
-        print()
-   
-        context = {
-            "container":container,
-        }
+        context = container_info(request, pk)
         
         return render(request, 'container-expence-detail.html',context)
+    
+
 
 class ContainerTradeHistoryView(View):
     def get(self, request,pk):
+       
+        
+        context = container_info(request, pk)
         
         container = Container.objects.filter(id=int(pk)).first()
         orders = Order.objects.filter(container_order=container).order_by('-id')
         
-        context = {
-            "container":container,
-            "orders":orders
-        }
+        context["orders"] = orders
         
         return render(request, 'container-trade-history.html',context)
     
@@ -140,6 +113,7 @@ class Clientiew(LoginRequiredMixin,View):
         }
         return render(request, 'clients.html',context)
     
+    @check_active_user_view
     def post(self,request):
         name = request.POST['name']
         phone = request.POST['phone']
@@ -180,6 +154,19 @@ class GeneralExpence(LoginRequiredMixin,View):
         
         return render(request, 'general-expenses.html', context)
     
+    
+class AllExpense(LoginRequiredMixin,View):
+    def get(self, request):
+        
+        expenses = Expense.objects.filter(is_active=True, created_at__date__gte=date.today().replace(day=1))
+        
+        context = {
+            "expenses":expenses,
+        }
+        
+        return render(request, 'all_expenses.html', context)
+    
+    
 class WorkerView(LoginRequiredMixin,View):
     def get(self, request):
         
@@ -191,6 +178,7 @@ class WorkerView(LoginRequiredMixin,View):
         
         return render(request, 'workers.html', context)
     
+    @check_active_user_view
     def post(self,request):
         name = request.POST['name']
         phone = request.POST['phone']
@@ -222,15 +210,12 @@ class ArchiveContainers(LoginRequiredMixin,View):
 class ArchiveContainerDetail(LoginRequiredMixin,View):
     def get(self,request, pk):
         
-        container = Container.objects.filter(id=int(pk)).first()
+        context = container_info(request,pk)
         
-        orders = Order.objects.filter(container_order=container).order_by('-id')
+        orders = Order.objects.filter(container_order=context['container']).order_by('-id')
         
         
-        context = {
-            "container":container,
-            "unique_orders":orders
-        }
+        context['unique_orders'] = orders
         
         return render(request, 'archive-container-products-detail.html', context)
     
@@ -238,29 +223,21 @@ class ArchiveContainerDetail(LoginRequiredMixin,View):
 class ArchiveContainerExpenseDetail(View):
     def get(self, request, pk):
         
-        container = Container.objects.filter(id=pk)[0]
+        context = container_info(request,pk)
         
-        print()
-        print(container.expense_set.all())
-        print()
-   
-        context = {
-            "container":container,
-        }
         
+       
         return render(request, 'archive-expence-history-detail.html',context)
     
     
 class ArchiveContainerTradeDetail(View):
       def get(self, request,pk):
         
-        container = Container.objects.filter(id=int(pk)).first()
-        orders = Order.objects.filter(container_order=container).order_by('-id')
+        context = container_info(request,pk)    
+
+        orders = Order.objects.filter(container_order=context['container']).order_by('-id')
         
-        context = {
-            "container":container,
-            "orders":orders
-        }
+        context['orders'] = orders
         
         return render(request, 'archive-trade-history.html',context)
     

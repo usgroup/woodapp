@@ -1,7 +1,7 @@
 from .models import *
 from django.http import JsonResponse
 from collections import defaultdict
-
+from datetime import date
 
 
 def metr_to_cube(x,y,z, qty):
@@ -85,3 +85,49 @@ def divide(currency, exchange_rate , ex_sum ):
     
     return division_sum
 
+
+
+
+def container_info(request,pk):
+    
+    product_sizes = ProductSize.objects.filter(status=True)
+        
+    general_expenses = 0
+    product_cube = 0
+    product_rest_cube = 0
+    
+    container = Container.objects.filter(id=pk)[0]
+    container_products = container.container_products.all()
+    
+    expenses = Expense.objects.filter(containers__id=pk, is_active=True, created_at__date__gte=date.today().replace(day=1))
+    
+    # #statictic
+    for e in expenses:  #buni qoshish kerak generalga 
+        general_expenses += e.container_sum
+
+    for c in container_products: # productlarni qo'shilmasi
+        general_expenses += c.total_product_sum
+        product_cube += c.product_cube
+        product_rest_cube += c.rest_cube
+        
+    product_sold_out = product_cube - product_rest_cube
+            
+     
+     
+    profit = container.paid_amount - general_expenses
+
+    context = {
+        "container":container,
+        "product_sizes":product_sizes,
+        "general_expenses":general_expenses,
+        "total_sales_revenue_usd":container.total_sales_revenue_usd,
+        "container_paid_amount":container.paid_amount,
+        "profit": profit,
+        "product_come_cube":product_cube,
+        "product_rest_cube":product_rest_cube,
+        "product_sold_out":product_sold_out,
+        "expenses":expenses
+        
+    }
+    
+    return context

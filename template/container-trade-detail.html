@@ -12,40 +12,47 @@
 <div class="page-heading">
     <section class="section">
         <div class="card">
-            <div class="card-header d-flex ">
-                <h3 class="text m-1" id="container_name">Konteyner raqami: {{ container.name }}</h3> 
-                <i class="bi bi-pencil-square text-warning fs-4 mr-4" role="button" data-bs-toggle="modal"
-                data-bs-target="#border-less"></i>
+            <div class="card-header d-flex justify-content-between">
+                <h3 class="text m-1 " id="container_name">Konteyner raqami: {{ container.name }}   <i class="bi bi-pencil-square text-warning fs-4 mr-4" role="button" data-bs-toggle="modal"
+                    data-bs-target="#border-less"></i></h3> 
+             
+
+                <div class="card-text d-flex flex-wrap mt-2">
+                    <h6 class="text text-bold m-1" >Kelgan sanasi: </h6> <h6 class="text m-1 " id="container_come_date"> {{ container.come_date|date:"d/m/Y" }}</h6>
+                </div>
+                
             </div>
             <div class="card-body row">
 
             <div class="col-md-6">
 
+                
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1 ">Kirgan sanasi: </h6> <h6 class="text m-1 " id="container_come_date"> {{ container.come_date|date:"d/m/Y" }}</h6>
+                    <h6 class="text text-bold m-1">Harajatlar: </h6> <h6 class="text m-1">{{ general_expenses|floatformat:2}} $</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Kirdi: </h6> <h6 class="text m-1">25 metr kub </h6>
+                    <h6 class="text text-bold m-1">Kutilayotgan tushum: </h6> <h6 class="text m-1"> {{ total_sales_revenue_usd|floatformat:2 }} $</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Sotildi: </h6> <h6 class="text m-1"> 8 metr kub</h6>
+                    <h6 class="text text-bold m-1">Tushgan tushum: </h6> <h6 class="text m-1"> {{ container_paid_amount|floatformat:2 }} $</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Qoldi: </h6> <h6 class="text m-1">17 metr kub</h6>
-                </div>
+                    <h6 class="text text-bold m-1">Foyda: </h6> <h6 class="text m-1">{{ profit|floatformat:2 }} $</h6>
+                </div> 
+               
             </div>
             <div class="col-md-6">
+                
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Kirgan sunma: </h6> <h6 class="text m-1">1500 USD</h6>
+                    <h6 class="text text-bold m-1">Kelgan mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_come_cube|floatformat:4}} ( m³ )</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Sotilgan summa: </h6> <h6 class="text m-1"> 600 USD</h6>
+                    <h6 class="text text-bold m-1">Sotilgan mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_sold_out|floatformat:4}} ( m³ )</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Harajat summa: </h6> <h6 class="text m-1">50 USD</h6>
+                    <h6 class="text text-bold m-1">Qoldiq mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_rest_cube|floatformat:4}} ( m³ )</h6>
                 </div>
             </div>
-
 
                
             </div>
@@ -120,7 +127,7 @@
                                                             <th>#</th>
                                                             <th>O'lcham</th>
                                                             <th>Qoldiq ( dona ) </th>
-                                                            <th>Qoldiq ( kub )</th>
+                                                            <th>Qoldiq ( m³ )</th>
                                                             <th>Narx</th>
                                                             <th>Sotish (dona) </th>
                                                             <th>Jami narxi</th>
@@ -129,16 +136,21 @@
                                                         
                                                     </thead>
                                                     <tbody class="products_tbody">
+
                                
-                                                        {% for product in container.container_products.all %}
+                                                        {% for product in product_list %}
                                                         <tr>
                                                             
                                                             <td></td>
                                                             <td data-id="{{ product.id }}">{{ product.product_size }}</td>
                                                             <td class="text-bold-500">{{ product.rest_qty }}</td>
-                                                            <td class="text-bold-500">{{ product.rest_cube }}</td>
-                                                            <td><input type="number" min="0" class="w-100  product-cost" id="product_cost_id-1" style="font-size: 14px; border:none; "></td>
-                                                            <td><input type="number" min="0" max="15"  class=" w-100 product-qty"  id="product_qty_id-1"  style="font-size: 14px; border:none;"></td>
+                                                            <td class="text-bold-500">{{ product.rest_cube|floatformat:4 }}</td>
+                                                            <td><input type="number" min="0" class="w-100  product-cost" id="product_cost_id" style="font-size: 14px; border:none; "></td>
+                                                            <td>
+                                                                <input type="number" min="0" max="{{ product.rest_qty }}" class="w-100 product-qty check_qty" id="product_qty_id-{{ product.id }}" data-rest-qty="{{ product.rest_qty }}" style="font-size: 14px; border:none;">
+                                                                <div class="error-message text-danger" id="error-message-{{ product.id }}" style="display: none; font-size: 12px;">Omborda buncha mahsulot yo'q !</div>
+                                                            </td>
+
                                                             <td id="product_total_sum-1" class="total-sum">0</td>
                         
                                                         </tr>
@@ -260,7 +272,7 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
                     </div>
                     <br> 
                     <div class="info-text " style="text-align: left;">
-                        <h6 >Jami: <span class="all_total_summa" >0</span> so'm</h6>
+                        <h6 >Jami: <span class="all_total_summa" >0</span></h6>
                     </div>
 
                     
@@ -334,6 +346,28 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
 <script>
     let $select_ = $('select.searchable').selectize({normalize:true})
     let selectize1 = $select_[0].selectize
+
+    $(document).ready(function() {
+
+        $('.check_qty').on('input', function() {
+        var $this = $(this);
+        var restQty = parseFloat($this.data('rest-qty'));
+        var enteredQty = parseFloat($this.val());
+        var errorMessageId = '#error-message-' + $this.attr('id').split('-')[1];
+
+        if (enteredQty > restQty) {
+            $(errorMessageId).show();
+            $this.addClass('border-danger');
+            $this.removeClass('product-qty');
+            
+        } else {
+            $(errorMessageId).hide();
+            $this.removeClass('border-danger');
+            $this.addClass('product-qty');
+
+        }
+    });
+    })
 
     const order_list = {}
     

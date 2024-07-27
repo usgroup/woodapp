@@ -39,6 +39,8 @@ class Container(Base):
         return sales_revenue
     
     
+    
+    
       
     
 class ProductSize(Base): 
@@ -100,6 +102,7 @@ class Expense(Base): # chiqimlar
     expense_summa = models.FloatField(verbose_name="xarajat summasi")
     exchange_rate = models.IntegerField(verbose_name="Valyuta kursi")
     containers = models.ManyToManyField(Container, verbose_name="Containerga chiqim")
+    is_active = models.BooleanField(default=True)
     
         
     @property

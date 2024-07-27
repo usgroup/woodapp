@@ -484,7 +484,7 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
 
     // Delete User
     function deleteUser(user_id) {
-        if (confirm('Are you sure you want to delete this user?')) {
+        if (confirm("Ushbu foydalanuvchini o'chirmoqchimisiz ")) {
             $.ajax({
                 url: `/delete-user/${user_id}/`,
                 type: 'POST',

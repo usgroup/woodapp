@@ -1,18 +1,27 @@
-from django.shortcuts import redirect
+from functools import wraps
+from django.http import JsonResponse
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.shortcuts import redirect
 
-def who_are_you(method):
-    def wrapper(self,request, *args, **kwargs):
-        try:
-            user_id = request.session['user']
-            user = User.objects.get(id=int(user_id))
-        except:
-            user = None
-        user = user if user else request.user
-        
-        if not user.is_staff:
-            messages.add_message(request, messages.WARNING, "Sizda ushbu amalni amalga oshirish uchun ruxsat yo'q !")
-            return redirect("profil:verification")
-        return method(self, request, *args, **kwargs)
+
+def check_active_user(func):
+    @wraps(func)
+    def wrapper(view, request, *args, **kwargs):
+        if request.user.is_staff:
+            return func(view, request, *args, **kwargs)
+        else:
+            
+            return JsonResponse({'status':400,'message':"Sizda bu amalni bajarish uchun ruxsat yo'q !"})
+
+    return wrapper
+
+def check_active_user_view(func):
+    @wraps(func)
+    def wrapper(view, request, *args, **kwargs):
+        if request.user.is_staff:
+            return func(view, request, *args, **kwargs)
+        else:
+            messages.add_message(request, messages.ERROR, "Sizda bu amalni bajarish uchun ruxsat yo'q !")
+            return redirect(f'{request.path}')
+
     return wrapper
