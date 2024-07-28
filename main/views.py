@@ -279,4 +279,4 @@ def handler_404(request, exception):
     return render(request, 'error-404.html')
 
 def handler_500(request):
-    return render(request, 'errors/500.html')
+    return render(request, 'error-500.html')
