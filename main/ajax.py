@@ -227,9 +227,9 @@ class CreateOrderView(View):
     @check_active_user
     def post(self, request):
         currencyType = int(request.POST['currencyType'])
-        usd_currency = int(request.POST['usd_currency'])
+        usd_currency = float(request.POST['usd_currency'])
         client_id = int(request.POST['client'])
-        totalSumma = int(request.POST['totalSumma'])
+        totalSumma = float(request.POST['totalSumma'])
         debt_check = request.POST.get('debt_check', None)
         container_id = request.POST['container_id']
         
