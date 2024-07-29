@@ -272,7 +272,7 @@ class CreateOrderView(View):
         except:
             pass
             
-        if client_id > 0:
+        if client_id > 0 and debt_check == None:
             client = Client.objects.filter(id=client_id)[0]
             order = Order.objects.create(
                     container_order=container,
@@ -284,14 +284,14 @@ class CreateOrderView(View):
             
             
             
-        else:
-            order = Order.objects.create(
-                    container_order=container,
-                    currency=currencyType,
-                    sale_exchange_rate=usd_currency,
-                    debt_status=False,
-                )
-                
+        # else:
+        #     order = Order.objects.create(
+        #             container_order=container,
+        #             currency=currencyType,
+        #             sale_exchange_rate=usd_currency,
+        #             debt_status=False,
+        #         )
+          
         order_data = process_order_data(request)
         
         for i in order_data:
@@ -316,11 +316,14 @@ class CreateOrderView(View):
         
         for p in check_products_count:
             counter += p.rest_qty
+            
+        is_sold = False
         
         if counter <= 0:
             container.status = False
             container.end_date=date.today()
             container.save()
+            
         
       
         
