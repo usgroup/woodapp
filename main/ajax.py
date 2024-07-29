@@ -284,13 +284,13 @@ class CreateOrderView(View):
             
             
             
-        # else:
-        #     order = Order.objects.create(
-        #             container_order=container,
-        #             currency=currencyType,
-        #             sale_exchange_rate=usd_currency,
-        #             debt_status=False,
-        #         )
+        if  debt_check == None and client_id == 0:
+            order = Order.objects.create(
+                    container_order=container,
+                    currency=currencyType,
+                    sale_exchange_rate=usd_currency,
+                    debt_status=False,
+                )
           
         order_data = process_order_data(request)
         
