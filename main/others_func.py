@@ -7,8 +7,8 @@ from datetime import date
 def metr_to_cube(x,y,z, qty):
     qty = qty
     
-    x = x / 1000
-    y = y / 1000
+    x = x
+    y = y
     z = z
     
     volume = (x * y * z) * qty
