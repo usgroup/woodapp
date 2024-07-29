@@ -300,8 +300,8 @@ class CreateOrderView(View):
             OrderItem.objects.create(
                 order_item=order,
                 product_item=product,
-                product_cost=int(i['product_cost']),
-                amount_sold=int(i['amount_sold']),
+                product_cost=float(i['product_cost']),
+                amount_sold=float(i['amount_sold']),
            
             )
             
