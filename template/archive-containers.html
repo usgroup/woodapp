@@ -33,7 +33,7 @@
                 background-position: center;
                 background-repeat: no-repeat;
                 background-size: cover;" >
-                    <!-- <img class="img-fluid" src="../static/assets/static/images/extra-images/container-bg.png" alt="Card image cap"> -->
+                    
                     <div class="col-md-8 col-lg-12 col-xl-12 p-4 ">
                         <h4 class="text-dark font-bold">{{ container.name }}</h4>
                         <h6 class="text-dark font-semibold float-right" >{{ container.come_date|date:"d/m/Y" }}</h6>
@@ -74,7 +74,7 @@
         $.ajax({
             url:"{% url 'main:search-container' %}",
             method:"GET",
-            data:{'value':value},
+            data:{'value':value,"archive":true},
             dataType:'json',
             success:function(response){
            
@@ -101,15 +101,15 @@
 
                     <div class="card" >
                         <div class="card-content" style="
-                        background-image: url(static/assets/static/images/extra-images/container-bg.png); 
+                        background-image: url(static/assets/static/images/extra-images/archive-container-bg.jpg); 
                         height:200px; 
                         background-position: center;
                         background-repeat: no-repeat;
                         background-size: cover;" >
-                            <!-- <img class="img-fluid" src="../static/assets/static/images/extra-images/container-bg.png" alt="Card image cap"> -->
+                            <!-- <img class="img-fluid" src="../static/assets/static/images/extra-images/archive-container-bg.jpg" alt="Card image cap"> -->
                             <div class="col-md-8 col-lg-12 col-xl-12 p-4">
-                                <h4 class="text-white font-bold">${c.container_name}</h4>
-                                <h6 class="text-white font-semibold float-right" >${c.container_come_date}</h6>
+                                <h4 class="text-dark font-bold">${c.container_name}</h4>
+                                <h6 class="text-dark font-semibold float-right" >${c.container_come_date}</h6>
                                 
                             </div>
                         </div>
@@ -129,15 +129,15 @@
 
                     <div class="card" >
                         <div class="card-content" style="
-                        background-image: url(static/assets/static/images/extra-images/container-bg.png); 
+                        background-image: url(static/assets/static/images/extra-images/archive-container-bg.jpg); 
                         height:200px; 
                         background-position: center;
                         background-repeat: no-repeat;
                         background-size: cover;" >
-                            <!-- <img class="img-fluid" src="../static/assets/static/images/extra-images/container-bg.png" alt="Card image cap"> -->
+                            <!-- <img class="img-fluid" src="../static/assets/static/images/extra-images/archive-container-bg.jpg" alt="Card image cap"> -->
                             <div class="col-md-8 col-lg-12 col-xl-12 p-4">
-                                <h4 class="text-white font-bold">${c.container_name}</h4>
-                                <h6 class="text-white font-semibold float-right" >${c.come_date}</h6>
+                                <h4 class="text-dark font-bold">${c.container_name}</h4>
+                                <h6 class="text-dark font-semibold float-right" >${c.come_date}</h6>
                                 
                             </div>
                         </div>

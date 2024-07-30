@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractUser
 class Base(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
-
+    
 
 
 class CustomUser(AbstractUser):
@@ -75,6 +75,9 @@ class Product(Base): # info product
 
 class ExpenseType(Base): # chiqimlar turi
     title = models.CharField(max_length=255, verbose_name="Chiqim turi")
+    is_active = models.BooleanField(default=True)
+    
+
     
     def __str__(self) -> str:
         
@@ -107,7 +110,18 @@ class Expense(Base): # chiqimlar
         
     @property
     def container_sum(self): 
+        if self.currency == 1:
+            return self.expense_summa / self.containers.count()
+        if self.currency == 2:
+            return ((self.expense_summa/self.exchange_rate) / self.containers.count())
+    
+    @property
+    def only_sum(self):
         return self.expense_summa / self.containers.count()
+        
+           
+
+    
     
     def __str__(self) -> str:
         return f"{self.expense_type} | {self.workers} | {self.expense_summa}"
@@ -138,8 +152,8 @@ class Client(Base): # mijozlar
 class ClientAccount(Base):
     container_client = models.ForeignKey(Container, on_delete=models.PROTECT, blank=True, null=True)
     client_info = models.ForeignKey(Client, on_delete=models.PROTECT, blank=True, null=True, related_name='client_account')
-    debt_usd = models.IntegerField(verbose_name="Qarz USD", default=0)
-    debt_uzs = models.IntegerField(verbose_name="Qarz UZS", default=0)
+    debt_usd = models.IntegerField(verbose_name="Qarz USD", default=0) ### edit to float
+    debt_uzs = models.IntegerField(verbose_name="Qarz UZS", default=0) ####
     
 
 class Order(Base): #order
@@ -151,14 +165,16 @@ class Order(Base): #order
     customer = models.ForeignKey(Client, on_delete=models.PROTECT, blank=True, null=True)
     currency = models.IntegerField(choices=CURRENCY_TYPE, default=2)
     sale_exchange_rate = models.IntegerField(verbose_name="Valyuta kursi")
+    discount = models.FloatField(default=0)
     debt_status = models.BooleanField(default=False)
     
     @property
     def total_summa(self):
         order_sum = 0
         for item in self.items.all():
-            order_sum += item.total_price
-        return order_sum
+            order_sum += item.total_price 
+            
+        return order_sum - self.discount
     
     
     def __str__(self) -> str:

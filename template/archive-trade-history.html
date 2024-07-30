@@ -25,23 +25,29 @@
             </div>
             <div class="card-body row">
 
-            <div class="col-md-6">
+                <div class="col-md-6">
 
                 
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Harajatlar: </h6> <h6 class="text m-1">{{ general_expenses|floatformat:2}} $</h6>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Umumiy harajatlar: </h6> <h6 class="text m-1">{{ general_expenses|floatformat:2}} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Mahsulotlarni summasi: </h6> <h6 class="text m-1">{{ all_product_sum|floatformat:2}} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Chiqimlar summasi: </h6> <h6 class="text m-1">{{ all_expense_sum|floatformat:2}} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Umumiy savdo: </h6> <h6 class="text m-1"> {{ total_sales_revenue_usd|floatformat:2 }} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Tushgan summa: </h6> <h6 class="text m-1"> {{ container_paid_amount|floatformat:2 }} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Foyda: </h6> <h6 class="text m-1">{{ profit|floatformat:2 }} $</h6>
+                    </div> 
+                   
                 </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Kutilayotgan tushum: </h6> <h6 class="text m-1"> {{ total_sales_revenue_usd|floatformat:2 }} $</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Tushgan tushum: </h6> <h6 class="text m-1"> {{ container_paid_amount|floatformat:2 }} $</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Foyda: </h6> <h6 class="text m-1">{{ profit|floatformat:2 }} $</h6>
-                </div> 
-               
-            </div>
             <div class="col-md-6">
                 
                 <div class="card-text d-flex flex-wrap">

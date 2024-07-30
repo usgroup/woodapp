@@ -2,7 +2,7 @@ from django.views import View
 from django.http import JsonResponse
 from .models import *
 from datetime import datetime, date
-from .others_func import metr_to_cube, process_order_data, divide, calc_end_write
+from .others_func import metr_to_cube, process_order_data, calc_end_write
 from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
@@ -41,7 +41,7 @@ class AddSizeView(View):
             data = {
                 "size_x": float(product_size.product_size_x),
                 "size_y": float(product_size.product_size_y),
-                "size_z": float(product_size.product_size_y),
+                "size_z": float(product_size.product_size_z),
                 "id":product_size.id,
             
             }
@@ -232,12 +232,19 @@ class CreateOrderView(View):
         totalSumma = float(request.POST['totalSumma'])
         debt_check = request.POST.get('debt_check', None)
         container_id = request.POST['container_id']
+        general_summa = float(request.POST['general_summa'])
+        
+        
+        discount = totalSumma - general_summa
         
         container = Container.objects.filter(id=int(container_id)).first()
        
       
         if usd_currency <= 0:
             return JsonResponse(data={'status':400,'error_message': 'Valyuta kursni kiritishni unutdingiz !'})
+        
+        if general_summa <= 0:
+            return JsonResponse(data={'status':400,'error_message': 'Notogri qiymat kiritdingiz !'})
 
         try:
             # debt_check = request.POST['debt_check']
@@ -254,6 +261,7 @@ class CreateOrderView(View):
                                 customer=client,
                                 currency=currencyType,
                                 sale_exchange_rate=usd_currency,
+                                discount=discount,
                                 debt_status=True,
                             )
                 
@@ -263,10 +271,11 @@ class CreateOrderView(View):
                 )
                 
                 
+                
                 if currencyType == 1:
-                    client_account.debt_usd -= totalSumma
+                    client_account.debt_usd -= general_summa
                 else:
-                    client_account.debt_uzs -= totalSumma
+                    client_account.debt_uzs -= general_summa
                     
                 client_account.save()
         except:
@@ -279,8 +288,15 @@ class CreateOrderView(View):
                     customer=client,
                     currency=currencyType,
                     sale_exchange_rate=usd_currency,
+                    discount=discount,
                     debt_status=False,
                 )
+            if currencyType == 1:
+                container.paid_amount += general_summa
+            if currencyType == 2:
+                container.paid_amount += (general_summa / order.sale_exchange_rate)
+            
+            
             
             
             
@@ -289,8 +305,14 @@ class CreateOrderView(View):
                     container_order=container,
                     currency=currencyType,
                     sale_exchange_rate=usd_currency,
+                    discount=discount,
                     debt_status=False,
                 )
+            if currencyType == 1:
+                container.paid_amount += general_summa
+            if currencyType == 2:
+                container.paid_amount += (general_summa / order.sale_exchange_rate)
+                
           
         order_data = process_order_data(request)
         
@@ -311,21 +333,21 @@ class CreateOrderView(View):
             
             product.save()
         
+        
+        
         counter = 0
         check_products_count = Product.objects.filter(product_container=container)
         
         for p in check_products_count:
             counter += p.rest_qty
             
-        is_sold = False
         
         if counter <= 0:
             container.status = False
             container.end_date=date.today()
-            container.save()
             
-        
-      
+        container.save()
+            
         
         #message add 
         return JsonResponse({'status': 200, 'message': "Mahsulot sotildi ! To'lov qilishni unutmang !"})
@@ -504,7 +526,8 @@ class DeleteExpenseTypeView(View):
     def get(self, requets):
         id = int(requets.GET['id'])
         expense_type = ExpenseType.objects.filter(id=id).first()
-        expense_type.delete()
+        expense_type.is_active = False
+        expense_type.save()
 
         data = {
             "id":id
@@ -530,13 +553,13 @@ class CreateMainExpenseView(View):
         except:
             workers = Worker.objects.get(id=int(worker_id))
         
-        expense_summa = divide(currency, exchange_rate , ex_sum )
+        # expense_summa = divide(currency, exchange_rate , ex_sum )
         
         if not switchOnOff:
             expense = Expense.objects.create(
                 expense_type=expense_type,
                 currency=currency,
-                expense_summa=expense_summa,
+                expense_summa=ex_sum,
                 exchange_rate=exchange_rate,
             )
             expense.containers.set(checked_items)  
@@ -545,7 +568,7 @@ class CreateMainExpenseView(View):
             expense = Expense.objects.create(
                     workers=workers,
                     currency=currency,
-                    expense_summa=expense_summa,
+                    expense_summa=ex_sum,
                     exchange_rate=exchange_rate,
                 )
             expense.containers.set(checked_items)  
@@ -615,6 +638,9 @@ class SearchContainerView(View):
     def get(self, request):
         
         value =  request.GET.get('value')
+        archive =  request.GET.get('archive')
+
+        
         result = {
             'status':200,
             'data':[]
@@ -624,9 +650,13 @@ class SearchContainerView(View):
         
         query = Q(name__icontains=value) | Q(come_date__icontains=value)
         
+        
         if value:
-            containers = Container.objects.filter(query)
-            
+            if archive == 'true':
+                containers = Container.objects.filter(query, status=False)
+            if archive == 'false':
+                containers = Container.objects.filter(query, status=True)
+                
             
             for c in containers:
                 date_obj = datetime.strptime(str(c.come_date), '%Y-%m-%d')
@@ -640,7 +670,12 @@ class SearchContainerView(View):
                     }
                 )
         else:
-            containers = Container.objects.filter(status=True)
+            if archive == 'true':
+                containers = Container.objects.filter(status=False)
+
+            if archive == 'false':
+                containers = Container.objects.filter(status=True)
+                
             for c in containers:
                 date_obj = datetime.strptime(str(c.come_date), '%Y-%m-%d')
                 formatted_date_str = date_obj.strftime('%d/%m/%Y')
@@ -689,6 +724,8 @@ class CreatePaymentView(View):
         else:
             client_account.debt_uzs += payment_sum 
             container.paid_amount += (payment_sum / exchange_rate)
+            
+            
         
         
         payment.save()
@@ -796,6 +833,7 @@ class FilterOrdersView(View):
                 'customer_name': order.customer.name,
                 'total_summa': order.total_summa,
                 'currency': order.currency,
+                'discount': order.discount,
                 'created_at': order.created_at.strftime('%Y-%m-%d'),
                 'items': []
             }

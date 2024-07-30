@@ -24,23 +24,29 @@
             </div>
             <div class="card-body row">
 
-            <div class="col-md-6">
+                <div class="col-md-6">
 
                 
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Harajatlar: </h6> <h6 class="text m-1">{{ general_expenses|floatformat:2}} $</h6>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Umumiy harajatlar: </h6> <h6 class="text m-1">{{ general_expenses|floatformat:2}} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Mahsulotlarni summasi: </h6> <h6 class="text m-1">{{ all_product_sum|floatformat:2}} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Chiqimlar summasi: </h6> <h6 class="text m-1">{{ all_expense_sum|floatformat:2}} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Umumiy savdo: </h6> <h6 class="text m-1"> {{ total_sales_revenue_usd|floatformat:2 }} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Tushgan summa: </h6> <h6 class="text m-1"> {{ container_paid_amount|floatformat:2 }} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Foyda: </h6> <h6 class="text m-1">{{ profit|floatformat:2 }} $</h6>
+                    </div> 
+                   
                 </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Kutilayotgan tushum: </h6> <h6 class="text m-1"> {{ total_sales_revenue_usd|floatformat:2 }} $</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Tushgan tushum: </h6> <h6 class="text m-1"> {{ container_paid_amount|floatformat:2 }} $</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Foyda: </h6> <h6 class="text m-1">{{ profit|floatformat:2 }} $</h6>
-                </div> 
-               
-            </div>
             <div class="col-md-6">
                 
                 <div class="card-text d-flex flex-wrap">
@@ -128,11 +134,12 @@
                                                             <th>O'lcham</th>
                                                             <th>Qoldiq ( dona ) </th>
                                                             <th>Qoldiq ( m³ )</th>
-                                                            <th>Narx</th>
+                                                            <th>Narx ( m³)</th>
+                                                            <th>Narx ( dona )</th>
                                                             <th>Sotish (dona) </th>
                                                             <th>Jami narxi</th>
                                                         
-                                                        </tr>
+                                                        </tr> 
                                                         
                                                     </thead>
                                                     <tbody class="products_tbody">
@@ -143,8 +150,9 @@
                                                             
                                                             <td></td>
                                                             <td data-id="{{ product.id }}">{{ product.product_size }}</td>
-                                                            <td class="text-bold-500">{{ product.rest_qty }}</td>
-                                                            <td class="text-bold-500">{{ product.rest_cube|floatformat:4 }}</td>
+                                                            <td class="text-bold-500 product_rest_qty" >{{ product.rest_qty }}</td>
+                                                            <td class="text-bold-500 product_rest_cube">{{ product.rest_cube|floatformat:4 }}</td>
+                                                            <td><input type="number" min="0" class="w-100  product-cube-cost" id="product_cube_cost_id" style="font-size: 14px; border:none; "></td>
                                                             <td><input type="number" min="0" class="w-100  product-cost" id="product_cost_id" style="font-size: 14px; border:none; "></td>
                                                             <td>
                                                                 <input type="number" min="0" max="{{ product.rest_qty }}" class="w-100 product-qty check_qty" id="product_qty_id-{{ product.id }}" data-rest-qty="{{ product.rest_qty }}" style="font-size: 14px; border:none;">
@@ -293,6 +301,10 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
                             <input class="form-control" type="number" value="0" width="100%" name="usd_currency" id="rate_Currency" placeholder="$" >
                             <input class="form-control" type="number" value="{{ container.id }}" width="100%" name="container_id"  style="display: none;">
                         </div>
+                        <div class="col-md-12 m-2" >
+                            <label class="form-label" >To'lanayotgan summa</label>
+                            <input class="form-control" type="number" value="0" width="100%" name="general_summa" id="payment_sum" >
+                        </div>
                       
                         <div class="col-md-12">
                             <div class="form-check form-switch m-2">
@@ -376,17 +388,26 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
         $('.products_tbody tr').each(function() {
             let $row = $(this);
 
-           // let total_qty_product = Number($row.find('.total_qty_product').text())
+            let cube_cost = Math.abs(parseFloat($row.find('.product-cube-cost').val()) || 0);
+            let rest_cube = Math.abs(parseFloat($row.find('.product_rest_cube').text()) || 0);
+            let rest_qty = Math.abs(parseFloat($row.find('.product_rest_qty').text()) || 0);
 
-            let cost = Math.abs(parseFloat($row.find('.product-cost').val()) || 0)
-            let quantity = Math.abs(parseFloat($row.find('.product-qty').val()) || 0)
+            let one_piece_cube = rest_qty ? rest_cube / rest_qty : 0;
+            let one_piece_cost = cube_cost ? cube_cost * one_piece_cube : 0;
+
+            if (cube_cost) {
+                $row.find('.product-cost').val(one_piece_cost.toFixed(2));
+            }
+
+            let cost = Math.abs(parseFloat($row.find('.product-cost').val()) || 0);
+            let quantity = Math.abs(parseFloat($row.find('.product-qty').val()) || 0);
 
             let totalSum = cost * quantity;
             $row.find('.total-sum').text(totalSum.toFixed(2));
-        });
+});
     }
 
-    $('.product-cost, .product-qty').on('input', updateTotalSum);
+    $('.product-cost, .product-qty, .product-cube-cost').on('input', updateTotalSum);
 
     $('#show-modal').on('click', function() {
         let modalTableBody = $('#modal-products-tbody');
@@ -442,6 +463,8 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
 
         all_total_sum.text(numberTotalSum)
 
+        $('#payment_sum').val(numberTotalSum)
+
         $('#totalSumma').val(all_total_sum.text()) //this for another form 
 
         if (Number(all_total_sum.text()) > 0){
@@ -475,6 +498,7 @@ $(document).ready(function() {
         console.log(order_list)
 
         console.log(orderForm)
+
 
         let orderFormData = orderForm + '&' + $.param(addParam);
 

@@ -418,7 +418,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
             $.ajax({
                 url:"{% url 'main:search-container' %}",
                 method:"GET",
-                data:{'value':value},
+                data:{'value':value, "archive":false},
                 dataType:'json',
                 success:function(response){
                

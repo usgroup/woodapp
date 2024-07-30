@@ -93,7 +93,7 @@
                                             {% endif %}
 
                                             <td class="text-bold-500" style="border-top:1px solid lightgray;" id="expense_summa-{{ expense.id }}" data-summa="{{ expense.expense_summa }}">{{ expense.expense_summa|floatformat:2 }}   {% if expense.currency == 1 %}${% else %}so'm{% endif %}</td>
-                                            <td class="text-bold-500" style="border-top:1px solid lightgray;">{{ expense.container_sum|floatformat:2 }}   {% if expense.currency == 1 %}${% else %}so'm{% endif %}</td>
+                                            <td class="text-bold-500" style="border-top:1px solid lightgray;">{{ expense.only_sum|floatformat:2 }}   {% if expense.currency == 1 %}${% else %}so'm{% endif %}</td>
                                             
                                             <td class="text-bold-500" style="border-top:1px solid lightgray;" id="exchange_rate-{{ expense.id }}">{{ expense.exchange_rate }}</td>
                                             <td class="text-bold-500 d-block" style="border-top:1px solid lightgray;">

@@ -142,7 +142,7 @@ class PaymentView(LoginRequiredMixin,View):
 class GeneralExpence(LoginRequiredMixin,View):
     def get(self, request):
         
-        expense_types = ExpenseType.objects.all()
+        expense_types = ExpenseType.objects.filter(is_active=True)
         workers = Worker.objects.all()
         containers = Container.objects.filter(status=True)
         

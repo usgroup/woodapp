@@ -31,7 +31,7 @@
                                     <select id="first_select_expense" class="searchable">
                                         <option value="0" selected>Chiqim turi</option>
                                         {% for ex in expense_types %}
-                                        <option value="{{ ex.id }}" class="option_expense_type-{{ ex.id }}">{{ ex.title }}</option>
+                                        <option value="{{ ex.id }}">{{ ex.title }}</option>
                                         {% endfor %}
                                     </select>
                                     <p class="expense_type_error_msg text-center text-danger" style="display: none;">Chiqim turlaridan birini tanlang !</p>
@@ -406,7 +406,10 @@ $(document).ready(function() {
 
 
     $(document).ready(function() {
-        // Handle form submission with AJAX
+        
+        var selectizeControl = $('select.searchable').selectize();
+        var selectizeInstance = selectizeControl[0].selectize;
+
         $('#addSizeButton').click(function(event) {
             event.preventDefault();
             let formData = $('#sizeForm').serialize();
@@ -431,6 +434,7 @@ $(document).ready(function() {
                 url: '{% url "main:add-expense-type" %}', 
                 data: formData,
                 success: function(response) {
+
                     
                     let newRow = `
                         <tr id="tr_expense-${ response.data.id }">
@@ -467,7 +471,21 @@ $(document).ready(function() {
 
                     $(`.editFormSize-${ response.data.id }`).css({"display":"none"}) 
                     $(`#check-edit-${ response.data.id }`).css({"display":"none"}) 
-                    
+
+
+
+
+
+                    var newOption = {
+                        value: `${response.data.id}`, 
+                        text: `${response.data.title}`,
+                        selected: false,
+                    };
+            
+                    selectize1.addOption(newOption);
+            
+                    selectize1.addItem(newOption.value);
+                    selectize1.setValue('0')
                     messageToast(response.status, response.message)
                     
                 },
@@ -557,9 +575,6 @@ $(document).ready(function() {
                 success: function(response) {
                     
                     $(`#tr_expense-${response.data.id}`).remove()
-                    let option = $(`.option_expense_type-${response.data.id}`)
-
-                    console.log(option)
 
 
                     messageToast(response.status, response.message)

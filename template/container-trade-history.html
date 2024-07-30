@@ -24,23 +24,29 @@
             </div>
             <div class="card-body row">
 
-            <div class="col-md-6">
+                <div class="col-md-6">
 
                 
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Harajatlar: </h6> <h6 class="text m-1">{{ general_expenses|floatformat:2}} $</h6>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Umumiy harajatlar: </h6> <h6 class="text m-1">{{ general_expenses|floatformat:2}} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Mahsulotlarni summasi: </h6> <h6 class="text m-1">{{ all_product_sum|floatformat:2}} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Chiqimlar summasi: </h6> <h6 class="text m-1">{{ all_expense_sum|floatformat:2}} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Umumiy savdo: </h6> <h6 class="text m-1"> {{ total_sales_revenue_usd|floatformat:2 }} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Tushgan summa: </h6> <h6 class="text m-1"> {{ container_paid_amount|floatformat:2 }} $</h6>
+                    </div>
+                    <div class="card-text d-flex flex-wrap">
+                        <h6 class="text text-bold m-1">Foyda: </h6> <h6 class="text m-1">{{ profit|floatformat:2 }} $</h6>
+                    </div> 
+                   
                 </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Kutilayotgan tushum: </h6> <h6 class="text m-1"> {{ total_sales_revenue_usd|floatformat:2 }} $</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Tushgan tushum: </h6> <h6 class="text m-1"> {{ container_paid_amount|floatformat:2 }} $</h6>
-                </div>
-                <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Foyda: </h6> <h6 class="text m-1">{{ profit|floatformat:2 }} $</h6>
-                </div> 
-               
-            </div>
             <div class="col-md-6">
                 
                 <div class="card-text d-flex flex-wrap">
@@ -150,7 +156,7 @@
                                                 <div class="accordion-item mt-3 ">
                                                     <h2 class="accordion-header" id="flush-heading-{{ order.id }}">
                                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-{{ order.id }}" aria-expanded="false" aria-controls="flush-collapse-{{ order.id }}" style="background-color: #F2F7FF; border-radius:5px;">
-                                                           {{ order.customer.name }} |  Jami: {{ order.total_summa }} {% if order.currency == 1 %} $ {% else %} so'm {% endif %} |{% if order.currency == 1 %} $ {% else %} so'm {% endif %} | {{ order.created_at|date:'d/m/Y' }}
+                                                            {{ order.created_at|date:'d/m/Y' }} | Jami: {{ order.total_summa }} {% if order.currency == 1 %} $ {% else %} so'm {% endif %} | {{ order.customer.name }} | Chegirma: {{ order.discount }}
                                                         </button>
                                                     </h2>
                                                     <div id="flush-collapse-{{ order.id }}" class="accordion-collapse collapse" aria-labelledby="flush-heading-{{ order.id }}" data-bs-parent="#accordionFlushExample">
@@ -511,7 +517,7 @@ aria-labelledby="myModalLabel33" aria-hidden="true">
                             <div class="accordion-item mt-3">
                                 <h2 class="accordion-header" id="flush-heading-${order.id}">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-${order.id}" aria-expanded="false" aria-controls="flush-collapse-${order.id}" style="background-color: #F2F7FF; border-radius:5px;">
-                                        ${order.customer_name} |  Jami: ${order.total_summa} ${order.currency === 1 ? '$' : 'so\'m'} | ${order.created_at}
+                                        ${order.created_at} |  Jami: ${order.total_summa} ${order.currency === 1 ? '$' : 'so\'m'} | ${order.customer_name} | Chegirma: ${ order.discount }
                                     </button>
                                 </h2>
                                 <div id="flush-collapse-${order.id}" class="accordion-collapse collapse" aria-labelledby="flush-heading-${order.id}" data-bs-parent="#accordionFlushExample">

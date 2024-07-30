@@ -73,16 +73,16 @@ def process_order_data(request):
         return transformed_data
     
     
-def divide(currency, exchange_rate , ex_sum ):
+# def divide(currency, exchange_rate , ex_sum ):
     
-    if currency == 1:
-        return ex_sum
-    if currency == 2:
-        division_sum = (ex_sum / exchange_rate)
+#     if currency == 1:
+#         return ex_sum
+#     if currency == 2:
+#         division_sum = (ex_sum / exchange_rate)
         
     
     
-    return division_sum
+#     return division_sum
 
 
 
@@ -91,6 +91,8 @@ def container_info(request,pk):
     
     product_sizes = ProductSize.objects.filter(status=True)
         
+    all_product_sum = 0
+    all_expense_sum = 0
     general_expenses = 0
     product_cube = 0
     product_rest_cube = 0
@@ -100,11 +102,15 @@ def container_info(request,pk):
     
     expenses = Expense.objects.filter(containers__id=pk, is_active=True, created_at__date__gte=date.today().replace(day=1)) 
     # #statictic
-    for e in expenses:  #buni qoshish kerak generalga 
+    for e in expenses:  #buni qoshish kerak generalga
         general_expenses += e.container_sum
+        all_expense_sum += e.container_sum
+        
 
     for c in container_products: # productlarni qo'shilmasi
         general_expenses += c.total_product_sum
+        all_product_sum += c.total_product_sum
+        
         product_cube += c.product_cube
         product_rest_cube += c.rest_cube
         
@@ -124,7 +130,11 @@ def container_info(request,pk):
         "product_come_cube":product_cube,
         "product_rest_cube":product_rest_cube,
         "product_sold_out":product_sold_out,
-        "expenses":expenses
+        "expenses":expenses,
+        
+        "all_product_sum":all_product_sum,
+        "all_expense_sum":all_expense_sum,
+        
         
     }
     
