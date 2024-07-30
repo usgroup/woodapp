@@ -169,9 +169,9 @@ class Order(Base): #order
 class OrderItem(Base):
     order_item = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product_item = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="Mahsulot", related_name='pro_items')
-    product_cost = models.IntegerField(verbose_name="Mahsulot narxi")
-    amount_sold = models.IntegerField(verbose_name="Sotilgan miqdori | dona")
-    return_qty = models.IntegerField(default=0,verbose_name="Qaytarilgan tovar miqdori", blank=True, null=True)
+    product_cost = models.FloatField(verbose_name="Mahsulot narxi")
+    amount_sold = models.FloatField(verbose_name="Sotilgan miqdori | dona")
+    return_qty = models.FloatField(default=0,verbose_name="Qaytarilgan tovar miqdori", blank=True, null=True)
    
     @property
     def total_price(self):

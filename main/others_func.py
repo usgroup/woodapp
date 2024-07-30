@@ -6,8 +6,7 @@ from datetime import date
 
 def metr_to_cube(x,y,z, qty):
     qty = qty
-    
-    x = x 
+    x = x
     y = y
     z = z
     
