@@ -945,7 +945,16 @@ class EditUserView(View):
 
         user.username = username
         user.first_name = first_name
-        user.is_staff = (user_type == '1')
+        
+        print(user_type)
+        print(user_type)
+        
+        if user_type == '1':
+            user.is_staff = True
+            
+        if user_type == '2':
+            user.is_staff = False
+            
         if password:
             user.set_password(password)
         user.save()

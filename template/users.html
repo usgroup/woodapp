@@ -46,7 +46,7 @@
                                             <td class="text-bold-500" id="username-{{ user.id }}">{{ user.username }}</td>
                                             <td class="text-bold-500" id="first_name-{{ user.id }}">{{ user.first_name }}</td>
 
-                                            {% if user.is_active %} 
+                                            {% if user.is_staff %} 
                                              
                                             <td id="user_type-{{ user.id }}" data-info="1">admin</td>
                                             
@@ -202,7 +202,7 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                         Parol kiritilishi shart !
                     </p>
                     <p class="edit_check_password2_error_msg  m-2 text-start text-danger mt-1" style="display: none;">
-                        Parollarbir biriga mos kelmadi !
+                        Parollar bir biriga mos kelmadi !
                     </p>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light-primary" data-bs-dismiss="modal">

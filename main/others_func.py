@@ -7,8 +7,8 @@ from datetime import date
 def metr_to_cube(x,y,z, qty):
     qty = qty
     
-    x = x / 1000
-    y = y / 1000
+    x = x 
+    y = y
     z = z
     
     volume = (x * y * z) * qty
@@ -99,8 +99,7 @@ def container_info(request,pk):
     container = Container.objects.filter(id=pk)[0]
     container_products = container.container_products.all()
     
-    expenses = Expense.objects.filter(containers__id=pk, is_active=True, created_at__date__gte=date.today().replace(day=1))
-    
+    expenses = Expense.objects.filter(containers__id=pk, is_active=True, created_at__date__gte=date.today().replace(day=1)) 
     # #statictic
     for e in expenses:  #buni qoshish kerak generalga 
         general_expenses += e.container_sum

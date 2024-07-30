@@ -31,7 +31,7 @@
                                     <select id="first_select_expense" class="searchable">
                                         <option value="0" selected>Chiqim turi</option>
                                         {% for ex in expense_types %}
-                                        <option value="{{ ex.id }}">{{ ex.title }}</option>
+                                        <option value="{{ ex.id }}" class="option_expense_type-{{ ex.id }}">{{ ex.title }}</option>
                                         {% endfor %}
                                     </select>
                                     <p class="expense_type_error_msg text-center text-danger" style="display: none;">Chiqim turlaridan birini tanlang !</p>
@@ -557,6 +557,10 @@ $(document).ready(function() {
                 success: function(response) {
                     
                     $(`#tr_expense-${response.data.id}`).remove()
+                    let option = $(`.option_expense_type-${response.data.id}`)
+
+                    console.log(option)
+
 
                     messageToast(response.status, response.message)
 
