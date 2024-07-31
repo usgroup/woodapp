@@ -26,17 +26,14 @@ class Container(Base):
     def __str__(self) -> str:
         return f"{self.name} | {self.come_date}"
     
+
     @property
     def total_sales_revenue_usd(self):
-        sales_revenue = 0
-        for product in self.container_products.all():
-            for item in product.pro_items.all():
-                if item.order_item.currency == 1:  # USD
-                    sales_revenue += item.total_price
-                elif item.order_item.currency == 2:  # UZS
-                    sales_revenue += item.total_price / item.order_item.sale_exchange_rate
-                
-        return sales_revenue
+        calc_sum = 0
+    
+        for order in self.orders.all():
+            calc_sum += order.total_summa            
+        return calc_sum
     
     
     
@@ -152,8 +149,8 @@ class Client(Base): # mijozlar
 class ClientAccount(Base):
     container_client = models.ForeignKey(Container, on_delete=models.PROTECT, blank=True, null=True)
     client_info = models.ForeignKey(Client, on_delete=models.PROTECT, blank=True, null=True, related_name='client_account')
-    debt_usd = models.IntegerField(verbose_name="Qarz USD", default=0) ### edit to float
-    debt_uzs = models.IntegerField(verbose_name="Qarz UZS", default=0) ####
+    debt_usd = models.FloatField(verbose_name="Qarz USD", default=0) 
+    debt_uzs = models.FloatField(verbose_name="Qarz UZS", default=0) 
     
 
 class Order(Base): #order
@@ -161,7 +158,7 @@ class Order(Base): #order
         (1, "USD"),
         (2, "UZS")
     )
-    container_order = models.ForeignKey(Container, on_delete=models.PROTECT, blank=True, null=True)
+    container_order = models.ForeignKey(Container, on_delete=models.PROTECT, blank=True, null=True, related_name='orders')
     customer = models.ForeignKey(Client, on_delete=models.PROTECT, blank=True, null=True)
     currency = models.IntegerField(choices=CURRENCY_TYPE, default=2)
     sale_exchange_rate = models.IntegerField(verbose_name="Valyuta kursi")
@@ -172,7 +169,10 @@ class Order(Base): #order
     def total_summa(self):
         order_sum = 0
         for item in self.items.all():
-            order_sum += item.total_price 
+            if self.currency == 1:
+                order_sum += item.total_price
+            if self.currency == 2:
+                order_sum += item.total_price / self.sale_exchange_rate
             
         return order_sum - self.discount
     
