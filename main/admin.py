@@ -15,6 +15,7 @@ admin.site.register(Expense)
 admin.site.register(Client)
 admin.site.register(ClientAccount)
 admin.site.register(Payment)
+admin.site.register(Note)
 
 
 

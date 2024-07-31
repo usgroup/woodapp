@@ -933,11 +933,75 @@ class CutProductView(View):
 
 
     
+class CreateNoteView(View):
+    @check_active_user
+    def post(self, request):
+        date = request.POST['date']
+        text = request.POST['text']
+        
+        date_of_notice = datetime.strptime(date, '%Y-%m-%d').date()
+        
+        
+        note = Note.objects.create(
+            text = text,
+            date_of_notice = date_of_notice
+        )
+        
+        
+        return JsonResponse({'status': 200, 'message': 'Eslatma yaratildi!'})
+
+
+class EditNoteView(View):
+    @check_active_user
+    def post(self, request):
+        date = request.POST['date']
+        text = request.POST['text']
+        note_id = int(request.POST['note_id'])
+        
+        note = Note.objects.filter(id=note_id).first()
+        note.text = text
+        note.date_of_notice = date
+        note.save()
+        
+        
+        print()
+        print(request.POST)
+        print()
+        
+        return redirect('/notes')
+
+
+class DeleteNoteView(View):
+    @check_active_user
+    def get(self, request):
+        
+        id  = int(request.GET['id'])
+        
+        note = Note.objects.filter(id=id).first()
+        note.delete()
+        
+        return JsonResponse({'status': 200, 'message': "Eslatma o'chirildi !"})
+
     
-    
 
+class EditNoteStatusView(View):
+    @check_active_user
+    def get(self, request):
+        id  = int(request.GET['id'])
+        status = request.GET['status']
+        
+            
+        note = Note.objects.filter(id=id).first()
+        
+        if status == 'active':
+            note.is_active = True
+        if status == 'disactive':
+            note.is_active = False
+        
+        note.save()
 
-
+            
+        return JsonResponse({'status': 200, 'message': "Eslatma o'qildi !"})
 
 
 

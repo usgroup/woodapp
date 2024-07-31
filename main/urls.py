@@ -17,6 +17,7 @@ urlpatterns = [
     path('payments',PaymentView.as_view(), name='payments'),
     path('workers',WorkerView.as_view(), name='workers'),
     path('edit-worker', EditWorkerView.as_view(), name='edit-worker'),
+    path('notes', NoteView.as_view(), name='notes'),
     
     
     path('login',login_view, name='login'),
@@ -67,5 +68,9 @@ urlpatterns = [
     path('cut-product', CutProductView.as_view(), name='cut-product'),
     
     path('edit-expense',EditExpenseView.as_view(), name='edit-expense'),
+    path('create-note',CreateNoteView.as_view(), name='create-note'),
+    path('delete-note',DeleteNoteView.as_view(), name='delete-note'),
+    path('edit-note',EditNoteView.as_view(), name='edit-note'),
+    path('edit-note-status',EditNoteStatusView.as_view(), name='edit-note-status'),
     
 ]

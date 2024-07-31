@@ -209,3 +209,12 @@ class Payment(Base):
     
     def __str__(self) -> str:
         return f"{self.client_account} | {self.payment_amount} "
+    
+
+class Note(Base):
+    text = models.TextField()
+    date_of_notice = models.DateField()
+    is_active = models.BooleanField(default=True)
+    
+    def __str__(self) -> str:
+        return self.text

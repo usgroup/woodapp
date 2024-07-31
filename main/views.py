@@ -220,7 +220,7 @@ class ArchiveContainerDetail(LoginRequiredMixin,View):
         return render(request, 'archive-container-products-detail.html', context)
     
     
-class ArchiveContainerExpenseDetail(View):
+class ArchiveContainerExpenseDetail(LoginRequiredMixin,View):
     def get(self, request, pk):
         
         context = container_info(request,pk)
@@ -230,7 +230,7 @@ class ArchiveContainerExpenseDetail(View):
         return render(request, 'archive-expence-history-detail.html',context)
     
     
-class ArchiveContainerTradeDetail(View):
+class ArchiveContainerTradeDetail(LoginRequiredMixin,View):
       def get(self, request,pk):
         
         context = container_info(request,pk)    
@@ -240,6 +240,16 @@ class ArchiveContainerTradeDetail(View):
         context['orders'] = orders
         
         return render(request, 'archive-trade-history.html',context)
+    
+    
+class NoteView(LoginRequiredMixin,View):
+    def get(self, request):
+        
+        notes = Note.objects.all().order_by('-is_active')
+        context = {
+            'notes':notes
+        }
+        return render(request, 'notes.html',context)
     
 
 class UsersView(LoginRequiredMixin,View):
