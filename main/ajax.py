@@ -824,14 +824,20 @@ class FilterOrdersView(View):
             
         except :
             orders = Order.objects.filter(container_order=container)
-
+            
 
         data = []
         for order in orders:
+            if order.customer == None:
+                customer_name = ''
+            else:
+                customer_name = order.customer.name
+                
             order_data = {
                 'id': order.id,
-                'customer_name': order.customer.name,
+                'customer_name': customer_name,
                 'total_summa': order.total_summa,
+                'self_total_summa': order.self_total_summa,
                 'currency': order.currency,
                 'discount': order.discount,
                 'created_at': order.created_at.strftime('%Y-%m-%d'),

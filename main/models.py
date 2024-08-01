@@ -176,6 +176,22 @@ class Order(Base): #order
             
         return order_sum - self.discount
     
+    @property
+    def self_total_summa(self):
+        order_sum = 0
+        for item in self.items.all():
+            if self.currency == 1:
+                order_sum += item.total_price
+            if self.currency == 2:
+                order_sum += item.total_price
+        
+  
+            
+        return order_sum - self.discount
+    
+
+        
+    
     
     def __str__(self) -> str:
         return f"{self.customer} | {self.total_summa} | {self.debt_status} "
