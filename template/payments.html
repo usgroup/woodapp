@@ -19,7 +19,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h3 class="text">To'lovlar</h3> 
-                            <div class="add-clients-btn d-flex justify-content-end" style="margin-top: -45px;">
+                            <div class="add-clients-btn d-flex justify-content-end" style="margin-top: -45px;" onclick="putCurrency()">
                                 <a href="#" class="btn btn-primary"  data-bs-toggle="modal" data-bs-target="#border-less">To'lov qilish +</a>
                             </div> 
                             
@@ -223,6 +223,13 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
             return cookieValue;
         }
         const csrftoken = getCookie('csrftoken');
+
+        function putCurrency(){
+    
+            let course = localStorage.getItem("course");
+
+            $('#exchangeRateInput').val(course)
+        }
         
 
         $(document).ready(function() {
@@ -232,6 +239,8 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                 let currencySelect = $('#currencySelect');
                 let containerselect = $('#containerselect');
                 let client_select = $('#client_select');
+
+          
 
                 let valid = true;
                
@@ -275,6 +284,8 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                     $('.exchange_rate_error_msg').hide()
                 }
 
+                
+                
                 
                 if (valid) {
                     event.preventDefault();

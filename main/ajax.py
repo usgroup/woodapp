@@ -227,7 +227,7 @@ class CreateOrderView(View):
     @check_active_user
     def post(self, request):
         currencyType = int(request.POST['currencyType'])
-        usd_currency = float(request.POST['usd_currency'])
+        usd_currency = float(request.POST.get('usd_currency'))
         client_id = int(request.POST['client'])
         totalSumma = float(request.POST['totalSumma'])
         debt_check = request.POST.get('debt_check', None)
@@ -240,7 +240,7 @@ class CreateOrderView(View):
         container = Container.objects.filter(id=int(container_id)).first()
        
       
-        if usd_currency <= 0:
+        if usd_currency <= 0 or usd_currency == '':
             return JsonResponse(data={'status':400,'error_message': 'Valyuta kursni kiritishni unutdingiz !'})
         
         if general_summa <= 0:

@@ -461,6 +461,10 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
 
         //console.log(order_list)
 
+        let course = localStorage.getItem("course");
+
+        $('#rate_Currency').val(course)
+
         all_total_sum.text(numberTotalSum)
 
         $('#payment_sum').val(numberTotalSum)
@@ -488,10 +492,23 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
 $(document).ready(function() {
 
     $('#confirmBtn').click(function(event) {
+        let msg = $('#error-message')
+
+        if ($('#rate_Currency').val().trim() === ''){
+            msg.text('Valyuta kiritishni unutdingiz !')
+            msg.show()
+        }else{
+            msg.hide()
+
+        }
+
+        let course = $('#rate_Currency').val()
+
+        localStorage.setItem("course", course);
+
         event.preventDefault();
        
         orderForm = $('#orderForm').serialize();
-        let msg = $('#error-message')
 
         let addParam = {"order_list":order_list} 
         

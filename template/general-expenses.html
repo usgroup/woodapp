@@ -205,6 +205,10 @@
 
 <script>
 
+    let course = localStorage.getItem("course");
+
+    $('#exchangeRateInput').val(course)
+
     $(document).ready(function() {
         function getCookie(name) {
             let cookieValue = null;
