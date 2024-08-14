@@ -20,7 +20,7 @@
 
 <div class="add-container-btn d-flex justify-content-end" >
     <a href="#" class="btn btn-info text-white m-2"  data-bs-toggle="modal"    data-bs-target="#animation"">O'lcham qo'shish +</a>
-    <a href="#" class="btn btn-primary m-2"  data-bs-toggle="modal" data-bs-target="#border-less">Konteyner qo'shish +</a>
+    <a href="#" class="btn btn-primary m-2"  data-bs-toggle="modal" data-bs-target="#border-less">Vagon qo'shish +</a>
 </div>
 
                              
@@ -62,7 +62,7 @@
 
         {% else %}
         <div class="col-md-12">
-            <h5 class="text-center mt-5">Konteynerlar mavjud emas !</h5>
+            <h5 class="text-center mt-5">Vagonlar mavjud emas !</h5>
         </div>
         {% endif %}
         
@@ -82,7 +82,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
 <div class="modal-dialog modal-dialog-scrollable" role="document">
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title">Konteyner qo'shish</h5>
+            <h5 class="modal-title">Vagon qo'shish</h5>
             <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
                 aria-label="Close">
                 <i data-feather="x"></i>
@@ -92,8 +92,8 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
            <form action="#" method="post">
             {% csrf_token %}
                 <div class="form-group">
-                    <label for="basicInputContainer" class="m-2">Konteyner raqami</label>
-                    <input type="text" class="form-control m-2" id="basicInputContainer" placeholder="Konteyner raqamini kiriting" name="container_name" required>
+                    <label for="basicInputContainer" class="m-2">Vagon raqami</label>
+                    <input type="text" class="form-control m-2" id="basicInputContainer" placeholder="Vagon raqamini kiriting" name="container_name" required>
                     <label for="basicInputDate1" class="m-2">Kelgan sana</label>
                     <input type="date" class="form-control m-2" id="basicInputDate1" name="come_date" required>
                 </div>

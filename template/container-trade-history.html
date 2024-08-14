@@ -13,7 +13,7 @@
     <section class="section">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h3 class="text m-1 " id="container_name">Konteyner raqami: {{ container.name }}   <i class="bi bi-pencil-square text-warning fs-4 mr-4" role="button" data-bs-toggle="modal"
+                <h3 class="text m-1 " id="container_name">Vagon raqami: {{ container.name }}   <i class="bi bi-pencil-square text-warning fs-4 mr-4" role="button" data-bs-toggle="modal"
                     data-bs-target="#border-less"></i></h3> 
              
 
@@ -371,7 +371,7 @@ aria-labelledby="myModalLabel33" aria-hidden="true">
                 data: editContainerForm,
                 success: function(response) {
 
-                    $('#container_name').text(`Konteyner raqami: ${response.data.container_name}`)
+                    $('#container_name').text(`Vagon raqami: ${response.data.container_name}`)
                     $('#container_come_date').text(response.data.container_come_date)
 
                     messageToast(response.status, response.message)
