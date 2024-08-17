@@ -50,13 +50,13 @@
             <div class="col-md-6">
                 
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Kelgan mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_come_cube|floatformat:4}} ( m³ )</h6>
+                    <h6 class="text text-bold m-1">Kelgan mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_come_cube|floatformat:4}} (kuba )</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Sotilgan mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_sold_out|floatformat:4}} ( m³ )</h6>
+                    <h6 class="text text-bold m-1">Sotilgan mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_sold_out|floatformat:4}} (kuba )</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Qoldiq mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_rest_cube|floatformat:4}} ( m³ )</h6>
+                    <h6 class="text text-bold m-1">Qoldiq mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_rest_cube|floatformat:4}} (kuba )</h6>
                 </div>
             </div>
 
@@ -183,7 +183,7 @@
                                                                     </thead>
                                                                     <tbody>
                                                                         {% for item in order.items.all %}
-                                                                        <tr>
+                                                                        <tr style="font-weight:bold;">
                                                                             <td class="text-bold-500">{{ forloop.counter }}</td>
                                                                             <td>{{item.product_item.product_size}}</td>
                                                                             <td id="td_item_qty-{{ item.id }}" class="text-bold-500">{{ item.amount_sold }}</td>
@@ -539,7 +539,7 @@ aria-labelledby="myModalLabel33" aria-hidden="true">
                                                 <tbody>`;
                             order.items.forEach((item, index) => {
                                 ordersHtml += `
-                                <tr>
+                                <tr style="font-weight:bold;">
                                     <td class="text-bold-500">${index + 1}</td>
                                     <td>${item.product_size}</td>
                                     <td id="td_item_qty-${item.id}" class="text-bold-500">${item.amount_sold}</td>

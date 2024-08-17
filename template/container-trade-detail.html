@@ -50,13 +50,13 @@
             <div class="col-md-6">
                 
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Kelgan mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_come_cube|floatformat:4}} ( m³ )</h6>
+                    <h6 class="text text-bold m-1">Kelgan mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_come_cube|floatformat:4}} (kuba )</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Sotilgan mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_sold_out|floatformat:4}} ( m³ )</h6>
+                    <h6 class="text text-bold m-1">Sotilgan mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_sold_out|floatformat:4}} (kuba )</h6>
                 </div>
                 <div class="card-text d-flex flex-wrap">
-                    <h6 class="text text-bold m-1">Qoldiq mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_rest_cube|floatformat:4}} ( m³ )</h6>
+                    <h6 class="text text-bold m-1">Qoldiq mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_rest_cube|floatformat:4}} (kuba )</h6>
                 </div>
             </div>
 
@@ -129,12 +129,12 @@
                 
                 
                                                     <thead >
-                                                        <tr>
+                                                        <tr >
                                                             <th>#</th>
-                                                            <th>O'lcham</th>
+                                                            <th >O'lcham</th>
                                                             <th>Qoldiq ( dona ) </th>
-                                                            <th>Qoldiq ( m³ )</th>
-                                                            <th>Narx ( m³)</th>
+                                                            <th>Qoldiq (kuba )</th>
+                                                            <th>Narx (kuba)</th>
                                                             <th>Narx ( dona )</th>
                                                             <th>Sotish (dona) </th>
                                                             <th>Jami narxi</th>
@@ -146,7 +146,7 @@
 
                                
                                                         {% for product in product_list %}
-                                                        <tr>
+                                                        <tr style=" font-weight:bold;">
                                                             
                                                             <td></td>
                                                             <td data-id="{{ product.id }}">{{ product.product_size }}</td>
@@ -494,6 +494,8 @@ $(document).ready(function() {
     $('#confirmBtn').click(function(event) {
         let msg = $('#error-message')
 
+        $("#confirmBtn").prop('disabled', true)
+
         if ($('#rate_Currency').val().trim() === ''){
             msg.text('Valyuta kiritishni unutdingiz !')
             msg.show()
@@ -512,9 +514,6 @@ $(document).ready(function() {
 
         let addParam = {"order_list":order_list} 
         
-        console.log(order_list)
-
-        console.log(orderForm)
 
 
         let orderFormData = orderForm + '&' + $.param(addParam);
@@ -536,12 +535,16 @@ $(document).ready(function() {
 
                 }
                 
-               
+                $("#confirmBtn").prop('disabled', false)
+                
             },
             error: function(xhr, status, error) {
 
                 console.log('Error updating data: ' + error);
                 messageToast(status, error)
+
+                $("#confirmBtn").prop('disabled', false)
+
 
             }
         });
