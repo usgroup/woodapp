@@ -21,10 +21,11 @@ class Container(Base):
     end_date = models.DateField(blank=True, null=True)
     paid_amount = models.FloatField(default=0, verbose_name="Container balansi", blank=True, null=True)
     status = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
     
     
     def __str__(self) -> str:
-        return f"{self.name} | {self.come_date}"
+        return f"{self.name} | {self.come_date} | is_active: {self.is_active}"
     
 
     @property

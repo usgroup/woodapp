@@ -168,8 +168,7 @@
                                                                 <th>Narxi</th>
                                                                 <th>Valyuta</th>
                                                                 <th>Jami</th>
-                                                                <th></th>
-                                                                <th></th>
+                                                                
                                                      
                                                             </tr>
                                                       
@@ -183,14 +182,8 @@
                                                                 <td  id="td_item_cost-{{ item.id }}"  class="text-bold-500">{{ item.product_cost }}</td>
                                                                 <td  id="td_item_cost-{{ item.id }}"  class="text-bold-500">{% if order.currency == 1 %} $ {% else %} so'm {% endif %}</td>
                                                                 <td class="text-bold-500">{{ item.total_price }}</td>
-                                                                <td class="text-bold-500 text-center">
-                                                                    <i class="bi bi-pencil-square text-warning fs-5 cursor-pointer" role="button" data-bs-toggle="modal" data-bs-target="#default" onclick="editItem(' {{ item.id }} ')"></i>
-                                                                </td>
-                                                                <td class="text-bold-500 text-center " style="width:5%;">
-                                                                    <span class="badge bg-secondary" type="button" data-bs-toggle="modal"
-                                                                    data-bs-target="#inlineForm" onclick="returnItem('{{ item.id }}')">Qaytarish</span>
-                                                                    
-                                                                </td>
+                                                               
+                                                               
                                                               
                                                       
                                                             </tr>

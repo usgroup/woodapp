@@ -14,7 +14,7 @@ class HomeView(LoginRequiredMixin,View):
     
     def get(self, request):
         
-        containers = Container.objects.filter(status=True).order_by('-id')
+        containers = Container.objects.filter(status=True,  is_active=True).order_by('-id')
         all_product_size = ProductSize.objects.filter(status=True)
         
         context = {
@@ -101,7 +101,17 @@ class ContainerTradeHistoryView(View):
         
         return render(request, 'container-trade-history.html',context)
     
-    
+
+class ContainerDeleteView(View):
+    def post(self, request):
+        
+        container_id = int(request.POST['container_id'])
+        container = Container.objects.filter(id=container_id).first()
+        container.is_active = False
+        container.save()
+        
+        
+        return redirect('/')
 
 
     
@@ -127,7 +137,7 @@ class Clientiew(LoginRequiredMixin,View):
 class PaymentView(LoginRequiredMixin,View):
     def get(self, request):
         clients = Client.objects.all()
-        containers = Container.objects.filter(status=True)
+        containers = Container.objects.filter(status=True,  is_active=True)
         payments = Payment.objects.all().order_by('-id')
         
         
@@ -144,7 +154,7 @@ class GeneralExpence(LoginRequiredMixin,View):
         
         expense_types = ExpenseType.objects.filter(is_active=True)
         workers = Worker.objects.all()
-        containers = Container.objects.filter(status=True)
+        containers = Container.objects.filter(status=True,  is_active=True)
         
         context = {
             "expense_types":expense_types,
@@ -199,7 +209,7 @@ class WorkerView(LoginRequiredMixin,View):
 class ArchiveContainers(LoginRequiredMixin,View):
     def get(self,request):
         
-        containers = Container.objects.filter(status=False).order_by('-id')
+        containers = Container.objects.filter(status=False,  is_active=True).order_by('-id')
         
         context = {
             "containers":containers

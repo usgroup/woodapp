@@ -359,7 +359,7 @@ class EditOrderItem(View):
     def post(self, request):
         item_id = int(request.POST['order_item_id'])
         qty_item = int(request.POST['qty_item'])
-        cost_item = int(request.POST['cost_item'])
+        cost_item = float(request.POST['cost_item'])
         
         order_item = OrderItem.objects.filter(id=item_id).first()
         last_product = order_item.product_item ## product
@@ -403,6 +403,41 @@ class EditOrderItem(View):
         
         return JsonResponse({'status': 200, 'message': "Buyurtmaga o'zgarishlar kiritildi !"})
 
+
+class DeleteOrderView(View):
+    def post(self, request):
+        order_id=int(request.POST['order_id'])
+        
+        order = Order.objects.filter(id=order_id).first()
+        order_items = order.items.all()
+        
+        for item in order_items:
+            qty = item.product_item.rest_qty + item.amount_sold 
+            item.product_item.rest_qty += item.amount_sold 
+            cube = metr_to_cube(item.product_item.product_size.product_size_x, item.product_item.product_size.product_size_y, item.product_item.product_size.product_size_z, qty)
+            item.product_item.rest_cube = cube
+            
+            item.product_item.save()
+            item.save()
+        
+        if order.debt_status:
+            client_account = ClientAccount.objects.filter(container_client=order.container_order,client_info=order.customer).first()
+            if order.currency == 1:
+                client_account.debt_usd -= order.self_total_summa
+            if order.currency == 1:
+                client_account.debt_uzs -= order.self_total_summa
+            
+            client_account.save()
+        else:
+            order.container_order.paid_amount -= order.total_summa
+        
+        order.save()
+        order.container_order.save()
+        order.delete()
+                
+
+        return JsonResponse({'status': 200, 'message': "Sotuv tarixi o'chirildi !"})
+        
     
     
 class ReturnOrderItem(View):
@@ -653,9 +688,9 @@ class SearchContainerView(View):
         
         if value:
             if archive == 'true':
-                containers = Container.objects.filter(query, status=False)
+                containers = Container.objects.filter(query, status=False, is_active=True)
             if archive == 'false':
-                containers = Container.objects.filter(query, status=True)
+                containers = Container.objects.filter(query, status=True,  is_active=True)
                 
             
             for c in containers:
@@ -671,10 +706,10 @@ class SearchContainerView(View):
                 )
         else:
             if archive == 'true':
-                containers = Container.objects.filter(status=False)
+                containers = Container.objects.filter(status=False, is_active=True)
 
             if archive == 'false':
-                containers = Container.objects.filter(status=True)
+                containers = Container.objects.filter(status=True, is_active=True)
                 
             for c in containers:
                 date_obj = datetime.strptime(str(c.come_date), '%Y-%m-%d')

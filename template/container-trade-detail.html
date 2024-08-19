@@ -13,8 +13,12 @@
     <section class="section">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h3 class="text m-1 " id="container_name">Vagon raqami: {{ container.name }}   <i class="bi bi-pencil-square text-warning fs-4 mr-4" role="button" data-bs-toggle="modal"
-                    data-bs-target="#border-less"></i></h3> 
+                <h3 class="text m-1 " id="container_name">Vagon raqami: {{ container.name }}   
+                    <i class="bi bi-pencil-square text-warning fs-4 mr-4" role="button" data-bs-toggle="modal"
+                    data-bs-target="#border-less"></i>
+                    <i class="bi bi-trash-fill text-danger fs-4 mr-4" role="button" data-bs-toggle="modal"
+                    data-bs-target="#dangerContainer"></i>
+                </h3> 
              
 
                 <div class="card-text d-flex flex-wrap mt-2">
@@ -201,6 +205,41 @@
  
 </div> 
 
+</div>
+
+<div class="modal fade text-left" id="dangerContainer" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel120" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+    role="document">
+    <div class="modal-content">
+        <div class="modal-header bg-danger">
+            <h5 class="modal-title white" id="myModalLabel120"></h5>
+            <button type="button" class="close" data-bs-dismiss="modal"
+                aria-label="Close">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <h5 class="modal-title text-center" id="myModalLabel120">Ushbu vagonni o'chirishni xoxlaysizmi ?</h5>
+            <p class="text-center">Ushbu vagon o'chirilgan taqdirda unga bog'liq barcha ma'lumotlar o'chiriladi !</p>
+            <form action="{% url 'main:delete-container' %}" method="post" >{% csrf_token %}
+                <input type="number" style="display: none;" name="container_id" value="{{container.id }}">
+                <div class="btns d-flex justify-content-center m-4">
+
+                    <button type="button" class="btn btn-light-secondary  m-3"
+                        data-bs-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Yo'q</span>
+                    </button>
+                    <button type="submit" class="btn btn-danger ms-1 m-3">
+                        Ha
+                    </button>
+                </div>
+            </form>
+        </div>
+     
+    </div>
+</div>
 </div>
 
 <!-- modal 1 -->
