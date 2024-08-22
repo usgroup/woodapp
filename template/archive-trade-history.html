@@ -156,7 +156,7 @@
                                     <div class="accordion-item mt-3 ">
                                         <h2 class="accordion-header" id="flush-heading-{{ order.id }}">
                                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-{{ order.id }}" aria-expanded="false" aria-controls="flush-collapse-{{ order.id }}" style="background-color: #F2F7FF; border-radius:5px;">
-                                                {{ order.created_at|date:'d/m/Y' }} | Jami: {{ order.total_summa }} {% if order.currency == 1 %} $ {% else %} so'm {% endif %} | {{ order.customer.name }} | Chegirma: {{ order.discount }}
+                                                {{ order.created_at|date:'d/m/Y' }} | Jami: {{ order.total_summa|floatformat:2 }} {% if order.currency == 1 %} $ {% else %} so'm {% endif %} | {{ order.customer.name }} | Chegirma: {{ order.discount }}
                                             </button>
                                         </h2>
                                         <div id="flush-collapse-{{ order.id }}" class="accordion-collapse collapse" aria-labelledby="flush-heading-{{ order.id }}" data-bs-parent="#accordionFlushExample">

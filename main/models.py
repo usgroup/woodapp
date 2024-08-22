@@ -118,7 +118,10 @@ class Expense(Base): # chiqimlar
     
     @property
     def only_sum(self):
-        return self.expense_summa / self.containers.count()
+        if self.expense_summa == 0:
+            return 0
+        else:
+            return self.expense_summa / self.containers.count()
         
            
 
