@@ -210,6 +210,16 @@
                 
 
             </li>
+
+            <li
+                class="sidebar-item {% if request.path == '/trash' %} active {% else%} {% endif %} ">
+                <a href="{% url 'main:trash' %}" class='sidebar-link'>
+                    <i class="bi bi-trash3"></i>
+                    <span>Korzina</span>
+                </a>
+                
+
+            </li>
             
             <li
             class="sidebar-item ">

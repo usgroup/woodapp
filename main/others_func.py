@@ -98,7 +98,7 @@ def container_info(request,pk):
     product_rest_cube = 0
     
     container = Container.objects.filter(id=pk)[0]
-    container_products = container.container_products.all()
+    container_products = container.container_products.filter(is_active=True)
     
     expenses = Expense.objects.filter(containers__id=pk, is_active=True, created_at__date__gte=date.today().replace(day=1)) 
     # #statictic

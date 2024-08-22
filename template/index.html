@@ -152,8 +152,12 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                                 <input type="number" class="form-control" name="product_size_z" required>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <button class="btn badge bg-success p-2 mt-1" type="submit" id="addSizeButton">Qo'shish +</button>
+                        <div class="col-md-2 ">
+                            <button class="btn badge bg-success p-2" type="submit" id="addSizeButton">Qo'shish +</button>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="product_size_title" required>
+                            
                         </div>
                     </div>
                 </form>
@@ -171,7 +175,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                             <tr id="tr_product_size-{{ s.id }}">
                                 <td class="text-bold-500">
                                    <div class="sizeInfo-{{ s.id }}">
-                                    {{ s.product_size_x }} x {{ s.product_size_y }} x {{ s.product_size_z }}
+                                    {{ s.product_size_x }} x {{ s.product_size_y }} x {{ s.product_size_z }} | {{s.product_size_title }}
                                    </div>
                                    <form id='updateSizeForm-{{ s.id }}''>
                                        {% csrf_token %}
@@ -185,6 +189,9 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                                         </div>
                                         <div class="col-md-4">
                                             <input type="text" class="form-control" value="{{ s.product_size_z }}" name="update_size_z">
+                                        </div>
+                                        <div class="col-md-12 mt-1">
+                                            <input type="text" class="form-control" name="update_product_size_title" value="{{ s.product_size_title }}" >
                                         </div>
                                         <input type="text" value="{{ s.id }}" name="product_size_id" style="display: none;">
                                     </div>
@@ -284,7 +291,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                             <tr id="tr_product_size-${ response.data.id }">
                                 <td class="text-bold-500">
                                        <div class="sizeInfo-${ response.data.id }">
-                                        ${ response.data.size_x } x ${ response.data.size_y } x ${ response.data.size_z }
+                                        ${ response.data.size_x } x ${ response.data.size_y } x ${ response.data.size_z } | ${ response.data.product_size_title }
                                        </div>
                                        <form id=updateSizeForm-${ response.data.id }>
                                         <div class="row editFormSize-${ response.data.id } style="display: none;">
@@ -296,6 +303,9 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                                             </div>
                                             <div class="col-md-4">
                                                 <input type="text" class="form-control" value="${ response.data.size_z }" name="update_size_z">
+                                            </div>
+                                            <div class="col-md-12 mt-1">
+                                                <input type="text" class="form-control" name="update_product_size_title" value="${ response.data.product_size_title }" >
                                             </div>
                                             <input type="text" value=${ response.data.id } name="product_size_id" style="display: none;">
     
@@ -363,7 +373,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                 success: function(response) {
 
                     if(response.status == 200){
-                        $(`.sizeInfo-${response.data.id}`).html(`${response.data.product_size_x} x ${response.data.product_size_y} x ${response.data.product_size_z}` )
+                        $(`.sizeInfo-${response.data.id}`).html(`${response.data.product_size_x} x ${response.data.product_size_y} x ${response.data.product_size_z} | ${ response.data.product_size_title }` )
                     }else{
                         messageToast(response.status, response.message)
 

@@ -42,9 +42,11 @@ class Container(Base):
       
     
 class ProductSize(Base): 
+    product_size_title = models.CharField(max_length=255, default='text', verbose_name='Nomi')
     product_size_x = models.FloatField(verbose_name="Eni")
     product_size_y = models.FloatField(verbose_name="Bo'yi")
     product_size_z = models.FloatField(verbose_name="Balandligi")
+    
     status = models.BooleanField(default=True, blank=True, null=True)
     
     def __str__(self) -> str:
@@ -61,6 +63,7 @@ class Product(Base): # info product
     rest_qty = models.IntegerField(default=0, verbose_name="Qoldiq soni / dona")
     
     is_cut = models.BooleanField(default=False, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
     
     @property
     def total_product_sum(self):
@@ -165,6 +168,8 @@ class Order(Base): #order
     sale_exchange_rate = models.IntegerField(verbose_name="Valyuta kursi")
     discount = models.FloatField(default=0)
     debt_status = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    
     
     @property
     def total_summa(self):
@@ -205,7 +210,7 @@ class OrderItem(Base):
     product_cost = models.FloatField(verbose_name="Mahsulot narxi")
     amount_sold = models.FloatField(verbose_name="Sotilgan miqdori | dona")
     return_qty = models.FloatField(default=0,verbose_name="Qaytarilgan tovar miqdori", blank=True, null=True)
-   
+    
     @property
     def total_price(self):
         return self.product_cost * self.amount_sold

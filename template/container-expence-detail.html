@@ -64,6 +64,9 @@
                 <div class="card-text d-flex flex-wrap">
                     <h6 class="text text-bold m-1">Qoldiq mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_rest_cube|floatformat:4}} (kuba )</h6>
                 </div>
+                <span class="badge bg-primary m-1 " style="cursor: pointer;" data-bs-toggle="modal"
+                data-bs-target="#backToArchive">Arxivlarga o'tkazish   <i class="bi bi-archive mx-1"></i>
+                </span>
             </div>
 
                
@@ -275,6 +278,42 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
 </div>
 </div>
 <!-- endmodal 1 -->
+
+
+<div class="modal fade text-left" id="backToArchive" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel120" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+    role="document">
+    <div class="modal-content">
+        <div class="modal-header ">
+            <h5 class="modal-title white" id="myModalLabel120"></h5>
+            <button type="button" class="close" data-bs-dismiss="modal"
+                aria-label="Close">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <h5 class="modal-title text-center" id="myModalLabel120">Ushbu vagonni arxivdan chiqarmoqchimisiz ?</h5>
+            <p class="text-center">Arxivdan chiqarilgan barcha vagonlar asosiy sahifaga qo'shiladi !</p>
+            <form action="{% url 'main:back-archive-container' %}" method="post" >{% csrf_token %}
+                <input type="number" style="display: none;" name="container_id" value="{{container.id }}">
+                <div class="btns d-flex justify-content-center m-4">
+
+                    <button type="button" class="btn btn-light-secondary  m-3"
+                        data-bs-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block " >Yo'q</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary text-white ms-1 m-3">
+                        Ha
+                    </button>
+                </div>
+            </form>
+        </div>
+     
+    </div>
+</div>
+</div>
 
 
 <script>

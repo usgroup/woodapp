@@ -19,11 +19,13 @@ class AddSizeView(View):
         size_x = float(request.POST.get('product_size_x'))
         size_y = float(request.POST.get('product_size_y'))
         size_z = float(request.POST.get('product_size_z'))
+        product_size_title = request.POST.get('product_size_title')
         
         check_product_size = ProductSize.objects.filter( 
             product_size_x=size_x,
             product_size_y=size_y,
             product_size_z=size_z,
+            product_size_title = product_size_title,
             status=True
             )
         
@@ -35,13 +37,16 @@ class AddSizeView(View):
             product_size = ProductSize.objects.create(
                 product_size_x=size_x,
                 product_size_y=size_y,
-                product_size_z=size_z
+                product_size_z=size_z,
+                product_size_title = product_size_title,
+                
                 )
 
             data = {
                 "size_x": float(product_size.product_size_x),
                 "size_y": float(product_size.product_size_y),
                 "size_z": float(product_size.product_size_z),
+                "product_size_title": product_size.product_size_title,
                 "id":product_size.id,
             
             }
@@ -58,12 +63,14 @@ class UpdateSizeView(View):
         update_size_x = float(request.POST['update_size_x'])
         update_size_y = float(request.POST['update_size_y'])
         update_size_z = float(request.POST['update_size_z'])
+        update_product_size_title = request.POST['update_product_size_title']
         
         
         check_product_size = ProductSize.objects.filter( 
             product_size_x=update_size_x,
             product_size_y=update_size_y,
-            product_size_z=update_size_z
+            product_size_z=update_size_z,
+            product_size_title=update_product_size_title,
             )
         
         if check_product_size.exists():
@@ -76,12 +83,14 @@ class UpdateSizeView(View):
             product_size.product_size_x = update_size_x
             product_size.product_size_y = update_size_y
             product_size.product_size_z = update_size_z
+            product_size.product_size_title = update_product_size_title
             product_size.save()
             
             data = {
                 "product_size_x": product_size.product_size_x ,
                 "product_size_y": product_size.product_size_y,
                 "product_size_z":product_size.product_size_z,
+                "product_size_title":product_size.product_size_title,
                 "id":product_size.id
             }
     
@@ -183,7 +192,9 @@ class DeleteProduct(View):
     def post(self, request):
         product_id = int(request.POST['product_id'])
         
-        Product.objects.filter(id=product_id)[0].delete()
+        product = Product.objects.filter(id=product_id)[0]
+        product.is_active=False
+        product.save()        
         
         data = {
             "product_id":product_id
@@ -431,9 +442,11 @@ class DeleteOrderView(View):
         else:
             order.container_order.paid_amount -= order.total_summa
         
+        
+        order.is_active=False
         order.save()
         order.container_order.save()
-        order.delete()
+        
                 
 
         return JsonResponse({'status': 200, 'message': "Sotuv tarixi o'chirildi !"})
@@ -490,6 +503,54 @@ class ReturnOrderItem(View):
         last_product.save()
         
         return JsonResponse({'status': 200, 'message': "Buyurtma qaytarib olindi !"})
+    
+    
+        
+class BackOrderView(View):
+    def post(self, request):
+        order_id = int(request.POST['order_id'])
+
+        order = Order.objects.filter(id=order_id).first()
+        order_items = order.items.all()
+        
+        for item in order_items:
+            qty = item.product_item.rest_qty - item.amount_sold 
+            item.product_item.rest_qty -= item.amount_sold 
+            cube = metr_to_cube(item.product_item.product_size.product_size_x, item.product_item.product_size.product_size_y, item.product_item.product_size.product_size_z, qty)
+            item.product_item.rest_cube = cube
+            
+            item.product_item.save()
+            item.save()
+        
+        if order.debt_status:
+            client_account = ClientAccount.objects.filter(container_client=order.container_order,client_info=order.customer).first()
+            if order.currency == 1:
+                client_account.debt_usd += order.self_total_summa
+            if order.currency == 1:
+                client_account.debt_uzs += order.self_total_summa
+            
+            client_account.save()
+        else:
+            order.container_order.paid_amount += order.total_summa
+        
+        
+        order.is_active=True
+        order.save()
+        order.container_order.save()
+        
+        return redirect('/trash')
+    
+    
+class BackProductView(View):
+    def post(self, request):
+        product_id = int(request.POST['product_id'])
+         
+        product = Product.objects.filter(id=product_id)[0]
+        product.is_active=True
+        product.save()
+        
+        
+        return redirect('/trash')
 
         
         
@@ -639,6 +700,15 @@ class EditExpenseView(View):
         return JsonResponse({'status':200,'message': "Chiqim tahrirlandi !"})
 
     
+class BackExpenseView(View):
+    def post(self, request):
+        expense_id = int(request.POST['expense_id'])
+        
+        expense = Expense.objects.filter(id=expense_id).first()
+        expense.is_active = True
+        expense.save()
+        
+        return redirect('/trash')
     
 class EditWorkerView(View):
     @check_active_user_view
@@ -855,10 +925,10 @@ class FilterOrdersView(View):
             start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
             end_date =  datetime.strptime(end_date, '%Y-%m-%d').date()
             
-            orders = Order.objects.filter(container_order=container, created_at__range=[start_date, end_date])
+            orders = Order.objects.filter(container_order=container, created_at__range=[start_date, end_date], is_active=True)
             
         except :
-            orders = Order.objects.filter(container_order=container)
+            orders = Order.objects.filter(container_order=container,is_active=True)
             
 
         data = []
@@ -881,7 +951,7 @@ class FilterOrdersView(View):
             for item in order.items.all():
                 order_data['items'].append({
                     'id': item.id,
-                    'product_size': f"{item.product_item.product_size.product_size_x} x {item.product_item.product_size.product_size_y} x {item.product_item.product_size.product_size_z}",
+                    'product_size': f"{item.product_item.product_size.product_size_x} x {item.product_item.product_size.product_size_y} x {item.product_item.product_size.product_size_z} | { item.product_item.product_size.product_size_title }",
                     'amount_sold': item.amount_sold,
                     'product_cost': item.product_cost,
                     'total_price': item.total_price

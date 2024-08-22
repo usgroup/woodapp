@@ -4,8 +4,9 @@ from django.views import View
 from .models import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from datetime import datetime,date
+from datetime import datetime, date , timedelta
 from .others_func import calc_end_write,container_info
+from django.utils import timezone
 
 from .decorator_handle import check_active_user_view
 
@@ -37,12 +38,16 @@ class HomeView(LoginRequiredMixin,View):
         
         return redirect(f'/container-products-detail/{pk}')
     
+
+    
     
 class ContainerProductsDetailView(LoginRequiredMixin,View):
     
     def get(self, request, pk):
        
-        context = container_info(request,pk)
+        context = container_info(request, pk)
+        context['products'] = Product.objects.filter(product_container=context['container'], is_active=True)
+        
       
         
         return render(request, 'container-products-detail.html', context)
@@ -64,7 +69,7 @@ class ContainerTradeDetailView(LoginRequiredMixin,View):
     def get(self, request,pk):
         product_list = []
         context = container_info(request, pk)
-        products = Product.objects.filter(product_container=context['container'])
+        products = Product.objects.filter(product_container=context['container'], is_active=True)
         
         for p in products:
             if p.rest_qty > 0:
@@ -95,7 +100,7 @@ class ContainerTradeHistoryView(View):
         context = container_info(request, pk)
         
         container = Container.objects.filter(id=int(pk)).first()
-        orders = Order.objects.filter(container_order=container).order_by('-id')
+        orders = Order.objects.filter(container_order=container, is_active=True).order_by('-id')
         
         context["orders"] = orders
         
@@ -222,7 +227,7 @@ class ArchiveContainerDetail(LoginRequiredMixin,View):
         
         context = container_info(request,pk)
         
-        orders = Order.objects.filter(container_order=context['container']).order_by('-id')
+        orders = Order.objects.filter(container_order=context['container'], is_active=True).order_by('-id')
         
         
         context['unique_orders'] = orders
@@ -245,11 +250,36 @@ class ArchiveContainerTradeDetail(LoginRequiredMixin,View):
         
         context = container_info(request,pk)    
 
-        orders = Order.objects.filter(container_order=context['container']).order_by('-id')
+        orders = Order.objects.filter(container_order=context['container'], is_active=True).order_by('-id')
         
         context['orders'] = orders
         
         return render(request, 'archive-trade-history.html',context)
+    
+    
+class BackMainContainer(View):
+    def post(self,request):
+        container_id = int(request.POST['container_id'])
+        
+        container = Container.objects.filter(id=container_id).first()
+        container.status = True
+        container.save()
+        
+        return redirect('/')
+    
+    
+class BackArchiveContainer(View):
+    
+    def post(self,request):
+        container_id = int(request.POST['container_id'])
+        
+        container = Container.objects.filter(id=container_id).first()
+        container.status = False
+        container.save()
+        
+        return redirect('/trade-history')
+        
+        
     
     
 class NoteView(LoginRequiredMixin,View):
@@ -260,6 +290,34 @@ class NoteView(LoginRequiredMixin,View):
             'notes':notes
         }
         return render(request, 'notes.html',context)
+    
+    
+    
+
+class TrashView(View):
+    def get(self, request):
+        
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+
+        old_products = Product.objects.filter(is_active=False, updated_at__lte=thirty_days_ago)
+        old_orders = Order.objects.filter(is_active=False, updated_at__lte=thirty_days_ago)
+        old_expenses = Expense.objects.filter(is_active=False, updated_at__lte=thirty_days_ago)
+
+        old_products.delete()
+        old_orders.delete()
+        old_expenses.delete()
+        
+        products = Product.objects.filter(is_active=False)
+        orders = Order.objects.filter(is_active=False)
+        expenses = Expense.objects.filter(is_active=False)
+        
+        context = {
+            "products":products,
+            "orders":orders,
+            "expenses":expenses,
+        }
+        
+        return render(request, 'trash.html', context)
     
 
 class UsersView(LoginRequiredMixin,View):

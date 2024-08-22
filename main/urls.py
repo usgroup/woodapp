@@ -19,6 +19,7 @@ urlpatterns = [
     path('workers',WorkerView.as_view(), name='workers'),
     path('edit-worker', EditWorkerView.as_view(), name='edit-worker'),
     path('notes', NoteView.as_view(), name='notes'),
+    path('trash', TrashView.as_view(), name='trash'),
     
     
     path('login',login_view, name='login'),
@@ -38,6 +39,8 @@ urlpatterns = [
     path('archive-product-history-detail/<int:pk>',ArchiveContainerDetail.as_view(), name='archive-product-detail'),
     path('archive-expense-history-detail/<int:pk>',ArchiveContainerExpenseDetail.as_view(), name='archive-expense-container-detail'),
     path('archive-trade-history-detail/<int:pk>',ArchiveContainerTradeDetail.as_view(), name='archive-trade-history-detail'),
+    path('back-main-container',BackMainContainer.as_view(), name='back-main-container'),
+    path('back-archive-container',BackArchiveContainer.as_view(), name='back-archive-container'),
     
     
     #ajax
@@ -47,13 +50,19 @@ urlpatterns = [
     path('update-container-info/', UpdateContainerInfoView.as_view(), name='update-container-info'),
     path('edit-product-info/', EditProductInfoView.as_view(), name='edit-product-info'),
     path('delete-product/', DeleteProduct.as_view(), name='delete-product'),
+    
+    path('back-product', BackProductView.as_view(), name='back-product'),
+    
     path('edit-client', EditClientView.as_view(), name='edit-client'),
+    
     path('create-order', CreateOrderView.as_view(), name='create-order'),
+    
     path('add-expense-type', AddExpenseTypeView.as_view(), name='add-expense-type'),
     path('edit-expense-type', EditExpenseTypeView.as_view(), name='edit-expense-type'),
     path('delete-expense-type', DeleteExpenseTypeView.as_view(), name='delete-expense-type'),
     
     path('create-main-expense', CreateMainExpenseView.as_view(), name='create-main-expense'),
+    path('back-expense', BackExpenseView.as_view(), name='back-expense'),
     path('delete-worker', DeleteWorkerView.as_view(), name='delete-worker'),
     #search
     path('search-container', SearchContainerView.as_view(), name='search-container'),
@@ -65,6 +74,7 @@ urlpatterns = [
     
     
     path('delete-order', DeleteOrderView.as_view(), name='delete-order'),
+    path('back-order', BackOrderView.as_view(), name='back-order'),
     
     #filter
     path('filter-orders', FilterOrdersView.as_view(), name='filter-orders'),
