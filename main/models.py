@@ -116,12 +116,16 @@ class Expense(Base): # chiqimlar
         if self.currency == 2:
             return ((self.expense_summa/self.exchange_rate) / self.containers.count())
     
+    
     @property
     def only_sum(self):
+        container_count = self.containers.count()
+        if container_count == 0:
+            return 0
         if self.expense_summa == 0:
             return 0
         else:
-            return self.expense_summa / self.containers.count()
+            return self.expense_summa / container_count
         
            
 
