@@ -2,6 +2,7 @@ from django.views import View
 from django.http import JsonResponse
 from .models import *
 from datetime import datetime, date
+from django.contrib import messages
 from .others_func import metr_to_cube, process_order_data, calc_end_write
 from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
@@ -1012,34 +1013,78 @@ class CutProductView(View):
      
         product_ = Product.objects.filter(id=product_id).first()
         
+        if cut_qty > product_.rest_qty:
+            return JsonResponse({'status': 200, 'message': "Kiritilgan son mahsulot qoldig'idan yuqori bo'lishi mumkin emas !"})
+            
+        
         product_.rest_qty -= cut_qty
         
         new_cube = metr_to_cube(product_.product_size.product_size_x, product_.product_size.product_size_y, product_.product_size.product_size_z, cut_qty)
         
         product_.rest_cube -= new_cube
         
-        product, created = Product.objects.get_or_create(
-            product_container=product_.product_container,
-            product_size=product_.product_size,
-            is_cut=True,
-        
-        )
-        product.product_qty += 0
-        product.product_cube += 0
-        
-        product.rest_qty += cut_qty
-        product.rest_cube += new_cube
-        
         product_.save()
-        product.save()
-        
-        
         
         data = { 
             
         }
         
         return JsonResponse({'status': 200, 'message': 'Mahsulot kesildi !', 'data': data})
+    
+    
+class AddCutProductView(View):
+    def post(self, request):
+        container_id = request.POST['container_id']
+        product_qty = int(request.POST['product_qty'])
+        select_size = int(request.POST['select_size'])
+        
+        
+        if select_size == 0 or product_qty == 0:
+            messages.error(request, "O'lcham yoki mahsulot soni notog'ri kiritildi !")
+            return redirect(f"/container-products-detail/{container_id}")
+        
+        product_size = ProductSize.objects.filter(id=select_size).first()
+        container = Container.objects.filter(id=container_id).first()
+        
+        new_cube = metr_to_cube(product_size.product_size_x, product_size.product_size_y, product_size.product_size_z, product_qty)
+        
+        product = Product.objects.create(
+            product_container = container,
+            product_size=product_size,
+            rest_qty = product_qty,
+            rest_cube = new_cube,
+            is_cut = True
+        )
+       
+        
+        return redirect(f"/container-products-detail/{container_id}")
+    
+class EditCutProductView(View):
+    def post(self, request):
+        container_id = request.POST['container_id']
+        product_id = request.POST['product_id']
+        product_qty = int(request.POST['product_qty'])
+        select_size = int(request.POST['select_size'])
+        
+        if select_size == 0 or product_qty == 0:
+            messages.error(request, "O'lcham yoki mahsulot soni notog'ri kiritildi !")
+            return redirect(f"/container-products-detail/{container_id}")
+        
+        
+        product_size = ProductSize.objects.filter(id=select_size).first()
+        product = Product.objects.filter(id=product_id).first()  
+        
+        new_cube = metr_to_cube(product_size.product_size_x, product_size.product_size_y, product_size.product_size_z, product_qty)
+        
+        product.product_size = product_size
+        product.rest_qty = product_qty
+        product.rest_cube = new_cube
+        
+        product.save()
+        
+        
+        return redirect(f"/container-products-detail/{container_id}")
+        
     
 
 
@@ -1073,12 +1118,7 @@ class EditNoteView(View):
         note.text = text
         note.date_of_notice = date
         note.save()
-        
-        
-        print()
-        print(request.POST)
-        print()
-        
+    
         return redirect('/notes')
 
 
@@ -1158,10 +1198,7 @@ class EditUserView(View):
 
         user.username = username
         user.first_name = first_name
-        
-        print(user_type)
-        print(user_type)
-        
+
         if user_type == '1':
             user.is_staff = True
             

@@ -96,9 +96,11 @@ def container_info(request,pk):
     general_expenses = 0
     product_cube = 0
     product_rest_cube = 0
+    product_sold_out = 0
     
     container = Container.objects.filter(id=pk)[0]
     container_products = container.container_products.filter(is_active=True)
+    orders = Order.objects.filter(container_order=container,is_active=True)
     
     expenses = Expense.objects.filter(containers__id=pk, is_active=True, created_at__date__gte=date.today().replace(day=1)) 
     # #statictic
@@ -108,13 +110,18 @@ def container_info(request,pk):
         
 
     for c in container_products: # productlarni qo'shilmasi
+        
         general_expenses += c.total_product_sum
         all_product_sum += c.total_product_sum
         
         product_cube += c.product_cube
         product_rest_cube += c.rest_cube
         
-    product_sold_out = product_cube - product_rest_cube
+    # product_sold_out = product_cube - product_rest_cube
+    
+    for order in orders:
+        for item in order.items.all():
+            product_sold_out += item.item_cube
             
      
      

@@ -49,6 +49,11 @@ class ProductSize(Base):
     
     status = models.BooleanField(default=True, blank=True, null=True)
     
+    @property
+    def calc_size(self):
+        size = self.product_size_x * self.product_size_y * self.product_size_z
+        return size
+    
     def __str__(self) -> str:
         return f"{self.product_size_x} x {self.product_size_y} x {self.product_size_z}"
     
@@ -221,6 +226,13 @@ class OrderItem(Base):
     @property
     def total_price(self):
         return self.product_cost * self.amount_sold
+    
+    @property
+    def item_cube(self):
+        
+        product_size = self.product_item.product_size.calc_size * self.amount_sold
+        
+        return product_size
     
     def __str__(self) -> str:
         return f"{self.product_item} | {self.product_cost} | {self.amount_sold} "

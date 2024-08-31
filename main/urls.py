@@ -81,6 +81,8 @@ urlpatterns = [
     path('filter-expenses', FilterExpenseView.as_view(), name='filter-expenses'),
     
     path('cut-product', CutProductView.as_view(), name='cut-product'),
+    path('add-cut-product', AddCutProductView.as_view(), name='add_cut_product'),
+    path('edit-cut-product', EditCutProductView.as_view(), name='edit_cut_product'),
     
     path('edit-expense',EditExpenseView.as_view(), name='edit-expense'),
     path('create-note',CreateNoteView.as_view(), name='create-note'),

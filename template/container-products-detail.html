@@ -126,7 +126,7 @@
                                         
                                             <div class="table-responsive">
                                                 
-                                                <form action="{% url 'main:container-products-detail' container.id %}" method="post" class="d-flex justify-content-around mt-2">
+                                                <form action="{% url 'main:container-products-detail' container.id %}" method="post" class="d-flex justify-content-center mt-2">
                                                     {%  csrf_token %}
                                                 <div class="row" >
                                                     
@@ -159,11 +159,13 @@
                                                         <div class="col-md-2" >
                                                         
                                                                 <button class="badge bg-primary border-0 " type="submit"><i class="bi bi-plus-circle-fill fs-4"></i></button>
-
                                                             
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                        <span class="badge bg-info  text-center text-white " data-bs-toggle="modal"
+                                                        data-bs-target="#addCut" role="button" style="width: auto; height:35px;"><p class="mt-1 text">Kesilganlarni qo'shish +</p></span>
                                                 </form> 
+                                               
             
             
                                                 <table class="table table-bordered mb-0 " style="max-height: 40vh;">
@@ -198,17 +200,30 @@
                                                             <td class="text-bold-500">{{ product.rest_qty }}</td>
                                                             <td class="text-bold-500">{{ product.rest_cube|floatformat:4 }}</td>
 
+                                                            {% if product.is_cut %}
+                                                            
                                                             <td><i class="bi bi-pencil-square text-warning fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
-                                                                data-bs-target="#default" onclick="getAndPut('{{ product.id }}', '{{ product.product_size.id }}' )"></i></td>
+                                                                data-bs-target="#editCut" onclick="getCutId('{{ product.id }}', '{{ product.product_size.id }}', '{{ product.rest_qty }}' )"></i>
+                                                            </td>
+                                                            {% else %}
+
+                                                            <td><i class="bi bi-pencil-square text-warning fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
+                                                                data-bs-target="#default" onclick="getAndPut('{{ product.id }}', '{{ product.product_size.id }}' )"></i>
+                                                            </td>
+                                                            {% endif  %}
 
                                                             <td><i class="bi bi-trash-fill text-danger fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
                                                                 data-bs-target="#danger" onclick="getProduct('{{ product.id }}')"></i></td>
 
-                                                            <td><i class="bi bi-gear-wide text-primary fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
+                                                            {% if product.is_cut %}
+                                                            {% else %}
+                                                            <td><i class="bi bi-dash-circle-dotted text-primary fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
                                                                 data-bs-target="#inlineForm" onclick="getCutProduct('{{ product.id }}')"></i>
                                                             </td>
+                                                            {% endif %}
                                                   
                                                         </tr>
+
                                                         {% endfor %}
                                                         
                                                     </tbody>
@@ -433,7 +448,7 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                         role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 class="modal-title" id="myModalLabel33">Kesish</h4>
+                                <h4 class="modal-title" id="myModalLabel33">Qoldiqdan ayirish</h4>
                                 <button type="button" class="close" data-bs-dismiss="modal"
                                     aria-label="Close">
                                     <i data-feather="x"></i>
@@ -441,7 +456,7 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
                             </div>
                             <form action="#" id="cutProductForm" method="post"> {% csrf_token %}
                                 <div class="modal-body">
-                                    <label for="email">Kesish soni</label>
+                                    <label for="email">Soni</label>
                                     <div class="form-group">
                                         <input id="cut_qty" type="number" placeholder="Soni" class="form-control mt-2" name="cut_qty" required >
                                         <input id="cutProductId" type="number" class="form-control mt-2" style="display: none;" name="product_id">
@@ -506,6 +521,127 @@ aria-labelledby="myModalLabel120" aria-hidden="true">
 
 
 
+<div class="modal fade text-left" id="addCut" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel1">Kesilganlarni qo'shish</h5>
+            <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
+                aria-label="Close">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form action="{% url 'main:add_cut_product' %}" method="post" class="d-flex justify-content-around mt-2" id="addCutForm">
+                {%  csrf_token %}
+            <div class="row" >
+                
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="" class="">O'lcham</label>
+
+                            <select class="choices form-select mt-2" name="select_size" required >
+                                <option value="0">O'lcham tanlang</option>
+                                {% for ps in product_sizes %}
+                                <option value="{{ ps.id }}" id="option_product_size-{{ ps.id }}" >{{ ps.product_size_x }} x {{ ps.product_size_y }} x {{ ps.product_size_z }}</option>
+                 
+                                {% endfor %}
+                                
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="basicInput">Soni</label>
+
+                            <input type="number" class="form-control  mt-2" id="add_modal_product_qty" placeholder="Soni" name="product_qty" required>
+                            <input type="number" class="form-control  mt-2" name="container_id" value="{{ container.id }}" style="display: none;">
+                        </div>
+
+                    </div>
+                   
+                   
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" data-bs-dismiss="modal">
+                    <i class="bx bx-x d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Orqaga</span>
+                </button>
+                <button type="submit" class="btn btn-primary ms-1"  id="addCutBtn">
+                    <i class="bx bx-check d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Saqlash</span>
+                </button>
+            </div>
+        </form> 
+    </div>
+</div>
+</div>
+
+<div class="modal fade text-left" id="editCut" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel1">Tahrirlash</h5>
+            <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
+                aria-label="Close">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form action="{% url 'main:edit_cut_product' %}" method="post" class="d-flex justify-content-around mt-2" >
+                {%  csrf_token %}
+            <div class="row" >
+                
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="" class="">O'lcham</label>
+
+                            <select class="choices form-select mt-2" name="select_size" required >
+                                <option value="0">O'lcham tanlang</option>
+                                {% for ps in product_sizes %}
+                                <option value="{{ ps.id }}" id="cut_option_product_size-{{ ps.id }}" >{{ ps.product_size_x }} x {{ ps.product_size_y }} x {{ ps.product_size_z }}</option>
+                 
+                                {% endfor %}
+                                
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="basicInput">Soni</label>
+
+                            <input type="number" class="form-control  mt-2" id="edit_modal_product_qty" placeholder="Soni" name="product_qty" required>
+                            <input type="number" class="form-control  mt-2" name="container_id" value="{{ container.id }}" style="display: none;">
+                            <input type="number" class="form-control  mt-2" name="product_id" id="cut_product_id"  style="display: none;">
+                        </div>
+
+                    </div>
+                   
+                   
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" data-bs-dismiss="modal">
+                    <i class="bx bx-x d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Orqaga</span>
+                </button>
+                <button type="submit" class="btn btn-primary ms-1"  id="addCutBtn">
+                    <i class="bx bx-check d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Saqlash</span>
+                </button>
+            </div>
+        </form> 
+    </div>
+</div>
+</div>
+
+
+
 
 <script>
 
@@ -538,8 +674,7 @@ aria-labelledby="myModalLabel120" aria-hidden="true">
 
             cut_data = $('#cutProductForm').serialize()
 
-            console.log(cut_data)
-            console.log(cut_data)
+        
 
             $.ajax({
                 url: '{% url "main:cut-product" %}',  
@@ -622,6 +757,14 @@ aria-labelledby="myModalLabel120" aria-hidden="true">
         
  
     }
+    
+    function getCutId(product_id, product_size_id, rest_qty) {
+
+        $('#cut_product_id').val(product_id)
+        let modal_product_size = $(`#cut_option_product_size-${product_size_id}`).prop('selected', true)
+        let modal_product_qty = $(`#edit_modal_product_qty`).val(rest_qty)
+     
+    }
 
     $(document).ready(function() {
         
@@ -641,15 +784,21 @@ aria-labelledby="myModalLabel120" aria-hidden="true">
                                         <td class="text-bold-500">#</td>
                                         <td id="td_product_size-${ response.data.product_size_id }">${ response.data.product_size }</td>
                                         <td class="text-bold-500" id="td_product_qty-${response.data.product_id}">${response.data.product_qty}</td>
-                                        <td class="text-bold-500" >${response.data.product_cube}</td>
+                                        <td class="text-bold-500" >${response.data.product_cube.toFixed(4)}</td>
                                         <td class="text-bold-500" id="td_product_cost-${response.data.product_id}">${response.data.come_cost}</td>
                                         <td class="text-bold-500">${response.data.rest_qty}</td>
-                                        <td class="text-bold-500">${response.data.rest_cube}</td>
+                                        <td class="text-bold-500">${response.data.rest_cube.toFixed(4)}</td>
+
 
                                         <td><i class="bi bi-pencil-square text-warning fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
                                             data-bs-target="#default" onclick="getAndPut(${response.data.product_id}, ${response.data.product_size_id} )"></i></td>
 
                                         <td><i class="bi bi-trash-fill text-danger fs-5 cursor-pointer" role="button" data-bs-toggle="modal" data-bs-target="#danger"   onclick="getProduct(${response.data.product_id})"></i></td>
+                                        <td><i class="bi bi-dash-circle-dotted text-primary fs-5 cursor-pointer" role="button" data-bs-toggle="modal"
+                                                                data-bs-target="#inlineForm" onclick="getCutProduct(${response.data.product_id })"></i>
+                                        </td>
+
+                                            
                                                   
                            
                     `) 
