@@ -32,7 +32,7 @@ class Container(Base):
     def total_sales_revenue_usd(self):
         calc_sum = 0
     
-        for order in self.orders.all():
+        for order in self.orders.filter(is_active=True):
             calc_sum += order.total_summa            
         return calc_sum
     
