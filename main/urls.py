@@ -21,6 +21,14 @@ urlpatterns = [
     path('notes', NoteView.as_view(), name='notes'),
     path('trash', TrashView.as_view(), name='trash'),
     
+    path('suppliers', SupplierView.as_view(), name='suppliers'),
+    path('supplier-detail/<int:pk>', SupplierDetail.as_view(), name='supplier-detail'),
+    path('edit-supplier', EditSupplier.as_view(), name='edit-supplier'),
+    path('get-supplier-debt', GetSupplierDebt.as_view(), name='get-supplier-debt'),
+    path('payment-supplier', PaymentSupplier.as_view(), name='payment-supplier'),
+    path('delete-supplier-payment', DeleteSupplierPayment.as_view(), name='delete-supplier-payment'),
+    path('edit-supplier-payment', EditSupplierPayment.as_view(), name='edit-supplier-payment'),
+    
     
     path('login',login_view, name='login'),
     path('logout',  logout_view, name='logout'),

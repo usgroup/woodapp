@@ -17,10 +17,13 @@ class HomeView(LoginRequiredMixin,View):
         
         containers = Container.objects.filter(status=True,  is_active=True).order_by('-id')
         all_product_size = ProductSize.objects.filter(status=True)
+        suppliers = Supplier.objects.filter(is_active=True)
+        
         
         context = {
             "containers":containers,
-            "all_product_size":all_product_size
+            "all_product_size":all_product_size,
+            "suppliers":suppliers,
         }
         
         return render(request, 'index.html',context)
@@ -28,10 +31,14 @@ class HomeView(LoginRequiredMixin,View):
     @check_active_user_view
     def post(self, request):
         
+        supplier_id = int(request.POST['supplier'])
         container_name = request.POST['container_name']
         come_date = datetime.strptime(request.POST['come_date'], "%Y-%m-%d").date()
         
-        container = Container.objects.create(name=container_name, come_date=come_date)
+        supplier = Supplier.objects.filter(id=supplier_id).first()
+        
+        
+        container = Container.objects.create(supplier_container=supplier, name=container_name, come_date=come_date)
         
         pk = container.id
      
@@ -57,6 +64,7 @@ class ContainerProductsDetailView(LoginRequiredMixin,View):
         
         if int(request.POST['select_size']) > 0:
             calc_wood = calc_end_write(request,pk)
+            
         else:
             print("error select tanlash kere")
         
@@ -319,6 +327,60 @@ class TrashView(View):
         
         return render(request, 'trash.html', context)
     
+    
+class SupplierView(View):
+    def get(self,request):
+        
+        suppliers = Supplier.objects.filter(is_active=True)
+        
+        for supplier in suppliers:
+            supplier.calc_all_containers()
+            
+        containers = Container.objects.filter(is_active=True)
+        
+        
+        context = {
+            "suppliers":suppliers,
+            "containers":containers
+        }
+        
+        return render(request, 'suppliers.html',context)
+    
+    def post(self, request):
+        name = request.POST['name']
+        phone = request.POST['phone']
+        
+        Supplier.objects.create(name=name, phone=phone)
+        
+        
+        return redirect('/suppliers')
+
+class EditSupplier(View):
+    def post(self, request):
+        supplier_id = int(request.POST['supplier_id'])
+        name = request.POST['name']
+        phone = request.POST['phone']
+        
+        supplier = Supplier.objects.filter(id=supplier_id).first()
+        supplier.name = name
+        supplier.phone = phone
+        supplier.save()
+
+        
+        return redirect('/suppliers')
+
+class SupplierDetail(View):
+    def get(self, request,pk):
+        
+        supplier = Supplier.objects.filter(id=pk).first()
+        containers = supplier.containers.filter(is_active=True)
+        
+        context  = { 
+            "supplier":supplier,
+            "containers":containers       
+        }
+        
+        return render(request, 'supplier-detail.html',context)
 
 class UsersView(LoginRequiredMixin,View):
     def get(self, request):

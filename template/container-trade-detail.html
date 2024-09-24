@@ -62,6 +62,8 @@
                 <div class="card-text d-flex flex-wrap">
                     <h6 class="text text-bold m-1">Qoldiq mahsulot hajmi: </h6> <h6 class="text m-1">{{ product_rest_cube|floatformat:4}} (kuba )</h6>
                 </div>
+                <h6 class="text text-bold m-1 " >Ta'minotchi: {{ container.supplier_container.name }}</h6> 
+
 
                 <span class="badge bg-primary m-1 " style="cursor: pointer;" data-bs-toggle="modal"
                 data-bs-target="#backToArchive">Arxivlarga o'tkazish   <i class="bi bi-archive mx-1"></i>
@@ -252,7 +254,7 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
 <div class="modal-dialog modal-dialog-scrollable" role="document">
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title">Border-Less</h5>
+            <h5 class="modal-title">Vagonni tahrirlash</h5>
             <button type="button" class="close rounded-pill" data-bs-dismiss="modal"
                 aria-label="Close">
                 <i data-feather="x"></i>
@@ -263,9 +265,22 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
                 {% csrf_token %}
 
                 <div class="form-group">
-                    <label for="basicInput">Name</label>
+
+                    <select id="client_select" class="searchable" required name="supplier">
+                        <option value="0" selected>Ta'minotchini tanlang</option>
+                        {% for supplier in suppliers %}
+                        {% if  supplier.id == container.supplier_container.id %}
+                        <option value="{{ supplier.id }}" selected>{{ supplier.name }}</option>
+                        {% else %}
+                        <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                        {% endif %}
+                        
+                        {% endfor %}
+                    </select>
+
+                    <label for="basicInput" class="m-1">Raqami</label>
                     <input type="text" class="form-control" id="basicInput" name="name" value="{{ container.name }}" required>
-                    <label for="basicInputDate1">Date</label>
+                    <label for="basicInputDate1" class="m-1">Sana</label>
                     
                     <input type="date" class="form-control" id="basicInputDate1"  name="date" value="{{ container.come_date|date:'Y-m-d' }}" required>
                     <input type="text" value="{{ container.id }}" name="container_id" style="display: none;">
@@ -634,11 +649,9 @@ $(document).ready(function() {
 })
 
 
-
 $(document).ready(function() {
     // Handle form submission with AJAX
     $('#editContainerBtn').click(function(event) {
-        
         event.preventDefault();
 
 
@@ -650,10 +663,14 @@ $(document).ready(function() {
             data: editContainerForm,
             success: function(response) {
 
-                $('#container_name').text(`Vagon raqami: ${response.data.container_name}`)
+                $('#container_name').html(`Vagon raqami: ${response.data.container_name}  <i class="bi bi-pencil-square text-warning fs-4 mr-4" role="button" data-bs-toggle="modal"
+                data-bs-target="#border-less"></i>
+                <i class="bi bi-trash-fill text-danger fs-4 mr-4" role="button" data-bs-toggle="modal"
+                data-bs-target="#dangerContainer"></i>`)
                 $('#container_come_date').text(response.data.container_come_date)
-
+                $('.supplier_info').text(`Ta'minotchi: ${response.data.supplier}`)
                 messageToast(response.status, response.message)
+
 
             },
             error: function(xhr, status, error) {
@@ -666,8 +683,6 @@ $(document).ready(function() {
 
     })
 })
-
-
 
 
 

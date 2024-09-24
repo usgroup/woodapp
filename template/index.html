@@ -91,8 +91,17 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
         <div class="modal-body">
            <form action="#" method="post">
             {% csrf_token %}
+           
                 <div class="form-group">
-                    <label for="basicInputContainer" class="m-2">Vagon raqami</label>
+                    
+                    <select id="client_select" class="searchable" required name="supplier">
+                        <option value="0" selected>Ta'minotchini tanlang</option>
+                        {% for supplier in suppliers %}
+                        <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="basicInputContainer" class="m-2">Vagon raqami</label> 
                     <input type="text" class="form-control m-2" id="basicInputContainer" placeholder="Vagon raqamini kiriting" name="container_name" required>
                     <label for="basicInputDate1" class="m-2">Kelgan sana</label>
                     <input type="date" class="form-control m-2" id="basicInputDate1" name="come_date" required>
@@ -228,6 +237,8 @@ role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
 
 
 <script>
+    let $select_ = $('.searchable').selectize()
+
 
     $(document).ready(function() {
     function getCookie(name) {

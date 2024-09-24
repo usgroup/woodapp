@@ -16,6 +16,8 @@ admin.site.register(Client)
 admin.site.register(ClientAccount)
 admin.site.register(Payment)
 admin.site.register(Note)
+admin.site.register(Supplier)
+admin.site.register(PaymentToSupplier)
 
 
 

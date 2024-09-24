@@ -40,6 +40,8 @@ def calc_end_write(request, pk):
         rest_qty=product_qty,
     )
     
+    container.calc_debt()
+    
     return True
 
 
@@ -101,6 +103,8 @@ def container_info(request,pk):
     container = Container.objects.filter(id=pk)[0]
     container_products = container.container_products.filter(is_active=True)
     orders = Order.objects.filter(container_order=container,is_active=True)
+    suppliers = Supplier.objects.filter(is_active=True)
+    
     
     expenses = Expense.objects.filter(containers__id=pk, is_active=True, created_at__date__gte=date.today().replace(day=1)) 
     # #statictic
@@ -141,6 +145,7 @@ def container_info(request,pk):
         
         "all_product_sum":all_product_sum,
         "all_expense_sum":all_expense_sum,
+        "suppliers":suppliers,
         
         
     }

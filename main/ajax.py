@@ -115,19 +115,24 @@ class UpdateContainerInfoView(View):
     @check_active_user
     def post(self, request):
         id = int(request.POST['container_id'])
+        supplier_id = int(request.POST['supplier'])
         name = request.POST['name']
         date = datetime.strptime(request.POST['date'], "%Y-%m-%d").date()
         
-        container = Container.objects.filter(id=id)[0]
+        container = Container.objects.filter(id=id).first()
+        supplier = Supplier.objects.filter(id=supplier_id).first()
         
         container.name = name
         container.come_date = date
+        container.supplier_container = supplier
         container.save()
+        container.calc_debt()
         
    
         data = {
             "container_name":container.name,
-            "container_come_date": container.come_date.strftime('%d/%m/%Y')
+            "container_come_date": container.come_date.strftime('%d/%m/%Y'),
+            "supplier":container.supplier_container.name,
         }
         
         
@@ -169,6 +174,7 @@ class EditProductInfoView(View):
         
         product.save()
         
+        product.product_container.calc_debt() #function new
   
         
         data = {
@@ -196,6 +202,8 @@ class DeleteProduct(View):
         product = Product.objects.filter(id=product_id)[0]
         product.is_active=False
         product.save()        
+        
+        product.product_container.calc_debt() #function new
         
         data = {
             "product_id":product_id
@@ -813,16 +821,14 @@ class CreatePaymentView(View):
         client = Client.objects.filter(id=client_id).first()
         client_account = ClientAccount.objects.filter(client_info=client, container_client=container).first()
         
-        payment, created = Payment.objects.get_or_create(
+        payment = Payment.objects.create(
             client_account=client_account,
             currency=currency_type,
+            sale_exchange_rate=exchange_rate,
+            payment_amount=payment_sum
         )
-        if not created:
-            payment.sale_exchange_rate = exchange_rate
-            payment.payment_amount += payment_sum
-        else:
-            payment.sale_exchange_rate = exchange_rate
-            payment.payment_amount = payment_sum
+        
+   
         
         if currency_type == 1:
             client_account.debt_usd += payment_sum
@@ -890,6 +896,91 @@ class EditPaymentView(View):
 
         return JsonResponse({'status':200,'message': "To'lov ma'lumotlari yangilandi !"})
 
+class GetSupplierDebt(View):
+    @check_active_user
+    def post(self, request):
+        supplierId = int(request.POST['supplierId'])
+        container_id = int(request.POST['container_id'])
+        
+        container = Container.objects.filter(id=container_id, supplier_container__id=supplierId).first() 
+        
+        
+        if container is None:
+            return JsonResponse({'status': 400, 'message': 'Invalid client or container ID'}, status=400)
+        
+        
+        
+        data = {
+            "debt_usd": container.difference_summa,
+        }
+        
+        return JsonResponse({'status': 200, 'message': 'Get client debt successfully', 'data': data})
+
+
+class PaymentSupplier(View):
+    
+    def post(self,request):
+        payment_sum = float(request.POST['payment_sum'])
+        container_id = int(request.POST['container'])
+        supplier_id = int(request.POST['supplier'])
+        
+        supplier = Supplier.objects.filter(id=supplier_id).first()
+        container = Container.objects.filter(id=container_id, supplier_container__id=supplier_id).first()
+        
+        
+        if container == None:
+            return JsonResponse({'status': 400, 'message': "Noto'g'ri ma'lumotlar kiritildi !"})
+        
+        container.paid_summa += payment_sum
+        container.save()
+        
+        payment = PaymentToSupplier.objects.create(
+            supplier_name=supplier,
+            container_name=container,
+            paid_summa=payment_sum,
+            debt=container.difference_summa
+        )
+            
+        
+        
+        return JsonResponse({'status': 200, 'message': "To'lov amalga oshirildi."})
+
+
+class DeleteSupplierPayment(View):
+    def post(self,request):
+        payment_id = int(request.POST['payment_id'])
+        
+        payment = PaymentToSupplier.objects.filter(id=payment_id).first()
+        container = Container.objects.filter(id=payment.container_name.id).first()
+        container.paid_summa -= payment.paid_summa
+        container.save()
+        payment.delete()
+
+        return JsonResponse({'status': 200, 'message': "To'lov tarixi o'chirildi", "id":payment_id})
+    
+class EditSupplierPayment(View):
+    def post(self,request):
+        payment_id = int(request.POST['payment_id'])
+        payment_sum = float(request.POST['payment_sum'])
+        
+        payment = PaymentToSupplier.objects.filter(id=payment_id).first()
+        container = Container.objects.filter(id=payment.container_name.id).first()
+        
+        container.paid_summa -= payment.paid_summa
+        container.paid_summa += payment_sum
+        
+        payment.paid_summa = payment_sum
+        container.save()
+        
+        payment.debt = container.difference_summa
+        
+        payment.save()
+        
+        
+        
+        
+        return JsonResponse({'status': 200, 'message': "To'lov tarixi tahrirlandi "})
+        
         
     
 

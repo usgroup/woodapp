@@ -14,8 +14,30 @@ class CustomUser(AbstractUser):
     is_staff = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     
+
+
+class Supplier(Base):
+    name = models.CharField(max_length=255, verbose_name="Ta'minotchining ismi")
+    phone = models.CharField(max_length=13, verbose_name="telefon raqami")
+    usd_summa = models.FloatField(default=0) 
+    is_active = models.BooleanField(default=True)
+    
+    def calc_all_containers(self):
+        debt = 0
+        for i in self.containers.filter(is_active=True):
+            debt += i.difference_summa
+        self.usd_summa = debt
+        self.save()
+    
+    def __str__(self) -> str:
+        return self.name
+        
+
+
     
 class Container(Base):
+    supplier_container = models.ForeignKey(Supplier, models.PROTECT, blank=True, null=True, related_name='containers') #new added
+    
     name = models.CharField(max_length=255, verbose_name="Container nomi")
     come_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
@@ -24,9 +46,29 @@ class Container(Base):
     is_active = models.BooleanField(default=True)
     
     
-    def __str__(self) -> str:
-        return f"{self.name} | {self.come_date} | is_active: {self.is_active}"
+    debt_summa = models.FloatField(default=0, verbose_name="Ta'minotchidan qarz") #new added
+    paid_summa = models.FloatField(default=0, verbose_name="Ta'minotchiga to'langan summa") #new added
     
+    
+    @property
+    def difference_summa(self): #new added
+        return self.paid_summa - self.debt_summa
+    
+    def calc_debt(self):  #new added
+        debt = 0
+        for product in self.container_products.filter(is_active=True):
+            debt += product.total_product_sum 
+        self.debt_summa = debt
+        self.save()
+        
+    @property
+    def total_cube(self):
+        cube = 0
+        for c in self.container_products.filter(is_active=True):
+            cube +=c.product_cube
+        return cube
+    
+
 
     @property
     def total_sales_revenue_usd(self):
@@ -36,6 +78,15 @@ class Container(Base):
             calc_sum += order.total_summa            
         return calc_sum
     
+    def __str__(self) -> str:
+        return f"{self.name} | {self.come_date} | is_active: {self.is_active}"
+    
+    
+class PaymentToSupplier(Base):
+    supplier_name = models.ForeignKey(Supplier, models.CASCADE, related_name="payments_supplier")
+    container_name = models.ForeignKey(Container, models.CASCADE)
+    paid_summa = models.FloatField(default=0)
+    debt = models.FloatField(default=0)
     
     
     
@@ -259,3 +310,4 @@ class Note(Base):
     
     def __str__(self) -> str:
         return self.text
+
