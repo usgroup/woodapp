@@ -100,7 +100,7 @@
                                 {% for client in container.clients.all %}
                                     {% if client.debt_usd != 0 or client.debt_uzs != 0 %}
                                     <option value="{{ container.id }}" data-client-id="{{ client.client_info.id }}">
-                                        {{ container.name }} | Qarz: {{ client.debt_usd }}$ | {{ client.debt_uzs }} so'm
+                                        {{ container.name }} | Qarz: {{ client.debt_usd }}  $  {{ client.debt_uzs }} so'm
                                     </option>
                                     {% endif %}
                                 {% endfor %}
