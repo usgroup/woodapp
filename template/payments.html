@@ -95,10 +95,15 @@
                     <div class="form-group">
                         <select id="containerselect" class="searchable-2" required  name="container">
                             <option value="0" selected>Kontenerni tanlang</option>
-                            {% for container in containers %}  
-                                {% if container.clients.all.0.debt_usd < 0  or container.clients.all.0.debt_uzs < 0 %}
-                                <option value="{{ container.id }}">{{ container.name }} </option>
-                                {% endif %}
+                            <option value="0" selected>Kontenerni tanlang</option>
+                            {% for container in containers %}
+                                {% for client in container.clients.all %}
+                                    {% if client.debt_usd != 0 or client.debt_uzs != 0 %}
+                                    <option value="{{ container.id }}" data-client-id="{{ client.client_info.id }}">
+                                        {{ container.name }} | Qarz: {{ client.debt_usd }}$ | {{ client.debt_uzs }} so'm
+                                    </option>
+                                    {% endif %}
+                                {% endfor %}
                             {% endfor %}
                         </select>
                         <p class="container_error_msg text-start text-danger" style="display: none;">
@@ -460,6 +465,28 @@ aria-labelledby="myModalLabel1" aria-hidden="true">
 
         
     </script>
+ <script>
+    $(document).ready(function() {
+        // Mijoz tanlanganda konteynerlarni ko'rsatish
+        $('#client_select').change(function() {
+            var clientId = $(this).val();
+            
+            // Barcha konteynerlarni yashirish
+            $('#containerselect option').each(function() {
+                if ($(this).attr('value') != '0') {
+                    $(this).hide();
+                }
+            });
+
+            // Tanlangan mijozga tegishli konteynerlarni ko'rsatish
+            $('#containerselect option').each(function() {
+                if ($(this).data('client-id') == clientId) {
+                    $(this).show();
+                }
+            });
+        });
+    });
+</script>
 
 <script src="static/assets/extensions/simple-datatables/umd/simple-datatables.js"></script>
 <script src="static/assets/static/js/pages/simple-datatables.js"></script>
