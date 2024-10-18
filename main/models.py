@@ -214,7 +214,7 @@ class Client(Base): # mijozlar
         return self.name
 
 class ClientAccount(Base):
-    container_client = models.ForeignKey(Container, on_delete=models.PROTECT, blank=True, null=True)
+    container_client = models.ForeignKey(Container, on_delete=models.PROTECT, blank=True, null=True, related_name='clients')
     client_info = models.ForeignKey(Client, on_delete=models.PROTECT, blank=True, null=True, related_name='client_account')
     debt_usd = models.FloatField(verbose_name="Qarz USD", default=0) 
     debt_uzs = models.FloatField(verbose_name="Qarz UZS", default=0) 
