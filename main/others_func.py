@@ -106,7 +106,7 @@ def container_info(request,pk):
     suppliers = Supplier.objects.filter(is_active=True)
     
     
-    expenses = Expense.objects.filter(containers__id=pk, is_active=True, created_at__date__gte=date.today().replace(day=1)) 
+    expenses = Expense.objects.filter(containers__id=pk, is_active=True) 
     # #statictic
     for e in expenses:  #buni qoshish kerak generalga
         general_expenses += e.container_sum

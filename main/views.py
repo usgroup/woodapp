@@ -181,7 +181,7 @@ class GeneralExpence(LoginRequiredMixin,View):
 class AllExpense(LoginRequiredMixin,View):
     def get(self, request):
         
-        expenses = Expense.objects.filter(is_active=True, created_at__date__gte=date.today().replace(day=1))
+        expenses = Expense.objects.filter(is_active=True).order_by('-id')
         
         context = {
             "expenses":expenses,
