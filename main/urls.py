@@ -97,5 +97,6 @@ urlpatterns = [
     path('delete-note',DeleteNoteView.as_view(), name='delete-note'),
     path('edit-note',EditNoteView.as_view(), name='edit-note'),
     path('edit-note-status',EditNoteStatusView.as_view(), name='edit-note-status'),
+    path('add-client/', add_client, name='add-client'),
     
 ]

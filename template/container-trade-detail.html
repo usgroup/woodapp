@@ -381,6 +381,18 @@ aria-labelledby="myModalLabel16" aria-hidden="true">
                             
                         </select>
                     </div>
+                    <br>
+                    
+
+                    <div class="col-md-12 m-2">
+                        <label class="form-label" > Yangi Mijoz</label>
+                            <input class="form-control" type="text"  width="100%"  id="client_name" placeholder="Ismi" >
+                            <input class="form-control" type="text"  width="100%"  id="client_number"  placeholder="Nomeri" >
+                            <button type="button" class="btn btn-success mt-5 mr-3" id="add_client" >
+                                <span class="d-none d-sm-block">Mijoz Qoshish </span>
+                            </button>
+                        </div>
+                   
                     <input type="text" id="totalSumma" name="totalSumma" style="display: none;">
                     <div class="col-md-12 d-flex justify-content-end">
                         <button type="button" class="btn btn-light-secondary mt-5 mr-3" data-bs-dismiss="modal">
@@ -682,7 +694,31 @@ $(document).ready(function() {
 
 
     })
-})
+});
+
+$(document).on('click', '#add_client', function () {
+        let clientName = $('#client_name').val();
+        let clientNumber = $('#client_number').val();
+
+        // AJAX so'rovi
+        $.ajax({
+            url: '/add-client/', // Django URL manzili
+            type: 'POST',
+            data: {
+                name: clientName,
+                number: clientNumber,
+                csrfmiddlewaretoken: '{{ csrf_token }}', // CSRF token
+            },
+            success: function (response) {
+                alert('Mijoz muvaffaqiyatli qo‘shildi!');
+                $('#client_name').val('');
+                $('#client_number').val('');
+            },
+            error: function (xhr) {
+                alert('Xatolik yuz berdi: ' + xhr.responseJSON.error);
+            }
+        });
+    });
 
 
 
