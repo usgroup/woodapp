@@ -1322,8 +1322,8 @@ def add_client(request):
 
         # Ma'lumotlarni saqlash (masalan, Client modeli)
         if name and number:
-            Client.objects.create(name=name,phone=number)
-            return JsonResponse({'message': 'Mijoz muvaffaqiyatli qo‘shildi!'}, status=200)
+            client =  Client.objects.create(name=name,phone=number)
+            return JsonResponse({'client_id':client.id, 'client_name':client.name}, status=200)
         return JsonResponse({'error': 'Barcha maydonlarni to‘ldiring!'}, status=400)
 
     return JsonResponse({'error': 'Faqat POST so‘rovlari qabul qilinadi!'}, status=405)

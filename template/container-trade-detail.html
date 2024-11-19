@@ -710,6 +710,11 @@ $(document).on('click', '#add_client', function () {
                 csrfmiddlewaretoken: '{{ csrf_token }}', // CSRF token
             },
             success: function (response) {
+                let $select = $('#select_clients').selectize(); // Selectize obyekti olish
+                let selectize = $select[0].selectize;
+
+                selectize.addOption({ value: response.client_id, text: response.client_name }); // Yangi option qo'shish
+                selectize.addItem(response.client_id); // Qo'shilgan optionni tanlash (ixtiyoriy)
                 alert('Mijoz muvaffaqiyatli qo‘shildi!');
                 $('#client_name').val('');
                 $('#client_number').val('');
