@@ -1333,7 +1333,22 @@ class DeleteUserView(View):
         return JsonResponse({'status': 'success', 'message': 'User deleted successfully'})
 
         
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
+@method_decorator(csrf_exempt, name='dispatch')  # Agar sizda CSRF token ishlatilmagan bo'lsa
+def add_client(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        number = request.POST.get('number')
+
+        # Ma'lumotlarni saqlash (masalan, Client modeli)
+        if name and number:
+            client =  Client.objects.create(name=name,phone=number)
+            return JsonResponse({'client_id':client.id, 'client_name':client.name}, status=200)
+        return JsonResponse({'error': 'Barcha maydonlarni to‘ldiring!'}, status=400)
+
+    return JsonResponse({'error': 'Faqat POST so‘rovlari qabul qilinadi!'}, status=405)
 
 
 
