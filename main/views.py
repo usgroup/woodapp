@@ -237,8 +237,7 @@ class ArchiveContainerDetail(LoginRequiredMixin,View):
         
         orders = Order.objects.filter(container_order=context['container'], is_active=True).order_by('-id')
         
-        
-        context['unique_orders'] = orders
+    
         
         return render(request, 'archive-container-products-detail.html', context)
     
@@ -247,7 +246,6 @@ class ArchiveContainerExpenseDetail(LoginRequiredMixin,View):
     def get(self, request, pk):
         
         context = container_info(request,pk)
-        
         
        
         return render(request, 'archive-expence-history-detail.html',context)

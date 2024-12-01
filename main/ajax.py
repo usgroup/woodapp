@@ -381,10 +381,16 @@ class EditOrderItem(View):
         qty_item = int(request.POST['qty_item'])
         cost_item = float(request.POST['cost_item'])
         
+        
+        
         order_item = OrderItem.objects.filter(id=item_id).first()
         last_product = order_item.product_item ## product
         last_product_size = order_item.product_item.product_size ## product size
         order = order_item.order_item ## order
+        container_balance = order_item.order_item.container_order.paid_amount # container balance
+        currency = order_item.order_item.currency # currency
+        sale_exchange_rate = order_item.order_item.sale_exchange_rate # sale_exchange_rate
+        
         last_amount_sold = order_item.amount_sold
         last_product_cost = order_item.product_cost 
         
@@ -392,15 +398,30 @@ class EditOrderItem(View):
         last_cube = metr_to_cube(last_product_size.product_size_x, last_product_size.product_size_y, last_product_size.product_size_z, last_amount_sold  )
         last_product.rest_cube += float(last_cube)
         
+        if currency == 1:
+            container_balance -= (last_amount_sold * last_product_cost)
+        else:
+            container_balance -= (last_amount_sold * last_product_cost) / sale_exchange_rate
+
         ##edit
         
         last_product.rest_qty -= qty_item
         new_cube = metr_to_cube(last_product_size.product_size_x, last_product_size.product_size_y,last_product_size.product_size_z, qty_item  )
         
-        order_item.product_cost  = cost_item
+        order_item.product_cost = cost_item
         last_product.rest_cube -= float(new_cube)
         
         order_item.amount_sold = qty_item
+        
+        if currency == 1:
+            container_balance += (cost_item * qty_item)
+        else:
+            container_balance += (cost_item * qty_item) / sale_exchange_rate
+            
+ 
+        
+        order_item.order_item.container_order.paid_amount = container_balance
+        order_item.order_item.container_order.save()
         
         if order.debt_status:
         
@@ -416,6 +437,7 @@ class EditOrderItem(View):
             
             client_account.save()
             
+        
         order_item.save()
         last_product.save()
         
